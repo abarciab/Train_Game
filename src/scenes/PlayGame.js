@@ -19,7 +19,7 @@ class PlayGame extends Phaser.Scene {
         let num_tracks = 3;
         tracks = {}; // key: track row, value: track objects
         junctions = {}; // key: track row, value: junction objects
-        for (var i = 1; i <= num_tracks; i++) {
+        for (let i = 1; i <= num_tracks; i++) {
             tracks[i] = [];
         }
         
@@ -37,6 +37,17 @@ class PlayGame extends Phaser.Scene {
     }
 
     updateEvents(delta) {
-        
+        if (W_key.isDown) {
+
+        }
+        if (A_key.isDown) {
+            
+        }
+        if (S_key.isDown) {
+
+        }
+        if (D_key.isDown) {
+            
+        }
     }
 }
