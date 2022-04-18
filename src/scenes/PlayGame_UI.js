@@ -11,6 +11,14 @@
     for now, call it un Update(), and if it's getting laggy, we can only call it periodically.
 */
 
+this.textConfig = {
+    frontFamily: 'Courier',
+    fontSize: '28px',
+    //backgroundColor: '#F3B141',
+    color: '#000000',
+    align: 'center',
+}
+
 function LoadUI(scene){
     console.log("loaded all the assets required to display UI");
 }
@@ -18,7 +26,12 @@ function LoadUI(scene){
 function StartUI(scene){
     console.log("started UI Display");
 
-    scene.add.text(game.config.width/2, game.config.height/2, "TRAIN GAME!!!").setOrigin(0.5);
+    this.topBar = scene.add.rectangle(game.config.width/2, 20, game.config.width*0.8, 80, 0xFFFFFF).setOrigin(0.5,0);
+    this.leftBar = scene.add.rectangle(0, game.config.height/3 + 50, 80, game.config.height*0.5, 0xFFFFFF).setOrigin(0,0.5);
+
+
+    scene.add.text(game.config.width/2, 50, "TRAIN GAME: THE RECKONING", this.textConfig).setOrigin(0.5).setDepth;
+    
 }
 
 function UpdateUI(scene){
