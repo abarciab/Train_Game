@@ -3,6 +3,11 @@ class PlayGame extends Phaser.Scene {
         super("playGame");
     }
 
+    preload() {
+        // load images/tile sprites
+        this.load.image('train', './assets/train.png');
+    }
+
     create() {
         let player;
 
@@ -17,6 +22,8 @@ class PlayGame extends Phaser.Scene {
         for (let i = 1; i <= num_tracks; i++) {
             this.tracks[i] = [];
         }
+        
+        this.train = new Train(this, game.config.width/2, game.config.height - borderUISize, 'train').setOrigin(0,0);
     }
 
     update(time, delta) {
