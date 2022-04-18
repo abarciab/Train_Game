@@ -1,5 +1,5 @@
 /*
-    This file handles all the UI in the game - all the infromation that needs to be displayed to the player that's not represented by something in-world.
+    This file handles all the UI in the game - all the information that needs to be displayed to the player that's not represented by something in-world.
 
     there are three functions that need to be called to make it work correctly: LoadUI, StartUI, and UpdateUI
 
