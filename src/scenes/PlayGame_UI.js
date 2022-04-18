@@ -11,15 +11,17 @@
     for now, call it un Update(), and if it's getting laggy, we can only call it periodically.
 */
 
-function LoadUI(){
+function LoadUI(scene){
     console.log("loaded all the assets required to display UI");
 }
 
-function StartUI(){
+function StartUI(scene){
     console.log("started UI Display");
+
+    scene.add.text(game.config.width/2, game.config.height/2, "TRAIN GAME!!!").setOrigin(0.5);
 }
 
-function UpdateUI(){
+function UpdateUI(scene){
     console.log("udpated UI Display");
 }
 
