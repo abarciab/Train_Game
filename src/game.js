@@ -5,4 +5,6 @@ var config = {
     scene: [Menu, PlayGame]
 }
 
+let W_key, A_key, S_key, D_key;
+
 var game = new Phaser.Game(config);
