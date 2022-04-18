@@ -6,23 +6,21 @@ class PlayGame extends Phaser.Scene {
     create() {
         let player;
 
-        let W_key = this.input.keyboard.addKey('W');
-        let A_key = this.input.keyboard.addKey('A');
-        let S_key = this.input.keyboard.addKey('S');
-        let D_key = this.input.keyboard.addKey('D');
+        W_key = this.input.keyboard.addKey('W');
+        A_key = this.input.keyboard.addKey('A');
+        S_key = this.input.keyboard.addKey('S');
+        D_key = this.input.keyboard.addKey('D');
 
         let num_tracks = 3;
-        tracks = {}; // key: track row, value: track objects
-        junctions = {}; // key: track row, value: junction objects
+        this.tracks = {}; // key: track row, value: track objects
+        this.junctions = {}; // key: track row, value: junction objects
         for (let i = 1; i <= num_tracks; i++) {
-            tracks[i] = [];
+            this.tracks[i] = [];
         }
     }
 
     update(time, delta) {
-        updateTracks(delta);
-        updateJunctions();
-        updateEvents(delta);
+        this.updateEvents(delta);
     }
 
     updateTracks(delta) {
@@ -31,7 +29,7 @@ class PlayGame extends Phaser.Scene {
 
     updateEvents(delta) {
         if (W_key.isDown) {
-
+            testMethod();
         }
         if (A_key.isDown) {
             
@@ -40,7 +38,7 @@ class PlayGame extends Phaser.Scene {
 
         }
         if (D_key.isDown) {
-            
+
         }
     }
 }
