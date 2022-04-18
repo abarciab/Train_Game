@@ -1,0 +1,54 @@
+please read this to find the asset you want and what it's called
+
+tracks
+    straight tracks are named "<tech> track straight.png"
+        ex: "basic track straight.png"
+    to start a junction or a merge node, place "<tech> node track.png". this lets the train enter the junction from a straight track, 
+    but to let the train enter from the top or the bottom, as well as allowing the train to leave the node (going straight, up, or top), you have to add more piece to the node:
+
+        pieces that allow the train to exit the junction node in different directions:
+            to allow the train to exit this junction node going up, place "<tech> out-top track.png".
+                ex: "basic out-up track.png"
+            to allow the train to exit this junction node going down, place "<tech> out-down track.png"
+                ex: "basic out-down track.png"
+            to allow the train to exit this junction node going straight, place "<tech> out-straight track.png"
+                ex: "basic out-stright track.png"
+
+        pieces that allow the train to enter the junction node from different directions (trains can always enter junctions from straight tracks):
+            to allow the train to enter the junction node from the top, place "<tech> in-top track.png"
+                ex: "basic in-top track.png"
+            to allow the train to enter the junction node from the bottom, place "<tech> in-bottom track.png"
+                ex: "basic in-down track.png"
+
+stations
+    Stations occupy 2 junctions, and are placed at the first junction. there are 3 styles of station, all of which behave the same:
+        to place a station that is visually above the track, place "<biome> top station.png"
+            ex: "desert top station.png"
+        to place a station that visually surrounds the track, place "<biome> full station.png"
+            ex: "desert full station.png"
+        to place a station that is visually below the track, place "<biome> down station.png"
+
+locomotives and wagons
+    To add the front of a train, place "<tech> locomotive.png"
+        ex: "basic locomotive"
+    To add a passenger wagon, place "<tech> passenger wagon.png"
+        ex: "basic passenger wagon.png"
+
+
+
+EXAMPLE:
+(the curly brackets indicate the location of the images, following the Phaser convetion of higher Y values representing lower points on the screen)
+
+( {0,0}: "basic track track.png")  ({1, 0} "basic node track.png" )({1,0} "basic out-straight track.png"){{1,0} "basic out-down.png"}   ({2, 0} "basic track straight")   ({3, 0} "basic node track.png")({3, 0} "basic out-straight.png")
+
+( {0,1}: "basic track track.png")  ({1, 1} "basic node track.png" )({1,1} "basic out-straight track.png")   ({2, 1} "basic track straight")   ({3, 1} "basic node track.png")({3, 1} "basic out-straight.png")({1,1} "basic in-top.png")
+
+the above placements would create the following two tracks:
+
+==== =O= ==== =O= 
+      \\
+              \\
+==== =O= ==== =O=
+
+
+
