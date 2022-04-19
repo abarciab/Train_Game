@@ -3,9 +3,9 @@ please read this to find the asset you want and what it's called
 PLACING AND NAMING RULES:
 
 tracks
-    straight tracks are named "<tech> track straight.png"
-        ex: "basic track straight.png"
-    end tracks are named "<tech> track end.png", and should be placed before train killing obstacles
+    straight tracks are named "<tech> straight track.png"
+        ex: "basic straight track.png"
+    end tracks are named "<tech> track end.png", and should be placed instead of out-straight tracks when there is a fatal obstacle ahead
         ex: "basic track end.png"
     at every junction tick, place "<tech> node track.png" piece. this lets the train enter the junction from a straight track, and to let the train leave, going straight and/or 
     up and/or down, you need to place additional pieces. if the train leaves a junction going any direction other than straight, it will move one unit vertically(up or down) 
