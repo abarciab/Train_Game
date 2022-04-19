@@ -1,0 +1,103 @@
+please read this to find the asset you want and what it's called
+
+PLACING AND NAMING RULES:
+
+tracks
+    straight tracks are named "<tech> track straight.png"
+        ex: "basic track straight.png"
+    end tracks are named "<tech> track end.png", and should be placed before train killing obstacles
+        ex: "basic track end.png"
+    at every junction tick, place "<tech> node track.png" piece. this lets the train enter the junction from a straight track, and to let the train leave, going straight and/or 
+    up and/or down, you need to place additional pieces. if the train leaves a junction going any direction other than straight, it will move one unit vertically(up or down) 
+    and one unit horizontally (forward).
+
+        pieces that allow the train to exit the junction node in different directions:
+            to allow the train to exit this junction node going up, place "<tech> out-top track.png".
+                ex: "basic out-up track.png"
+            to allow the train to exit this junction node going down, place "<tech> out-down track.png"
+                ex: "basic out-down track.png"
+            to allow the train to exit this junction node going straight, place "<tech> out-straight track.png"
+                ex: "basic out-stright track.png"
+
+stations
+    Stations occupy 2 junctions, and are placed at the first junction. there are 3 styles of station, all of which behave the same:
+        to place a station that is visually above the track, place "<biome> top station.png"
+            ex: "desert top station.png"
+        to place a station that visually surrounds the track, place "<biome> full station.png"
+            ex: "desert full station.png"
+        to place a station that is visually below the track, place "<biome> down station.png"
+            ex: desert down station.png"
+
+locomotives and wagons
+    To add the front of a train, place "<tech> locomotive.png"
+        ex: "basic locomotive.png"
+    To add a passenger wagon, place "<tech> passenger wagon.png"
+        ex: "basic passenger wagon.png"
+
+
+TRACK EXAMPLE:
+(the curly brackets indicate the location of the images, following the Phaser convetion of higher Y values representing lower points on the screen)
+
+( {0,0}: "basic track track.png")  ({1, 0} "basic node track.png" )({1,0} "basic out-straight track.png"){{1,0} "basic out-down.png"}   ({2, 0} "basic track straight")   ({3, 0} "basic node track.png")({3, 0} "basic out-straight.png")
+
+( {0,1}: "basic track track.png")  ({1, 1} "basic node track.png" )({1,1} "basic out-straight track.png")   ({2, 1} "basic track straight")   ({3, 1} "basic node track.png")({3, 1} "basic out-straight.png")
+
+the above placements would create the following two tracks:
+
+==== =O= ==== =O= 
+      \\
+       L=====v
+              \\
+==== =O= ==== =O=
+
+where the top-left intersection allows the train to leave or stay on the top track, and the bottom right intersection is where the train joins the bottom track from the top.
+
+
+Backgrounds
+    each biome has a single bbackground tileSprite named "<biome> background.png"
+        ex: "desert background.png"
+    when the player has nearly completed a biome, place a transition image to blend to the next biome, called "<oldBiome> to <newBiome> blend.png"
+        ex: "desert to mountain blend.png"
+
+Obstacles
+    there are two obstacles per biome. The first kind kills the train, and is placed after junctions. the other kind is placed on straight tracks, and just slows/damages the train
+    The deadly obstacles are named "<biome> deadly obstacle.png"
+        ex: "desert deadly obstacle.png"
+    The debris obstacles are named "<biome> debris obstacle.png"
+        ex: "desert debris obstacle.png"
+
+list of biomes:
+   plains
+
+list of tech levels:
+    basic
+
+
+ASSET DIRECTORY:
+
+tracks:
+    "basic straight track.png"
+    "basic track end.png"
+    "basic node track.png"
+    "basic out-up track.png"
+    "basic out-down track.png"
+    "basic out-straight track.png"
+
+stations:
+    "desert top station.png"
+    "desert full station.png"
+    "desert down station.png"
+
+wagons and locomotives:
+    "basic locomotive.png"
+    "basic passenger wagon.png"
+
+backgrounds:
+    "desert background.png"
+
+obstacles:
+    "desert deadly obstacle.png"
+    "desert debris obstacle.png"
+
+
+

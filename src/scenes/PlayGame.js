@@ -5,10 +5,11 @@ class PlayGame extends Phaser.Scene {
 
     preload() {
         // load images/tile sprites
-        this.load.image('train', './assets/train.png');
+        this.load.image('train', './assets/trains/basic locomotive.png');
     }
 
     create() {
+
         let player;
 
         W_key = this.input.keyboard.addKey('W');
@@ -25,7 +26,7 @@ class PlayGame extends Phaser.Scene {
             this.tracks[i] = [];
         }
         
-        this.train = new Train(this, game.config.width/2, game.config.height - borderUISize, 'train').setOrigin(0,0);
+        this.train = new Train(this, 0, 300, 'train').setOrigin(0,0);
     }
 
     update(time, delta) {
@@ -41,17 +42,21 @@ class PlayGame extends Phaser.Scene {
     }
 
     updateEvents(delta) {
-        if (W_key.isDown) {
+        if (Phaser.Input.Keyboard.JustDown(W_key) && (this.train.onTrack != 2)) {
+            this.train.onTrack++;
+            this.train.y -= 200;
             testMethod();
         }
         if (A_key.isDown) {
-            
+            testMethod();
         }
-        if (S_key.isDown) {
-
+        if (Phaser.Input.Keyboard.JustDown(S_key) && (this.train.onTrack != 0)) {
+            this.train.onTrack--;
+            this.train.y += 200;
+            testMethod();
         }
         if (D_key.isDown) {
-
+            testMethod();
         }
     }
 }
