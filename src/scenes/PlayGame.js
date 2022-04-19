@@ -9,6 +9,7 @@ class PlayGame extends Phaser.Scene {
     }
 
     create() {
+
         let player;
 
         W_key = this.input.keyboard.addKey('W');
@@ -24,8 +25,6 @@ class PlayGame extends Phaser.Scene {
         }
         
         this.train = new Train(this, 0, 300, 'train').setOrigin(0,0);
-        console.log(this.train.x);
-        console.log(this.train.y);
     }
 
     update(time, delta) {
