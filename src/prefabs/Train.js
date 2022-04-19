@@ -11,7 +11,6 @@ class Train extends Phaser.GameObjects.Sprite {
     update() {
         /*
         if (junction) {
-            this.moveSpeed = 1;
             while (junction) {
                 if (keyUp) {
                     this.onTrack--;
@@ -26,7 +25,6 @@ class Train extends Phaser.GameObjects.Sprite {
         }
 
         if (station) {
-            this.moveSpeed = 0;
             for (person in this.passengers) {
                 if (person.destination == station.location) {
                     person.goal = true;
