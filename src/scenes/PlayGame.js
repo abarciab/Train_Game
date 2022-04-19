@@ -17,6 +17,8 @@ class PlayGame extends Phaser.Scene {
         D_key = this.input.keyboard.addKey('D');
 
         let num_tracks = 3;
+        this.dx; // delta x; how much the player has traveled
+        this.j_tick = config.width / 4;
         this.tracks = {}; // key: track row, value: track objects
         this.junctions = {}; // key: track row, value: junction objects
         for (let i = 1; i <= num_tracks; i++) {
@@ -27,11 +29,15 @@ class PlayGame extends Phaser.Scene {
     }
 
     update(time, delta) {
+        this.updateTracks(delta);
         this.updateEvents(delta);
     }
 
     updateTracks(delta) {
-
+        if (this.dx >= this.j_tick) {
+            this.dx = 0;
+            SpawnTracks();
+        }
     }
 
     updateEvents(delta) {
