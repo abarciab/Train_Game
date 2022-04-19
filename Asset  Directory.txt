@@ -1,8 +1,12 @@
 please read this to find the asset you want and what it's called
 
+PLACING AND NAMING RULES:
+
 tracks
     straight tracks are named "<tech> track straight.png"
         ex: "basic track straight.png"
+    end tracks are named "<tech> track end.png", and should be placed before train killing obstacles
+        ex: "basic track end.png"
     to start a junction or a merge node, place "<tech> node track.png". this lets the train enter the junction from a straight track, 
     but to let the train enter from the top or the bottom, as well as allowing the train to leave the node (going straight, up, or top), you have to add more piece to the node:
 
@@ -27,16 +31,16 @@ stations
         to place a station that visually surrounds the track, place "<biome> full station.png"
             ex: "desert full station.png"
         to place a station that is visually below the track, place "<biome> down station.png"
+            ex: desert down station.png"
 
 locomotives and wagons
     To add the front of a train, place "<tech> locomotive.png"
-        ex: "basic locomotive"
+        ex: "basic locomotive.png"
     To add a passenger wagon, place "<tech> passenger wagon.png"
         ex: "basic passenger wagon.png"
 
 
-
-EXAMPLE:
+TRACK EXAMPLE:
 (the curly brackets indicate the location of the images, following the Phaser convetion of higher Y values representing lower points on the screen)
 
 ( {0,0}: "basic track track.png")  ({1, 0} "basic node track.png" )({1,0} "basic out-straight track.png"){{1,0} "basic out-down.png"}   ({2, 0} "basic track straight")   ({3, 0} "basic node track.png")({3, 0} "basic out-straight.png")
@@ -47,8 +51,60 @@ the above placements would create the following two tracks:
 
 ==== =O= ==== =O= 
       \\
+       L=====v
               \\
 ==== =O= ==== =O=
+
+where the top-left intersection allows the train to leave or stay on the top track, and the bottom right intersection is where the train joins the bottom track from the top.
+
+
+Backgrounds
+    each biome has a single bbackground tileSprite named "<biome> background.png"
+        ex: "desert background.png"
+    when the player has nearly completed a biome, place a transition image to blend to the next biome, called "<oldBiome> to <newBiome> blend.png"
+        ex: "desert to mountain blend.png"
+
+Obstacles
+    there are two obstacles per biome. The first kind kills the train, and is placed after junctions. the other kind is placed on straight tracks, and just slows/damages the train
+    The deadly obstacles are named "<biome> deadly obstacle.png"
+        ex: "desert deadly obstacle.png"
+    The debris obstacles are named "<biome> debris obstacle.png"
+        ex: "desert debris obstacle.png"
+
+list of biomes:
+   plains
+
+list of tech levels:
+    basic
+
+
+ASSET DIRECTORY:
+
+tracks:
+    "basic straight track.png"
+    "basic track end.png"
+    "basic node track.png"
+    "basic out-up track.png"
+    "basic out-down track.png"
+    "basic out-straight track.png"
+    "basic in-top track.png"
+    "basic in-down track.png"
+
+stations:
+    "desert top station.png"
+    "desert full station.png"
+    "desert down station.png"
+
+wagons and locomotives:
+    "basic locomotive.png"
+    "basic passenger wagon.png"
+
+backgrounds:
+    "desert background.png"
+
+obstacles:
+    "desert deadly obstacle.png"
+    "desert debris obstacle.png"
 
 
 
