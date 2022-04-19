@@ -4,10 +4,10 @@ class Train extends Phaser.GameObjects.Sprite {
     
         scene.add.existing(this); // add object to existing scene
         this.atStation = false;   // tracks if train is at station
-        this.moveSpeed = 2;       // pixels per frame
-        this.onTrack = 2;         // tracks which track the train is on
+        this.onTrack = 1;         // tracks which track the train is on
     }
 
+    /*
     update() {
         /*
         if (junction) {
@@ -39,10 +39,11 @@ class Train extends Phaser.GameObjects.Sprite {
                 this.passengers.add(person);
             }
         }
-        */
+        
     }
 
     reset() {
 
     }
+    */
 }
