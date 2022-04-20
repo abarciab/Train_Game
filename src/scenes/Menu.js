@@ -12,6 +12,9 @@ class Menu extends Phaser.Scene {
         this.load.image('back_out-up_track', './assets/tracks/basic out-up track.png');
         this.load.image('basic_locomotive', './assets/trains/basic locomotive.png');
         this.load.image('basic_passenger_wagon', './assets/trains/basic passenger wagon.png');
+
+        //trees
+        this.load.image('field_deadly_obstacle', './assets/obstacles/field deadly obstacle.png');
     }
     create() {
 
@@ -46,8 +49,11 @@ class Menu extends Phaser.Scene {
             });
 
 
-        //background and decrotaive tracks
+        //background 
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0).setDepth(-2);
+        this.tree1 = this.add.image(200, 600, 'field_deadly_obstacle');
+        this.tree2 = this.add.image(1600, 150, 'field_deadly_obstacle');
+
         //tracks behind title
         this.add.image(0, topGap, 'back_straight_track').setOrigin(0, 0.5).setDepth(-1);
         this.add.image(game.config.width, topGap, 'back_straight_track').setOrigin(1, 0.5).setDepth(-1);
