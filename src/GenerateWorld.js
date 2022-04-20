@@ -12,16 +12,24 @@ function testMethod() {
 3.) stations (?)
 */
 
+// spawn the world x the player's view
+function initSpawn(scene, tracks, nodes, margin, interval) {
+    // interval of tracks in y
+    console.log(config.width, interval);
+    for (let i = 0; i < Object.keys(tracks).length; i++) {
+        for (let j = 0; j < 5; j++) {
+            tracks[i].push(new Track(scene, j*(config.width/2), margin+(interval*(i+1)), "back_straight_track"));
+            nodes[i].push(new Node(scene, j*(config.width/2), margin+(interval*(i+1)), "back_node_track"));
+        }
+    }
+}
+
 // 1920 / 4: distance of ticks
 // spawn a chunk of tracks (one tick to another tick)
-function SpawnTracks(tracks, player_y) {
-    let y_offset_spawn = 150;
-    for (let i = 0; i < tracks.length; i++) {
-        // spawn a track at border + offset
-        /*tracks.push(new Track(
-            config.width+150, track_y,
-            "track"
-        ))*/
+function SpawnTracks(tracks, nodes, player_y) {
+    // place a track in each row, then place 4 track nodes per each row
+    for (let i = 0; i < Object.keys(tracks).length; i++) {
+        tracks[i].push(new Track(scene, j*(config.width/2), margin+(interval*(i+1)), "back_straight_track"));
     }
 }
 

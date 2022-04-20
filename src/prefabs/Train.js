@@ -12,8 +12,9 @@ class Train extends Phaser.GameObjects.Sprite {
         */
     }
 
-    /*
+    
     update() {
+        //this.x
         /*
         if (junction) {
             slow down and/or enable updateEvents()
@@ -51,10 +52,11 @@ class Train extends Phaser.GameObjects.Sprite {
         if (small obstacle) {
             either slow down or reduce health
         }
+        */
     }
 
     reset() {
 
     }
-    */
+    
 }
