@@ -10,8 +10,10 @@ class Menu extends Phaser.Scene {
         this.load.image('back_straight_track', './assets/tracks/basic straight track.png');
         this.load.image('back_out-down_track', './assets/tracks/basic out-down track.png');
         this.load.image('back_out-up_track', './assets/tracks/basic out-up track.png');
-        this.load.image('basic_locomotive', './assets/trains/basic locomotive.png');
-        this.load.image('basic_passenger_wagon', './assets/trains/basic passenger wagon.png');
+        //this.load.image('basic_locomotive', './assets/trains/basic locomotive.png');
+        // this.load.image('basic_passenger_wagon', './assets/trains/basic passenger wagon.png');
+        this.load.spritesheet('basic_locomotive', './assets/trains/basic locomotive.png', {frameWidth: 1088, frameHeight: 256, startFrame: 0, endFrame: 0});
+        this.load.spritesheet('basic_passenger_wagon', './assets/trains/basic passenger wagon.png', {frameWidth: 1088, frameHeight: 256, startFrame: 0, endFrame: 0});
     }
     create() {
 
