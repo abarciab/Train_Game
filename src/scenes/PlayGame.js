@@ -66,21 +66,23 @@ class PlayGame extends Phaser.Scene {
     }
 
     updateEvents(delta) {
-        if (Phaser.Input.Keyboard.JustDown(W_key) && (this.train.onTrack != 2)) {
-            this.train.onTrack++;
-            this.train.y -= this.interval;
-            testMethod();
-        }
-        if (A_key.isDown) {
-            testMethod();
-        }
-        if (Phaser.Input.Keyboard.JustDown(S_key) && (this.train.onTrack != 0)) {
-            this.train.onTrack--;
-            this.train.y += this.interval;
-            testMethod();
-        }
-        if (D_key.isDown) {
-            testMethod();
+        if (this.atJunction) {
+            if (Phaser.Input.Keyboard.JustDown(W_key) && (this.train.onTrack != 2)) {
+                this.train.onTrack++;
+                this.train.y -= this.interval;
+                testMethod();
+            }
+            if (A_key.isDown) {
+                testMethod();
+            }
+            if (Phaser.Input.Keyboard.JustDown(S_key) && (this.train.onTrack != 0)) {
+                this.train.onTrack--;
+                this.train.y += this.interval;
+                testMethod();
+            }
+            if (D_key.isDown) {
+                testMethod();
+            }
         }
     }
 }
