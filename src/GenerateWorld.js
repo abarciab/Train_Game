@@ -13,27 +13,25 @@ function testMethod() {
 */
 
 // spawn the world x the player's view
-function initSpawn(scene, tracks, nodes, margin, interval) {
+function initSpawn(scene, tracks, nodes, speed, margin, interval) {
     // interval of tracks in y
     console.log(config.width, interval);
     for (let i = 0; i < Object.keys(tracks).length; i++) {
         for (let j = 0; j < 5; j++) {
-            tracks[i].push(new Track(scene, j*(config.width/2), margin+(interval*(i+1)), "back_straight_track"));
-            nodes[i].push(new Node(scene, j*(config.width/2), margin+(interval*(i+1)), "back_node_track"));
+            tracks[i].push(new Track(scene, j*(config.width/2), margin+(interval*(i+1)), "back_straight_track", speed));
+            nodes[i].push(new Node(scene, j*(config.width/2), margin+(interval*(i+1)), "basic_node_track", speed));
         }
     }
 }
 
 // 1920 / 4: distance of ticks
 // spawn a chunk of tracks (one tick to another tick)
-function SpawnTracks(tracks, nodes, player_y) {
-    // place a track in each row, then place 4 track nodes per each row
+function SpawnTracks(scene, tracks, nodes, speed) {
+    console.log("spawn tracks");
+    // place a track in each row, then place track nodes per row
     for (let i = 0; i < Object.keys(tracks).length; i++) {
-        tracks[i].push(new Track(scene, j*(config.width/2), margin+(interval*(i+1)), "back_straight_track"));
+        let y_pos = tracks[i][0].y;
+        tracks[i].push(new Track(scene, 4*(config.width/2), y_pos, "back_straight_track", speed));
+        nodes[i].push(new Node(scene, 4*(config.width/2), y_pos, "basic_node_track", speed));
     }
-}
-
-// main function for algorithm
-function GenerateWorld() {
-
 }

@@ -80,8 +80,8 @@ class Menu extends Phaser.Scene {
         this.locomotiveB.flipX = true;
         this.wagonB1.flipX = true;
 
-        this.sound.play('train_on_rails', {volume: .3, loop: true});
-        this.sound.play('menu_music', {volume: .4, loop: true});
+        //this.sound.play('train_on_rails', {volume: .3, loop: true});
+        //this.sound.play('menu_music', {volume: .4, loop: true});
     }
 
     update(){
