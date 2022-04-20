@@ -6,6 +6,8 @@ class PlayGame extends Phaser.Scene {
     preload() {
         // load images/tile sprites
         this.load.image('train', './assets/trains/basic locomotive.png');
+
+        LoadUI(this);
     }
 
     create() {
@@ -27,6 +29,8 @@ class PlayGame extends Phaser.Scene {
         }
         
         this.train = new Train(this, 0, 300, 'train').setOrigin(0,0);
+
+        StartUI(this);
     }
 
     update(time, delta) {
