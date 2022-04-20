@@ -3,16 +3,16 @@ please read this to find the asset you want and what it's called
 PLACING AND NAMING RULES:
 
 tracks
-    straight tracks are named "<tech> track straight.png"
-        ex: "basic track straight.png"
-    end tracks are named "<tech> track end.png", and should be placed before train killing obstacles
+    straight tracks are named "<tech> straight track.png"
+        ex: "basic straight track.png"
+    end tracks are named "<tech> track end.png", and should be placed instead of out-straight tracks when there is a fatal obstacle ahead
         ex: "basic track end.png"
     at every junction tick, place "<tech> node track.png" piece. this lets the train enter the junction from a straight track, and to let the train leave, going straight and/or 
     up and/or down, you need to place additional pieces. if the train leaves a junction going any direction other than straight, it will move one unit vertically(up or down) 
     and one unit horizontally (forward).
 
         pieces that allow the train to exit the junction node in different directions:
-            to allow the train to exit this junction node going up, place "<tech> out-top track.png".
+            to allow the train to exit this junction node going up, place "<tech> out-up track.png".
                 ex: "basic out-up track.png"
             to allow the train to exit this junction node going down, place "<tech> out-down track.png"
                 ex: "basic out-down track.png"
@@ -67,7 +67,7 @@ Obstacles
         ex: "desert debris obstacle.png"
 
 list of biomes:
-   plains
+   field
 
 list of tech levels:
     basic
@@ -93,11 +93,11 @@ wagons and locomotives:
     "basic passenger wagon.png"
 
 backgrounds:
-    "desert background.png"
+    "field background.png"
 
 obstacles:
-    "desert deadly obstacle.png"
-    "desert debris obstacle.png"
+    "field deadly obstacle.png"
+    "field debris obstacle.png"
 
 
 

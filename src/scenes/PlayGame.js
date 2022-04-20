@@ -6,11 +6,15 @@ class PlayGame extends Phaser.Scene {
     preload() {
         // load images/tile sprites
         this.load.image('train', './assets/trains/basic locomotive.png');
+
+        LoadUI(this);
     }
 
     create() {
 
         let player;
+
+        this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0);
 
         W_key = this.input.keyboard.addKey('W');
         A_key = this.input.keyboard.addKey('A');
@@ -18,21 +22,36 @@ class PlayGame extends Phaser.Scene {
         D_key = this.input.keyboard.addKey('D');
 
         let num_tracks = 3;
+        this.dx; // delta x; how much the player has traveled
+        this.j_tick = config.width / 4;
         this.tracks = {}; // key: track row, value: track objects
         this.junctions = {}; // key: track row, value: junction objects
         for (let i = 1; i <= num_tracks; i++) {
             this.tracks[i] = [];
         }
         
-        this.train = new Train(this, 0, 300, 'train').setOrigin(0,0);
+        this.train = new Train(this, 0, 400, 'train').setOrigin(0,0);
+
+        
+
+        StartUI(this);
     }
 
     update(time, delta) {
+        this.updateTracks(delta);
         this.updateEvents(delta);
+        this.updateBackground();
+    }
+
+    updateBackground(){
+        this.background.tilePositionX += 20;
     }
 
     updateTracks(delta) {
-
+        if (this.dx >= this.j_tick) {
+            this.dx = 0;
+            SpawnTracks();
+        }
     }
 
     updateEvents(delta) {
