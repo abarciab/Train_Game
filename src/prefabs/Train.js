@@ -5,12 +5,17 @@ class Train extends Phaser.GameObjects.Sprite {
         scene.add.existing(this); // add object to existing scene
         this.atStation = false;   // tracks if train is at station
         this.onTrack = 1;         // tracks which track the train is on
+        this.health = 100;        // tracks yelp rating
+
+        /*
+        this.passengers = array of passengers;
     }
 
     /*
     update() {
         /*
         if (junction) {
+            slow down and/or enable updateEvents()
             while (junction) {
                 if (keyUp) {
                     this.onTrack--;
@@ -21,7 +26,6 @@ class Train extends Phaser.GameObjects.Sprite {
                     break;
                 }
             }
-            this.moveSpeed = 2;
         }
 
         if (station) {
@@ -37,7 +41,15 @@ class Train extends Phaser.GameObjects.Sprite {
                 this.passengers.add(person);
             }
         }
+
+        if (obstacle) {
+            play blow up animation
+            go to Game Over scene
+        }
         
+        if (small obstacle) {
+            either slow down or reduce health
+        }
     }
 
     reset() {
