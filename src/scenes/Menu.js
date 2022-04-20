@@ -51,8 +51,8 @@ class Menu extends Phaser.Scene {
 
         //background 
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0).setDepth(-2);
-        this.tree1 = this.add.image(200, 600, 'field_deadly_obstacle');
-        this.tree2 = this.add.image(1600, 150, 'field_deadly_obstacle');
+        this.tree1 = this.add.image(200, 600, 'field_deadly_obstacle').setDepth(2);
+        this.tree2 = this.add.image(1600, 150, 'field_deadly_obstacle').setDepth(2);
 
         //tracks behind title
         this.add.image(0, topGap, 'back_straight_track').setOrigin(0, 0.5).setDepth(-1);
@@ -69,10 +69,30 @@ class Menu extends Phaser.Scene {
         this.add.image(0, this.startButton.y + buttonGap, 'back_out-down_track').setOrigin(0, 0.5).setDepth(-1);
         this.add.image(0, topGap, 'back_out-up_track').setOrigin(0.5, 0.5).setDepth(-1);
         //trains
-        this.locomotiveA = this.add.image(200, topGap, 'basic_locomotive').setOrigin(0.5);
+        this.locomotiveA = this.add.image(-300, topGap, 'basic_locomotive').setOrigin(0.5).setDepth(1);
         this.locomotiveB = this.add.image(game.config.width, this.titleBar.y + buttonGap*3, 'basic_locomotive').setOrigin(.85, 0.5);
         this.wagonB1 = this.add.image(game.config.width + 350, this.titleBar.y + buttonGap*3, 'basic_passenger_wagon').setOrigin(.85, 0.5);
         this.locomotiveB.flipX = true;
         this.wagonB1.flipX = true;
+    }
+
+    update(){
+        this.locomotiveA.x += 3.5;
+        if (this.locomotiveA.x > game.config.width*1.2){
+
+            if (this.locomotiveA.y == this.titleBar.y){
+                this.locomotiveA.y = this.optionsButton.y;
+            } else {
+                this.locomotiveA.y = this.titleBar.y;
+            }
+            this.locomotiveA.x = -120;
+        }
+
+        this.locomotiveB.x -= 5;
+        this.wagonB1.x -= 5;
+        if (this.wagonB1.x <= -120){
+            this.locomotiveB.x = game.config.width * 1.5;
+            this.wagonB1.x = game.config.width * 1.5 + 350;
+        }
     }
 }
