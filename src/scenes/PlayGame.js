@@ -5,13 +5,9 @@ class PlayGame extends Phaser.Scene {
 
     preload() {
         // load images/tile sprites
-<<<<<<< HEAD
-
-=======
         this.load.image('train', './assets/trains/basic locomotive.png');
 
         LoadUI(this);
->>>>>>> 054336ba8b24871dc264512005ed7005920c18b7
     }
 
     create() {
@@ -33,22 +29,11 @@ class PlayGame extends Phaser.Scene {
             this.tracks[i] = [];
         }
         
-<<<<<<< HEAD
-        // this.train = new Train(this, 0, 300, 'train').setOrigin(0,0);
-        // animations
-        this.anims.create({
-            key: "train",
-            frames: this.anims.generateFrameNumbers("train"),
-            frameRate: 1,
-            repeat: -1
-        });
-=======
         this.train = new Train(this, 0, 400, 'train').setOrigin(0,0);
 
         
 
         StartUI(this);
->>>>>>> 054336ba8b24871dc264512005ed7005920c18b7
     }
 
     update(time, delta) {
@@ -69,21 +54,23 @@ class PlayGame extends Phaser.Scene {
     }
 
     updateEvents(delta) {
-        if (Phaser.Input.Keyboard.JustDown(W_key) && (this.train.onTrack != 2)) {
-            this.train.onTrack++;
-            this.train.y -= 200;
-            testMethod();
-        }
-        if (A_key.isDown) {
-            testMethod();
-        }
-        if (Phaser.Input.Keyboard.JustDown(S_key) && (this.train.onTrack != 0)) {
-            this.train.onTrack--;
-            this.train.y += 200;
-            testMethod();
-        }
-        if (D_key.isDown) {
-            testMethod();
+        if (atJunction) {
+            if (Phaser.Input.Keyboard.JustDown(W_key) && (this.train.onTrack != 2)) {
+                this.train.onTrack++;
+                this.train.y -= 200;
+                testMethod();
+            }
+            if (A_key.isDown) {
+                testMethod();
+            }
+            if (Phaser.Input.Keyboard.JustDown(S_key) && (this.train.onTrack != 0)) {
+                this.train.onTrack--;
+                this.train.y += 200;
+                testMethod();
+            }
+            if (D_key.isDown) {
+                testMethod();
+            }
         }
     }
 }

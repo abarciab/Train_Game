@@ -10,12 +10,6 @@ class Menu extends Phaser.Scene {
         this.load.image('back_straight_track', './assets/tracks/basic straight track.png');
         this.load.image('back_out-down_track', './assets/tracks/basic out-down track.png');
         this.load.image('back_out-up_track', './assets/tracks/basic out-up track.png');
-<<<<<<< HEAD
-        //this.load.image('basic_locomotive', './assets/trains/basic locomotive.png');
-        // this.load.image('basic_passenger_wagon', './assets/trains/basic passenger wagon.png');
-        this.load.spritesheet('basic_locomotive', './assets/trains/basic locomotive.png', {frameWidth: 1088, frameHeight: 256, startFrame: 0, endFrame: 0});
-        this.load.spritesheet('basic_passenger_wagon', './assets/trains/basic passenger wagon.png', {frameWidth: 1088, frameHeight: 256, startFrame: 0, endFrame: 0});
-=======
         this.load.image('basic_locomotive', './assets/trains/basic locomotive.png');
         this.load.image('basic_passenger_wagon', './assets/trains/basic passenger wagon.png');
 
@@ -25,7 +19,6 @@ class Menu extends Phaser.Scene {
         //sounds
         this.load.audio('train_on_rails', './assets/sound effects/train on rails 2.mp3');
         this.load.audio('menu_music', './assets/music/menu music.mp3');
->>>>>>> 054336ba8b24871dc264512005ed7005920c18b7
     }
     create() {
 
