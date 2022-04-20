@@ -5,14 +5,17 @@ class PlayGame extends Phaser.Scene {
 
     preload() {
         // load images/tile sprites
+<<<<<<< HEAD
+
+=======
         this.load.image('train', './assets/trains/basic locomotive.png');
 
         LoadUI(this);
+>>>>>>> 054336ba8b24871dc264512005ed7005920c18b7
     }
 
     create() {
-
-        let player;
+        this.player = new Train(this, config.width/2, config.height/2, 'basic_locomotive');
 
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0);
 
@@ -30,11 +33,22 @@ class PlayGame extends Phaser.Scene {
             this.tracks[i] = [];
         }
         
+<<<<<<< HEAD
+        // this.train = new Train(this, 0, 300, 'train').setOrigin(0,0);
+        // animations
+        this.anims.create({
+            key: "train",
+            frames: this.anims.generateFrameNumbers("train"),
+            frameRate: 1,
+            repeat: -1
+        });
+=======
         this.train = new Train(this, 0, 400, 'train').setOrigin(0,0);
 
         
 
         StartUI(this);
+>>>>>>> 054336ba8b24871dc264512005ed7005920c18b7
     }
 
     update(time, delta) {
