@@ -55,8 +55,8 @@ class Menu extends Phaser.Scene {
         this.tree2 = this.add.image(1600, 150, 'field_deadly_obstacle').setDepth(2);
 
         //tracks behind title
-        this.add.image(0, topGap, 'back_straight_track').setOrigin(0, 0.5).setDepth(-1);
-        this.add.image(game.config.width, topGap, 'back_straight_track').setOrigin(1, 0.5).setDepth(-1);
+        this.add.image(-30, topGap, 'back_straight_track').setOrigin(0, 0.5).setDepth(-1);
+        this.add.image(game.config.width+30, topGap, 'back_straight_track').setOrigin(1, 0.5).setDepth(-1);
         //tracks behind start button
         this.add.image(0, this.titleBar.y + buttonGap*3, 'back_straight_track').setOrigin(0, 0.5).setDepth(-1);
         this.add.image(game.config.width, this.titleBar.y + buttonGap*3, 'back_straight_track').setOrigin(1, 0.5).setDepth(-1);
@@ -85,7 +85,7 @@ class Menu extends Phaser.Scene {
             } else {
                 this.locomotiveA.y = this.titleBar.y;
             }
-            this.locomotiveA.x = -120;
+            this.locomotiveA.x = -230;
         }
 
         this.locomotiveB.x -= 5;
