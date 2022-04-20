@@ -9,6 +9,7 @@ class Train extends Phaser.GameObjects.Sprite {
 
         /*
         this.passengers = array of passengers;
+        */
     }
 
     /*
