@@ -22,6 +22,7 @@ class PlayGame extends Phaser.Scene {
         this.dx = 0; // delta x; how much the player has traveled
         this.j_tick = config.width / 2;
         this.tracks = {}; // key: track row, value: track objects
+        this.atJunction = true;
         this.nodes = {};
         for (let i = 0; i < num_tracks; i++) {
             this.tracks[i] = [];
@@ -40,7 +41,7 @@ class PlayGame extends Phaser.Scene {
 
     update(time, delta) {
         this.updateTracks(delta);
-        this.train.update();
+        // this.train.update();
         this.updateEvents(delta);
         this.updateBackground();
     }
@@ -67,17 +68,17 @@ class PlayGame extends Phaser.Scene {
 
     updateEvents(delta) {
         if (this.atJunction) {
-            if (Phaser.Input.Keyboard.JustDown(W_key) && (this.train.onTrack != 2)) {
-                this.train.onTrack++;
-                this.train.y -= this.interval;
+            if (Phaser.Input.Keyboard.JustDown(W_key) && (this.train.onTrack > 0)) {
+                this.train.onTrack--;
+                this.train.y = this.tracks[this.train.onTrack][0].y;
                 testMethod();
             }
             if (A_key.isDown) {
                 testMethod();
             }
-            if (Phaser.Input.Keyboard.JustDown(S_key) && (this.train.onTrack != 0)) {
-                this.train.onTrack--;
-                this.train.y += this.interval;
+            if (Phaser.Input.Keyboard.JustDown(S_key) && (this.train.onTrack < 2)) {
+                this.train.onTrack++;
+                this.train.y = this.tracks[this.train.onTrack][0].y;
                 testMethod();
             }
             if (D_key.isDown) {
