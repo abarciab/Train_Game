@@ -14,6 +14,8 @@ class PlayGame extends Phaser.Scene {
 
         let player;
 
+        this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0);
+
         W_key = this.input.keyboard.addKey('W');
         A_key = this.input.keyboard.addKey('A');
         S_key = this.input.keyboard.addKey('S');
@@ -28,7 +30,9 @@ class PlayGame extends Phaser.Scene {
             this.tracks[i] = [];
         }
         
-        this.train = new Train(this, 0, 300, 'train').setOrigin(0,0);
+        this.train = new Train(this, 0, 400, 'train').setOrigin(0,0);
+
+        
 
         StartUI(this);
     }
@@ -36,6 +40,11 @@ class PlayGame extends Phaser.Scene {
     update(time, delta) {
         this.updateTracks(delta);
         this.updateEvents(delta);
+        this.updateBackground();
+    }
+
+    updateBackground(){
+        this.background.tilePositionX += 20;
     }
 
     updateTracks(delta) {
