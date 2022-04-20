@@ -8,7 +8,7 @@ class Train extends Phaser.GameObjects.Sprite {
         this.health = 100;        // tracks yelp rating
 
         /*
-        this.passengers = array of passengers;
+        this.passengers = array of passengers;*/
     }
 
     /*
