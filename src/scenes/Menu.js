@@ -70,8 +70,8 @@ class Menu extends Phaser.Scene {
         this.add.image(0, topGap, 'back_out-up_track').setOrigin(0.5, 0.5).setDepth(-1);
         //trains
         this.locomotiveA = this.add.image(-300, topGap, 'basic_locomotive').setOrigin(0.5).setDepth(1);
-        this.locomotiveB = this.add.image(game.config.width, this.titleBar.y + buttonGap*3, 'basic_locomotive').setOrigin(.85, 0.5);
-        this.wagonB1 = this.add.image(game.config.width + 350, this.titleBar.y + buttonGap*3, 'basic_passenger_wagon').setOrigin(.85, 0.5);
+        this.locomotiveB = this.add.image(game.config.width*1.4, this.titleBar.y + buttonGap*3, 'basic_locomotive').setOrigin(.85, 0.5);
+        this.wagonB1 = this.add.image(game.config.width*1.4 + 350, this.titleBar.y + buttonGap*3, 'basic_passenger_wagon').setOrigin(.85, 0.5);
         this.locomotiveB.flipX = true;
         this.wagonB1.flipX = true;
     }
