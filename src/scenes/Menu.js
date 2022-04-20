@@ -10,10 +10,22 @@ class Menu extends Phaser.Scene {
         this.load.image('back_straight_track', './assets/tracks/basic straight track.png');
         this.load.image('back_out-down_track', './assets/tracks/basic out-down track.png');
         this.load.image('back_out-up_track', './assets/tracks/basic out-up track.png');
+<<<<<<< HEAD
         //this.load.image('basic_locomotive', './assets/trains/basic locomotive.png');
         // this.load.image('basic_passenger_wagon', './assets/trains/basic passenger wagon.png');
         this.load.spritesheet('basic_locomotive', './assets/trains/basic locomotive.png', {frameWidth: 1088, frameHeight: 256, startFrame: 0, endFrame: 0});
         this.load.spritesheet('basic_passenger_wagon', './assets/trains/basic passenger wagon.png', {frameWidth: 1088, frameHeight: 256, startFrame: 0, endFrame: 0});
+=======
+        this.load.image('basic_locomotive', './assets/trains/basic locomotive.png');
+        this.load.image('basic_passenger_wagon', './assets/trains/basic passenger wagon.png');
+
+        //trees
+        this.load.image('field_deadly_obstacle', './assets/obstacles/field deadly obstacle.png');
+
+        //sounds
+        this.load.audio('train_on_rails', './assets/sound effects/train on rails 2.mp3');
+        this.load.audio('menu_music', './assets/music/menu music.mp3');
+>>>>>>> 054336ba8b24871dc264512005ed7005920c18b7
     }
     create() {
 
@@ -48,11 +60,14 @@ class Menu extends Phaser.Scene {
             });
 
 
-        //background and decrotaive tracks
+        //background 
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0).setDepth(-2);
+        this.tree1 = this.add.image(200, 600, 'field_deadly_obstacle').setDepth(2);
+        this.tree2 = this.add.image(1600, 150, 'field_deadly_obstacle').setDepth(2);
+
         //tracks behind title
-        this.add.image(0, topGap, 'back_straight_track').setOrigin(0, 0.5).setDepth(-1);
-        this.add.image(game.config.width, topGap, 'back_straight_track').setOrigin(1, 0.5).setDepth(-1);
+        this.add.image(-30, topGap, 'back_straight_track').setOrigin(0, 0.5).setDepth(-1);
+        this.add.image(game.config.width+30, topGap, 'back_straight_track').setOrigin(1, 0.5).setDepth(-1);
         //tracks behind start button
         this.add.image(0, this.titleBar.y + buttonGap*3, 'back_straight_track').setOrigin(0, 0.5).setDepth(-1);
         this.add.image(game.config.width, this.titleBar.y + buttonGap*3, 'back_straight_track').setOrigin(1, 0.5).setDepth(-1);
@@ -65,10 +80,33 @@ class Menu extends Phaser.Scene {
         this.add.image(0, this.startButton.y + buttonGap, 'back_out-down_track').setOrigin(0, 0.5).setDepth(-1);
         this.add.image(0, topGap, 'back_out-up_track').setOrigin(0.5, 0.5).setDepth(-1);
         //trains
-        this.locomotiveA = this.add.image(200, topGap, 'basic_locomotive').setOrigin(0.5);
-        this.locomotiveB = this.add.image(game.config.width, this.titleBar.y + buttonGap*3, 'basic_locomotive').setOrigin(.85, 0.5);
-        this.wagonB1 = this.add.image(game.config.width + 350, this.titleBar.y + buttonGap*3, 'basic_passenger_wagon').setOrigin(.85, 0.5);
+        this.locomotiveA = this.add.image(-300, topGap, 'basic_locomotive').setOrigin(0.5).setDepth(1);
+        this.locomotiveB = this.add.image(game.config.width*1.4, this.titleBar.y + buttonGap*3, 'basic_locomotive').setOrigin(.85, 0.5);
+        this.wagonB1 = this.add.image(game.config.width*1.4 + 350, this.titleBar.y + buttonGap*3, 'basic_passenger_wagon').setOrigin(.85, 0.5);
         this.locomotiveB.flipX = true;
         this.wagonB1.flipX = true;
+
+        this.sound.play('train_on_rails', {volume: .3, loop: true});
+        this.sound.play('menu_music', {volume: .4, loop: true});
+    }
+
+    update(){
+        this.locomotiveA.x += 3.5;
+        if (this.locomotiveA.x > game.config.width*1.2){
+
+            if (this.locomotiveA.y == this.titleBar.y){
+                this.locomotiveA.y = this.optionsButton.y;
+            } else {
+                this.locomotiveA.y = this.titleBar.y;
+            }
+            this.locomotiveA.x = -230;
+        }
+
+        this.locomotiveB.x -= 5;
+        this.wagonB1.x -= 5;
+        if (this.wagonB1.x <= -120){
+            this.locomotiveB.x = game.config.width * 1.5;
+            this.wagonB1.x = game.config.width * 1.5 + 350;
+        }
     }
 }
