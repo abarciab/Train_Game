@@ -93,11 +93,11 @@ wagons and locomotives:
     "basic passenger wagon.png"
 
 backgrounds:
-    "desert background.png"
+    "field background.png"
 
 obstacles:
-    "desert deadly obstacle.png"
-    "desert debris obstacle.png"
+    "field deadly obstacle.png"
+    "field debris obstacle.png"
 
 
 
