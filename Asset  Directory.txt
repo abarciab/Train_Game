@@ -12,7 +12,7 @@ tracks
     and one unit horizontally (forward).
 
         pieces that allow the train to exit the junction node in different directions:
-            to allow the train to exit this junction node going up, place "<tech> out-top track.png".
+            to allow the train to exit this junction node going up, place "<tech> out-up track.png".
                 ex: "basic out-up track.png"
             to allow the train to exit this junction node going down, place "<tech> out-down track.png"
                 ex: "basic out-down track.png"
@@ -67,7 +67,7 @@ Obstacles
         ex: "desert debris obstacle.png"
 
 list of biomes:
-   plains
+   field
 
 list of tech levels:
     basic
