@@ -7,6 +7,4 @@ let config = {
 
 let W_key, A_key, S_key, D_key;
 
-// let borderUISize = game.config.height / 15;
-
 let game = new Phaser.Game(config);
