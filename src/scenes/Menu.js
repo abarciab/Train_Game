@@ -44,6 +44,8 @@ class Menu extends Phaser.Scene {
             .on('pointerover', () => { this.startButton.setStrokeStyle(3); })
             .on('pointerout', () => this.startButton.setStrokeStyle(0))
             .on('pointerdown', () => {
+                this.trainSound.stop();
+                this.menuMusic.stop();
                 this.scene.start("playGame");
             });
 
@@ -83,8 +85,11 @@ class Menu extends Phaser.Scene {
 
         //this.add.image(-600, this.startButton.y + buttonGap, 'WIP_station').setOrigin(0.5).setDepth(-1.5);
 
-        this.sound.play('train_on_rails', {volume: .3, loop: true});
-        this.sound.play('menu_music', {volume: .4, loop: true});
+        this.trainSound = this.sound.add('train_on_rails', {volume: .3, loop: true});
+        this.menuMusic = this.sound.add('menu_music', {volume: .4, loop: true});
+
+        this.trainSound.play();
+        this.menuMusic.play();
     }
 
     update(){
