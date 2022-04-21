@@ -24,18 +24,17 @@ function LoadUI(scene){
 }
 
 function StartUI(scene){
-    console.log("started UI Display");
-
+    //console.log("started UI Display");
+    //let topBar;
     this.topBar = scene.add.rectangle(game.config.width/2, 60, game.config.width*0.8, 80, 0xFFFFFF).setOrigin(0.5);
-    this.bottomBar = scene.add.rectangle(game.config.width/2, game.config.height/2, game.config.width*0.8, 80, game.config.height*0.5, 0xFFFFFF).setOrigin(0,0.5);
+    this.bottom = scene.add.rectangle(game.config.width/2, game.config.height - 60, game.config.width*0.8, 80, 0xFFFFFF).setOrigin(0.5);
 
     //scene.add.image(game.config.width/4, game.config.height/2, 'basic_out-up_track').setOrigin(0.5).setDepth(10);
-    //scene.add.image(game.config.width/3, game.config.height/2, 'WIP_station').setOrigin(0.5).setDepth(5);
+    //scene.add.image(200, game.config.height/2, 'WIP_station').setOrigin(0.5).setDepth(10).setScale(scene.global_scaling);
 
 
-    this.dist = scene.add.text(game.config.width*0.8, this.topBar.y, "Dist: 20,000m", this.textConfig).setOrigin(0.5).setDepth;
+    this.dist = scene.add.text(game.config.width*0.8, this.topBar.y, "Dist: 20,000m", this.textConfig).setOrigin(0.5);
     this.biomeBar = scene.add.image(game.config.width/2, this.topBar.y, 'biome_bar');
-    
 }
 
 function UpdateUI(scene){
