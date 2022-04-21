@@ -6,12 +6,10 @@ class Train extends Phaser.GameObjects.Sprite {
         this.atStation = false;   // tracks if train is at station
         this.onTrack = 1;         // tracks which track the train is on
         this.health = 100;        // tracks yelp rating
+        this.passengers = [];     // list of passengers in train
+        this.capacity = 6;        // # of passengers the train can fit
         this.displayOriginX = 200;
         this.setDepth(5);
-
-        /*
-        this.passengers = array of passengers;
-        */
     }
 
     
