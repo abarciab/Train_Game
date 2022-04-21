@@ -35,6 +35,7 @@ class PlayGame extends Phaser.Scene {
         this.global_scaling = this.y_interval / this.base_interval; // scaling of all objects
         this.x_unit = 64 * this.global_scaling; // unit square of measurement
         this.node_interval = 20 * this.x_unit;  // interval between each node/track placement
+        this.travel_interval = this.node_interval;
         this.input_interval = 10 * this.x_unit; // interval user can input an action before a junction
         this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
         this.speed = 20;    // speed of background
@@ -126,23 +127,21 @@ class PlayGame extends Phaser.Scene {
             }
         }
         this.dx += this.speed;
-        if (this.dx >= this.node_interval) {
-            SpawnTracks(this, this.tracks, this.nodes, this.speed, this.node_interval, this.num_chunks, this.global_scaling);
+        if (this.dx >= this.travel_interval) {
+            SpawnTracks(this, this.tracks, this.nodes, this.speed, this.node_interval, this.global_scaling);
+            this.travel_interval = this.travel_interval - (this.dx-this.travel_interval);
             this.dx = 0;
         }
     }
 
     updateEvents(delta) {
         if (this.atJunction) {
-            if (Phaser.Input.Keyboard.JustDown(W_key) && this.can_turn_N) {
+            if (W_key.isDown && this.can_turn_N) {
                 console.log("queue north");
                 this.train.turn_dir = "north";
                 //this.train.y = this.tracks[this.train.onTrack][0].y;
             }
-            if (A_key.isDown) {
-                this.speed += 10;
-            }
-            if (Phaser.Input.Keyboard.JustDown(S_key) && this.can_turn_S) {
+            if (S_key.isDown && this.can_turn_S) {
                 console.log("queue south")
                 this.train.turn_dir = "south";
                 //this.train.y = this.tracks[this.train.onTrack][0].y;
@@ -152,7 +151,7 @@ class PlayGame extends Phaser.Scene {
                 this.train.turn_dir = "straight";
             }
         }
-        if (A_key.isDown) {
+        if (A_key.isDown && this.speed < 150) {
             this.speed += 10;
         }
     }

@@ -15,6 +15,7 @@ class Node extends Phaser.GameObjects.Sprite {
                 break;
             case 1:
                 this.obstacle = scene.add.image(x+(10*64*scaling), y, "field_deadly_obstacle");
+                this.obstacle.y -= this.displayHeight/2;
                 this.obstacle.setScale(scaling);
                 this.obstacle.setDepth(5);
             case 2:

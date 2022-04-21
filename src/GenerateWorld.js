@@ -53,7 +53,7 @@ function initSpawn(scene, tracks, nodes, speed, margin, x_interval, y_interval, 
 
 // 1920 / 4: distance of ticks
 // spawn a chunk of tracks (one tick to another tick)
-function SpawnTracks(scene, tracks, nodes, speed, x_interval, num_chunks, scaling) {
+function SpawnTracks(scene, tracks, nodes, speed, x_interval, scaling) {
     // go through rows
     for (let i = 0; i < Object.keys(tracks).length; i++) {
         let n_junc=false;
