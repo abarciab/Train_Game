@@ -89,8 +89,8 @@ class Menu extends Phaser.Scene {
         this.trainSound = this.sound.add('train_on_rails', {volume: .3, loop: true});
         this.menuMusic = this.sound.add('menu_music', {volume: .4, loop: true});
 
-        //this.trainSound.play();
-        //this.menuMusic.play();
+        this.trainSound.play();
+        this.menuMusic.play();
     }
 
     update(){
