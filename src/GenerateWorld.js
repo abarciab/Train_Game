@@ -19,23 +19,35 @@ function initSpawn(scene, tracks, nodes, speed, margin, x_interval, y_interval, 
     for (let i = 0; i < Object.keys(tracks).length; i++) {
         // number of chunks; number of times to do for each row
         for (let j = 0; j < num_chunks; j++) {
-            let n_junc=false;
-            let s_junc=false;
-            let random_dir = Math.floor(Math.random()*100);
-            if (random_dir <= 25) {
-                if (i > 0)
-                    n_junc=true;
-            }
-            if (random_dir >= 25 && random_dir <= 50) {
-                if (i < 2)
-                    s_junc=true;
-            }
-            // let exit_type = Math.floor(Math.random()*(2-0+1)+0);
-            tracks[i].push(scene.add.image(j*x_interval*2, margin+(y_interval*(i+1)), "basic_straight_track"));
+            tracks[i].push(scene.add.image(j*x_interval, margin+(y_interval*(i+1)), "basic_straight_track"));
             tracks[i][tracks[i].length-1].setScale(scaling);
             tracks[i][tracks[i].length-1].setDepth(3);
             
-            nodes[i].push(new Node(scene, x_interval+(j*x_interval*2), margin+(y_interval*(i+1)), "basic_node_track", i, speed, scaling, n_junc, s_junc));
+            let n_junc=false;
+            let s_junc=false;
+            let obstacle_type = 0;
+            // only spawn junctions and objects past the 2nd chunk
+            if (j > 1) {
+                let random_dir = Math.floor(Math.random()*100);
+                if (random_dir <= 25) {
+                    if (i > 0)
+                        n_junc=true;
+                }
+                if (random_dir >= 25 && random_dir <= 50) {
+                    if (i < Object.keys(tracks).length-1)
+                        s_junc=true;
+                }
+                let obstacle_chance = Math.floor(Math.random()*100);
+                if (obstacle_chance <= 10 && (n_junc || s_junc)) {
+                    obstacle_type = 1;
+                }
+            }
+
+            nodes[i].push(new Node(
+                scene, x_interval/2+(j*x_interval), margin+(y_interval*(i+1)), 
+                "basic_node_track", i, speed, scaling, n_junc, s_junc,
+                obstacle_type
+            ));
         }
     }
 }
@@ -53,14 +65,21 @@ function SpawnTracks(scene, tracks, nodes, speed, x_interval, num_chunks, scalin
                 n_junc=true;
         }
         if (random_dir >= 25 && random_dir <= 50) {
-            if (i < 2)
+            if (i < Object.keys(tracks).length-1)
                 s_junc=true;
         }
-        tracks[i].push(scene.add.image((num_chunks-1)*x_interval*2, tracks[i][0].y, "basic_straight_track"));
+        let obstacle_chance = Math.floor(Math.random()*100);
+        let obstacle_type = 0;
+        if (obstacle_chance <= 10 && (n_junc || s_junc)) {
+            obstacle_type = 1;
+        }
+        tracks[i].push(scene.add.image((num_chunks-1)*x_interval, tracks[i][0].y, "basic_straight_track"));
         tracks[i][tracks[i].length-1].setScale(scaling);
         tracks[i][tracks[i].length-1].setDepth(3);
         //tracks[i].push(new Track(scene, j*(x_interval*2), margin+(y_interval*(i+1)), "back_straight_track", speed, scaling));
         
-        nodes[i].push(new Node(scene, x_interval+((num_chunks-1)*x_interval*2), nodes[i][0].y, "basic_node_track", i, speed, scaling, n_junc, s_junc));
+        nodes[i].push(new Node(scene, x_interval/2+((num_chunks-1)*x_interval), nodes[i][0].y,
+            "basic_node_track", i, speed, scaling, n_junc, s_junc, obstacle_type
+        ));
     }
 }

@@ -1,60 +1,38 @@
 class Train extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, texture, frame, scaling) {
+    constructor(scene, x, y, texture, frame, initial_track, speed, scaling) {
         super(scene, x, y, texture, frame);
     
         scene.add.existing(this); // add object to existing scene
         this.atStation = false;   // tracks if train is at station
-        this.onTrack = 1;         // tracks which track the train is on
+        this.onTrack = initial_track;         // tracks which track the train is on
         this.health = 100;        // tracks yelp rating
         this.passengers = [];     // list of passengers in train
         this.capacity = 6;        // # of passengers the train can fit
         this.displayOriginX = 200;
+        this.junction_wid = (1184-128)*scaling;
+        this.turning = false;
+        this.turn_dest = this.y;
+        this.speed = speed;
+        this.dx = 0;
+        this.turn_dir = "straight";
+        
         this.scaleX = scaling;
         this.scaleY = scaling;
-        this.setDepth(5);
+        this.setDepth(10);
     }
 
-    
     update() {
-        //this.x
-        /*
-        if (junction) {
-            slow down and/or enable updateEvents()
-            while (junction) {
-                if (keyUp) {
-                    this.onTrack--;
-                    break;
-                }
-                if (keyDown) {
-                    this.onTrack++;
-                    break;
-                }
+        if (this.turning) {
+            console.log("turning...");
+            this.dx += this.speed;
+            if (this.dx >= this.junction_wid) {
+                console.log("done turning");
+                this.turning = false;
+                this.dx = 0;
+                this.y = this.turn_dest;
+                this.turn_dir = "straight";
             }
         }
-
-        if (station) {
-            for (person in this.passengers) {
-                if (person.destination == station.location) {
-                    person.goal = true;
-                    person.onTrain = false;
-                    this.passengers.remove(person);
-                }
-            }
-            for (person in station.passengers) {
-                person.onTrain = true;
-                this.passengers.add(person);
-            }
-        }
-
-        if (obstacle) {
-            play blow up animation
-            go to Game Over scene
-        }
-        
-        if (small obstacle) {
-            either slow down or reduce health
-        }
-        */
     }
 
     reset() {
