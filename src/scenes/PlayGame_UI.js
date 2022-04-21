@@ -40,7 +40,6 @@ function StartUI(scene){
     this.iconScale = 0.5;
     this.bottomBarYpos = game.config.height - 60;
 
-<<<<<<< HEAD
     scene.anims.create({
         key: 'patience_bar_anim',
         frames: scene.anims.generateFrameNumbers('patience_bar', { start: 0, end: 4, first: 0 }),
@@ -56,10 +55,6 @@ function StartUI(scene){
 
     this.topBar = scene.add.rectangle(game.config.width/2, 60, game.config.width*0.8, 80, 0xFFFFFF).setOrigin(0.5);
     this.bottomBar = scene.add.rectangle(game.config.width/2, this.bottomBarYpos, game.config.width*0.8, 80, 0xFF00FF).setOrigin(0.5);
-=======
-    //scene.add.image(game.config.width/4, game.config.height/2, 'basic_out-up_track').setOrigin(0.5).setDepth(10);
-    //scene.add.image(200, game.config.height/2, 'station').setOrigin(0.5).setDepth(10).setScale(scene.global_scaling);
->>>>>>> 49ee5c8d6b896ceb291b7dd6a494586e3bbd0673
 
     //this.passengerTriangle = scene.add.image(this.front, game.config.height-60, 'pass_tri').setOrigin(0.5);
     //console.log("x: " + this.passengerTriangle.x + " y: " + this.passengerTriangle.y);
