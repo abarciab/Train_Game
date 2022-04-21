@@ -27,6 +27,8 @@ stations
             ex: "desert full station.png"
         to place a station that is visually below the track, place "<biome> down station.png"
             ex: desert down station.png"
+    Stations all have signs that denote what they are. the signs are named: "<color> <shape> station sign.png"
+        ex: "red square station sign.png"
 
 locomotives and wagons
     To add the front of a train, place "<tech> locomotive.png"
