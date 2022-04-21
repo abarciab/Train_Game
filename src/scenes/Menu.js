@@ -9,6 +9,7 @@ class Menu extends Phaser.Scene {
         //tracks and trains
         this.load.image('basic_straight_track', './assets/tracks/basic straight track.png');
         this.load.image('basic_node_track', './assets/tracks/basic node track.png');
+        this.load.image('basic_out-straight_track', './assets/tracks/basic out-straight track.png');
         this.load.image('basic_out-down_track', './assets/tracks/basic out-down track.png');
         this.load.image('basic_out-up_track', './assets/tracks/basic out-up track.png');
         this.load.image('basic_locomotive', './assets/trains/basic locomotive.png');

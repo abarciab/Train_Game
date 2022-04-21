@@ -11,20 +11,19 @@ class Node extends Phaser.GameObjects.Sprite {
         this.exit_N = exit_N;
         this.exit_S = exit_S;
         if (this.exit_N) {
-            this.back_N_track = scene.add.image(x, y, "back_out-up_track");
+            this.back_N_track = scene.add.image(x, y, "basic_out-up_track");
             this.back_N_track.setScale(scaling);
             this.back_N_track.setDepth(4);
         }
         if (this.exit_S) {
-            this.back_S_track = scene.add.image(x, y, "back_out-down_track");
+            this.back_S_track = scene.add.image(x, y, "basic_out-down_track");
             this.back_S_track.setScale(scaling);
             this.back_S_track.setDepth(4);
         }
-        this.back_E_track = scene.add.image(x, y, "back_out-straight_track");
+        this.back_E_track = scene.add.image(x, y, "basic_out-straight_track");
         this.back_E_track.setScale(scaling);
         this.back_E_track.setDepth(4);
         this.setDepth(4);
-        this.setTint("#FFFFFF");
     }
 
     update() {
