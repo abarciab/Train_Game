@@ -15,7 +15,6 @@ function testMethod() {
 // spawn the world initially with 4
 function initSpawn(scene, tracks, nodes, speed, margin, x_interval, y_interval, num_chunks, scaling) {
     // interval of tracks in y
-    // key
     for (let i = 0; i < Object.keys(tracks).length; i++) {
         // number of chunks; number of times to do for each row
         for (let j = 0; j < num_chunks; j++) {
@@ -73,12 +72,13 @@ function SpawnTracks(scene, tracks, nodes, speed, x_interval, num_chunks, scalin
         if (obstacle_chance <= 10 && (n_junc || s_junc)) {
             obstacle_type = 1;
         }
-        tracks[i].push(scene.add.image((num_chunks-1)*x_interval, tracks[i][0].y, "basic_straight_track"));
+        // add tracks to position relative to last track
+        let prev_x = tracks[i][tracks[i].length-1].x
+        tracks[i].push(scene.add.image(prev_x + x_interval, tracks[i][0].y, "basic_straight_track"));
         tracks[i][tracks[i].length-1].setScale(scaling);
         tracks[i][tracks[i].length-1].setDepth(3);
-        //tracks[i].push(new Track(scene, j*(x_interval*2), margin+(y_interval*(i+1)), "back_straight_track", speed, scaling));
         
-        nodes[i].push(new Node(scene, x_interval/2+((num_chunks-1)*x_interval), nodes[i][0].y,
+        nodes[i].push(new Node(scene, prev_x+(x_interval/2), nodes[i][0].y,
             "basic_node_track", i, speed, scaling, n_junc, s_junc, obstacle_type
         ));
     }

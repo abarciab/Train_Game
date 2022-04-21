@@ -17,7 +17,7 @@ class PlayGame extends Phaser.Scene {
         D_key = this.input.keyboard.addKey('D');
         this.base_interval = 64*6;  // base unscaled interval between rows of tracks
         this.num_tracks = 5;        // number of rows of tracks
-        this.num_chunks = 5;        // number of chunks that are loaded
+        this.num_chunks = 8;        // number of chunks that are loaded
         this.dx = 0;                // delta x; how much the player has traveled
         this.tracks = {};           // key: track row, value: track images
         this.nodes = {};            // key: track row, value: node objects
@@ -63,7 +63,7 @@ class PlayGame extends Phaser.Scene {
             // move the tracks
             for (let j = 0; j < this.tracks[i].length; j++) {
                 this.tracks[i][j].x -= this.speed;
-                if (this.tracks[i][j].x < -1*this.node_interval) {
+                if (this.tracks[i][j].x < -2*this.node_interval) {
                     delete this.tracks[i][j];
                     this.tracks[i].splice(j, 1);
                 }
@@ -118,7 +118,7 @@ class PlayGame extends Phaser.Scene {
                     this.can_turn_N=false;
                     this.can_turn_S=false;
                 }
-                if (this.nodes[i][j].x < -1*this.node_interval) {
+                if (this.nodes[i][j].x < -2*this.node_interval) {
                     this.nodes[i][j].destroy();
                     // delete this.nodes[i][j];
                     this.nodes[i].splice(j, 1);
@@ -127,8 +127,8 @@ class PlayGame extends Phaser.Scene {
         }
         this.dx += this.speed;
         if (this.dx >= this.node_interval) {
-            this.dx = 0;
             SpawnTracks(this, this.tracks, this.nodes, this.speed, this.node_interval, this.num_chunks, this.global_scaling);
+            this.dx = 0;
         }
     }
 
