@@ -30,6 +30,8 @@ class PlayGame extends Phaser.Scene {
             this.tracks[i] = [];
             this.nodes[i] = [];
         }
+
+
         let margin = 0; // margin; no use right now
         this.y_interval = (config.height-(2*margin))/(Object.keys(this.tracks).length+1); // interval that rows of tracks should be seperated
         this.global_scaling = this.y_interval / this.base_interval; // scaling of all objects
@@ -39,10 +41,18 @@ class PlayGame extends Phaser.Scene {
         this.input_interval = 10 * this.x_unit; // interval user can input an action before a junction
         this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
         this.speed = 5;    // speed of background
+
         // spawn the world initially
         initSpawn(this, this.tracks, this.nodes, this.speed, margin, this.node_interval, this.y_interval, this.num_chunks, this.global_scaling);
         // initial spawn:
         this.train = new Train(this, config.width/10, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'basic_locomotive', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
+
+        // tracks amount of fuel left
+        this.fuel = this.time.delayedCall(this.train.fuelCapacity, () => {
+            this.speed = 0;
+            this.gameOver = true;
+        }, null, this);
+
         StartUI(this);
     }
 
@@ -154,5 +164,30 @@ class PlayGame extends Phaser.Scene {
         if (A_key.isDown && this.speed < 150) {
             this.speed += 10;
         }
+        if (this.train.atStation) {
+            this.enterStation(this.currentStation);
+        }
+    }
+
+    enterStation(station) {
+        this.fuel = this.train.fuelCapacity;
+        this.train.passengers.forEach(passenger => {
+            if (passenger.destination == station.location || !passenger.goodReview) {
+                passenger.reached = true;
+                passenger.onTrain = false;
+                if (passenger.goodReview == false) {
+                    this.train.health -= 20;
+                }
+                this.train.passengers.remove(passenger);
+            }
+        });
+
+        station.passengers.forEach(passenger => {
+            if (this.train.passengers.length < this.train.capacity) {
+                passenger.onTrain = true;
+                this.train.passengers.push(passenger);
+
+            } 
+        });
     }
 }
