@@ -38,7 +38,7 @@ class PlayGame extends Phaser.Scene {
         this.travel_interval = this.node_interval;
         this.input_interval = 10 * this.x_unit; // interval user can input an action before a junction
         this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
-        this.speed = 20;    // speed of background
+        this.speed = 5;    // speed of background
         // spawn the world initially
         initSpawn(this, this.tracks, this.nodes, this.speed, margin, this.node_interval, this.y_interval, this.num_chunks, this.global_scaling);
         // initial spawn:
