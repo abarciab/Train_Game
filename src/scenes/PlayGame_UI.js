@@ -20,7 +20,7 @@ this.textConfig = {
 function LoadUI(scene){
     scene.load.image('biome_bar', './assets/UI/biome bar.png');
 
-    console.log("loaded all the assets required to display UI");
+    //console.log("loaded all the assets required to display UI");
 }
 
 function StartUI(scene){
@@ -28,6 +28,9 @@ function StartUI(scene){
 
     this.topBar = scene.add.rectangle(game.config.width/2, 60, game.config.width*0.8, 80, 0xFFFFFF).setOrigin(0.5);
     this.leftBar = scene.add.rectangle(0, game.config.height/3 + 50, 80, game.config.height*0.5, 0xFFFFFF).setOrigin(0,0.5);
+
+    scene.add.image(game.config.width/4, game.config.height/2, 'basic_out-up_track').setOrigin(0.5).setDepth(10);
+    scene.add.image(game.config.width/3, game.config.height/2, 'WIP_station').setOrigin(0.5).setDepth(5);
 
 
     this.dist = scene.add.text(game.config.width*0.8, this.topBar.y, "Dist: 20,000m", this.textConfig).setOrigin(0.5).setDepth;
