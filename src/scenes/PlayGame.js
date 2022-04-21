@@ -22,6 +22,8 @@ class PlayGame extends Phaser.Scene {
         this.dx = 0; // delta x; how much the player has traveled
         this.j_tick = config.width / 2;
         this.tracks = {}; // key: track row, value: track objects
+        this.atJunction = true;
+        this.atStation = false;
         this.nodes = {};
         for (let i = 0; i < num_tracks; i++) {
             this.tracks[i] = [];
@@ -84,5 +86,30 @@ class PlayGame extends Phaser.Scene {
                 testMethod();
             }
         }
+
+        if (this.atStation) {
+            this.enterStation(this.currentStation);
+        }
+    }
+
+    enterStation(station) {
+        this.train.passengers.forEach(passenger => {
+            if (passenger.destination == station.location || !passenger.goodReview) {
+                passenger.reached = true;
+                passenger.onTrain = false;
+                if (passenger.goodReview == false) {
+                    this.train.health -= 20;
+                }
+                this.train.passengers.remove(passenger);
+            }
+        });
+
+        station.passengers.forEach(passenger => {
+            if (this.train.passengers.length < this.train.capacity) {
+                passenger.onTrain = true;
+                this.train.passengers.push(passenger);
+
+            } 
+        });
     }
 }
