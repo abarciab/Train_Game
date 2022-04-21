@@ -12,9 +12,10 @@ function testMethod() {
 3.) stations (?)
 */
 
-// spawn the world initially with 4
-function initSpawn(scene, tracks, nodes, speed, margin, x_interval, y_interval, num_chunks, scaling) {
+// spawn the world x the player's view
+function initSpawn(scene, tracks, nodes, speed, margin, interval) {
     // interval of tracks in y
+<<<<<<< HEAD
     // key
     for (let i = 0; i < Object.keys(tracks).length; i++) {
         // number of chunks; number of times to do for each row
@@ -36,12 +37,20 @@ function initSpawn(scene, tracks, nodes, speed, margin, x_interval, y_interval, 
             tracks[i][tracks[i].length-1].setDepth(3);
             
             nodes[i].push(new Node(scene, x_interval+(j*x_interval*2), margin+(y_interval*(i+1)), "basic_node_track", i, speed, scaling, n_junc, s_junc));
+=======
+    console.log(config.width, interval);
+    for (let i = 0; i < Object.keys(tracks).length; i++) {
+        for (let j = 0; j < 5; j++) {
+            tracks[i].push(new Track(scene, j*(config.width/2), margin+(interval*(i+1)), "back_straight_track", speed));
+            nodes[i].push(new Node(scene, j*(config.width/2), margin+(interval*(i+1)), "basic_node_track", speed));
+>>>>>>> afc38091a9cccb083415af5ac765f51981b9d7d8
         }
     }
 }
 
 // 1920 / 4: distance of ticks
 // spawn a chunk of tracks (one tick to another tick)
+<<<<<<< HEAD
 function SpawnTracks(scene, tracks, nodes, speed, x_interval, num_chunks, scaling) {
     // go through rows
     for (let i = 0; i < Object.keys(tracks).length; i++) {
@@ -62,5 +71,14 @@ function SpawnTracks(scene, tracks, nodes, speed, x_interval, num_chunks, scalin
         //tracks[i].push(new Track(scene, j*(x_interval*2), margin+(y_interval*(i+1)), "back_straight_track", speed, scaling));
         
         nodes[i].push(new Node(scene, x_interval+((num_chunks-1)*x_interval*2), nodes[i][0].y, "basic_node_track", i, speed, scaling, n_junc, s_junc));
+=======
+function SpawnTracks(scene, tracks, nodes, speed) {
+    console.log("spawn tracks");
+    // place a track in each row, then place track nodes per row
+    for (let i = 0; i < Object.keys(tracks).length; i++) {
+        let y_pos = tracks[i][0].y;
+        tracks[i].push(new Track(scene, 4*(config.width/2), y_pos, "back_straight_track", speed));
+        nodes[i].push(new Node(scene, 4*(config.width/2), y_pos, "basic_node_track", speed));
+>>>>>>> afc38091a9cccb083415af5ac765f51981b9d7d8
     }
 }
