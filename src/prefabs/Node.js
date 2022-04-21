@@ -24,6 +24,7 @@ class Node extends Phaser.GameObjects.Sprite {
         this.back_E_track.setScale(scaling);
         this.back_E_track.setDepth(4);
         this.setDepth(4);
+        this.setTint("#FFFFFF");
     }
 
     update() {

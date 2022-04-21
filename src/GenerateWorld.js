@@ -15,16 +15,27 @@ function testMethod() {
 // spawn the world initially with 4
 function initSpawn(scene, tracks, nodes, speed, margin, x_interval, y_interval, num_chunks, scaling) {
     // interval of tracks in y
-    console.log(x_interval);
+    // key
     for (let i = 0; i < Object.keys(tracks).length; i++) {
+        // number of chunks; number of times to do for each row
         for (let j = 0; j < num_chunks; j++) {
+            let n_junc=false;
+            let s_junc=false;
+            let random_dir = Math.floor(Math.random()*100);
+            if (random_dir <= 25) {
+                if (i > 0)
+                    n_junc=true;
+            }
+            if (random_dir >= 25 && random_dir <= 50) {
+                if (i < 2)
+                    s_junc=true;
+            }
             // let exit_type = Math.floor(Math.random()*(2-0+1)+0);
-            tracks[i].push(scene.add.image(j*(x_interval*2), margin+(y_interval*(i+1)), "back_straight_track"));
+            tracks[i].push(scene.add.image(j*x_interval*2, margin+(y_interval*(i+1)), "back_straight_track"));
             tracks[i][tracks[i].length-1].setScale(scaling);
             tracks[i][tracks[i].length-1].setDepth(3);
-            //tracks[i].push(new Track(scene, j*(x_interval*2), margin+(y_interval*(i+1)), "back_straight_track", speed, scaling));
             
-            nodes[i].push(new Node(scene, x_interval+j*(x_interval*2), margin+(y_interval*(i+1)), "basic_node_track", i, speed, scaling, exit_N=true));
+            nodes[i].push(new Node(scene, x_interval+(j*x_interval*2), margin+(y_interval*(i+1)), "basic_node_track", i, speed, scaling, n_junc, s_junc));
         }
     }
 }
@@ -32,12 +43,24 @@ function initSpawn(scene, tracks, nodes, speed, margin, x_interval, y_interval, 
 // 1920 / 4: distance of ticks
 // spawn a chunk of tracks (one tick to another tick)
 function SpawnTracks(scene, tracks, nodes, speed, x_interval, num_chunks, scaling) {
+    // go through rows
     for (let i = 0; i < Object.keys(tracks).length; i++) {
-        tracks[i].push(scene.add.image((num_chunks-1)*(x_interval*2), tracks[i][0].y, "back_straight_track"));
+        let n_junc=false;
+        let s_junc=false;
+        let random_dir = Math.floor(Math.random()*100);
+        if (random_dir <= 25) {
+            if (i > 0)
+                n_junc=true;
+        }
+        if (random_dir >= 25 && random_dir <= 50) {
+            if (i < 2)
+                s_junc=true;
+        }
+        tracks[i].push(scene.add.image((num_chunks-1)*x_interval*2, tracks[i][0].y, "back_straight_track"));
         tracks[i][tracks[i].length-1].setScale(scaling);
         tracks[i][tracks[i].length-1].setDepth(3);
         //tracks[i].push(new Track(scene, j*(x_interval*2), margin+(y_interval*(i+1)), "back_straight_track", speed, scaling));
         
-        nodes[i].push(new Node(scene, x_interval+(num_chunks-1)*(x_interval*2), nodes[i][0].y, "basic_node_track", i, speed, scaling, exit_N=true));
+        nodes[i].push(new Node(scene, x_interval+((num_chunks-1)*x_interval*2), nodes[i][0].y, "basic_node_track", i, speed, scaling, n_junc, s_junc));
     }
 }

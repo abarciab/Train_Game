@@ -43,7 +43,7 @@ class PlayGame extends Phaser.Scene {
         initSpawn(this, this.tracks, this.nodes, this.speed, margin, this.node_interval, this.y_interval, this.num_chunks, this.global_scaling);
         // initial spawn:
         this.train = new Train(this, config.width/10, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'basic_locomotive', this.global_scaling);
-        StartUI(this);
+        //StartUI(this);
     }
 
     update(time, delta) {
@@ -54,32 +54,30 @@ class PlayGame extends Phaser.Scene {
     }
 
     updateBackground(){
-        this.background.tilePositionX += 20;
+        this.background.tilePositionX += this.speed;
     }
 
     updateTracks(delta) {
         // move the tracks
-        for (const[key, value] of Object.entries(this.tracks)) {
-            for (let i = 0; i < value.length; i++) {
-                // update tracks
-                value[i].x -= this.speed;
-                //value[i].update();
-                if (value[i].x < -1*this.node_interval) {
-                    console.log("destroy tracks");
-                    value[i].destroy();
-                    value.splice(i, 1);
+        for (let i = 0; i < this.num_tracks; i++) {
+            for (let j = 0; j < this.tracks[i].length; j++) {
+                this.tracks[i][j].x -= this.speed;
+                if (this.tracks[i][j].x < -1*this.node_interval*2) {
+                    delete this.tracks[i][j];
+                    this.tracks[i].splice(j, 1);
                 }
-                // update nodes
-                this.nodes[key][i].update();
-                if (this.nodes[key][i].x < -1*this.node_interval) {
-                    this.nodes[key][i].destroy();
-                    this.nodes[key].splice(i, 1);
+            }
+            for (let j = 0; j < this.nodes[i].length; j++) {
+                this.nodes[i][j].update();
+                if (this.nodes[i][j].x < -1*this.node_interval*2) {
+                    this.nodes[i][j].destroy();
+                    // delete this.nodes[i][j];
+                    this.nodes[i].splice(j, 1);
                 }
             }
         }
-        // every time the train travels, spawn a chunk
         this.dx += this.speed;
-        if (this.dx >= this.node_interval) {
+        if (this.dx >= this.node_interval*2) {
             this.dx = 0;
             SpawnTracks(this, this.tracks, this.nodes, this.speed, this.node_interval, this.num_chunks, this.global_scaling);
         }
