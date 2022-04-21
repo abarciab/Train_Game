@@ -14,7 +14,7 @@ class Menu extends Phaser.Scene {
         this.load.image('basic_out-up_track', './assets/tracks/basic out-up track.png');
         this.load.image('basic_locomotive', './assets/trains/basic locomotive.png');
         this.load.image('basic_passenger_wagon', './assets/trains/basic passenger wagon.png');
-        this.load.image('WIP_station', './assets/trains/WIP station.png');
+        this.load.image('station', './assets/trains/field top station.png');
 
         //trees
         this.load.image('field_deadly_obstacle', './assets/obstacles/field deadly obstacle.png');
@@ -84,7 +84,7 @@ class Menu extends Phaser.Scene {
         this.locomotiveB.flipX = true;
         this.wagonB1.flipX = true;
 
-        //this.add.image(-600, this.startButton.y + buttonGap, 'WIP_station').setOrigin(0.5).setDepth(-1.5);
+        //this.add.image(-600, this.startButton.y + buttonGap, 'station').setOrigin(0.5).setDepth(-1.5);
 
         this.trainSound = this.sound.add('train_on_rails', {volume: .3, loop: true});
         this.menuMusic = this.sound.add('menu_music', {volume: .4, loop: true});

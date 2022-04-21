@@ -30,7 +30,7 @@ function StartUI(scene){
     this.bottom = scene.add.rectangle(game.config.width/2, game.config.height - 60, game.config.width*0.8, 80, 0xFFFFFF).setOrigin(0.5);
 
     //scene.add.image(game.config.width/4, game.config.height/2, 'basic_out-up_track').setOrigin(0.5).setDepth(10);
-    //scene.add.image(200, game.config.height/2, 'WIP_station').setOrigin(0.5).setDepth(10).setScale(scene.global_scaling);
+    //scene.add.image(200, game.config.height/2, 'station').setOrigin(0.5).setDepth(10).setScale(scene.global_scaling);
 
 
     this.dist = scene.add.text(game.config.width*0.8, this.topBar.y, "Dist: 20,000m", this.textConfig).setOrigin(0.5);
