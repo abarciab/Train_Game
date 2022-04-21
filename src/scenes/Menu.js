@@ -33,8 +33,8 @@ class Menu extends Phaser.Scene {
         this.titleBar = this.add.rectangle(center, topGap, game.config.width*0.3, 120, 0xFFFFFF).setOrigin(0.5);
         this.TitleText = this.add.text(center, this.titleBar.y, "TRAIN GAME: Unfinished Business", {color: '#000000', fontSize: '22px'}).setOrigin(0.5);
         //
-        this.startButton = this.add.rectangle(center, this.titleBar.y + buttonGap*3, game.config.width*0.3, 80, 0xFFFFFF).setOrigin(0.5).setDepth(-20);
-        this.startText = this.add.text(center, this.startButton.y, "START GAME", {color: '#000000'}).setOrigin(0.5).setDepth(-20);
+        this.startButton = this.add.rectangle(center, this.titleBar.y + buttonGap*3, game.config.width*0.3, 80, 0xFFFFFF).setOrigin(0.5);
+        this.startText = this.add.text(center, this.startButton.y, "START GAME", {color: '#000000'}).setOrigin(0.5);
         //
         this.optionsButton = this.add.rectangle(center, this.startButton.y + buttonGap, game.config.width*0.3, 80, 0xFFFFFF).setOrigin(0.5);
         this.optionsText = this.add.text(center, this.optionsButton.y, "OPTIONS", {color: '#000000'}).setOrigin(0.5);
@@ -64,8 +64,8 @@ class Menu extends Phaser.Scene {
         this.add.image(-30, topGap, 'basic_straight_track').setOrigin(0, 0.5).setDepth(-1);
         this.add.image(game.config.width+30, topGap, 'basic_straight_track').setOrigin(1, 0.5).setDepth(-1);
         //tracks behind start button
-        this.add.image(0, this.titleBar.y + buttonGap*3, 'basic_straight_track').setOrigin(0, 0.5).setDepth(-10);
-        this.add.image(game.config.width, this.titleBar.y + buttonGap*3, 'basic_straight_track').setOrigin(1, 0.5).setDepth(-10);
+        this.add.image(0, this.titleBar.y + buttonGap*3, 'basic_straight_track').setOrigin(0, 0.5).setDepth(-1);
+        this.add.image(game.config.width, this.titleBar.y + buttonGap*3, 'basic_straight_track').setOrigin(1, 0.5).setDepth(-1);
         //tracks behind option button
         this.add.image(0, this.startButton.y + buttonGap, 'basic_straight_track').setOrigin(0, 0.5).setDepth(-1);
         this.add.image(game.config.width, this.startButton.y + buttonGap, 'basic_straight_track').setOrigin(1, 0.5).setDepth(-1);
@@ -81,10 +81,10 @@ class Menu extends Phaser.Scene {
         this.locomotiveB.flipX = true;
         this.wagonB1.flipX = true;
 
-        this.add.image(-600, this.startButton.y + buttonGap, 'WIP_station').setOrigin(0.5).setDepth(-1.5);
+        //this.add.image(-600, this.startButton.y + buttonGap, 'WIP_station').setOrigin(0.5).setDepth(-1.5);
 
-        //this.sound.play('train_on_rails', {volume: .3, loop: true});
-        //this.sound.play('menu_music', {volume: .4, loop: true});
+        this.sound.play('train_on_rails', {volume: .3, loop: true});
+        this.sound.play('menu_music', {volume: .4, loop: true});
     }
 
     update(){
@@ -99,8 +99,8 @@ class Menu extends Phaser.Scene {
             this.locomotiveA.x = -230;
         }
 
-        //this.locomotiveB.x -= 5;
-        //this.wagonB1.x -= 5;
+        this.locomotiveB.x -= 5;
+        this.wagonB1.x -= 5;
         if (this.wagonB1.x <= -120){
             this.locomotiveB.x = game.config.width * 1.5;
             this.wagonB1.x = game.config.width * 1.5 + 350;
