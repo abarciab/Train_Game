@@ -8,7 +8,7 @@ class Train extends Phaser.GameObjects.Sprite {
         this.health = 100;                    // tracks yelp rating
         this.passengers = [];                 // list of passengers in train
         this.capacity = 6;                    // # of passengers the train can fit
-        this.fuelCapacity = 10000;            // max amount of fuel Train can hold
+        this.fuelCapacity = 100000;            // max amount of fuel Train can hold
         this.distanceTraveled = 0;            // # of nodes passed
         this.displayOriginX = 200;
         this.junction_wid = (1184-128)*scaling;
