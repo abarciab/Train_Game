@@ -211,15 +211,17 @@ class PlayGame extends Phaser.Scene {
             if (passenger.destination == station.location) {
                 passenger.onTrain = false;
                 if (passenger.goodReview == false) {
-                    this.train.health -= 10;
+                    this.train.health -= 2;
                     console.log("Bad review");
+                } else {
+                    this.train.health += 1;
+                    console.log("Good review");
                 }
                 this.train.passengers.remove(passenger);
                 console.log("Passenger got off train");
-            }
-            else if (!passenger.goodReview) {
+            } else if (!passenger.goodReview) {
                 passenger.onTrain = false;
-                this.train.health -= 20;
+                this.train.health -= 4;
                 console.log("Terrible review!");
                 this.train.passengers.remove(passenger);
                 console.log("Passenger got off train");
