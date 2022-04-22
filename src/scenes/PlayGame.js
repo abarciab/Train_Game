@@ -205,7 +205,7 @@ class PlayGame extends Phaser.Scene {
         let stationTime = 5000;
         let tempSpeed = this.speed;
         this.speed = 0;
-        this.fuel += stationTime;
+        this.fuel.delay += stationTime;
         console.log("Fuel sustained");
         this.train.passengers.forEach(passenger => {
             if (passenger.destination == station.location) {
@@ -247,7 +247,7 @@ class PlayGame extends Phaser.Scene {
                 // Getting on animations
                 // Same as getting off
                 this.speed = tempSpeed;
-                this.fuel = this.train.fuelCapacity;
+                this.fuel.delay = this.train.fuelCapacity;
                 console.log("Refueled");
                 console.log("Station business done");
                 // start patience timers
