@@ -18,7 +18,8 @@ this.textConfig = {
 }
 
 function LoadUI(scene){
-    scene.load.image('biome_bar', './assets/UI/biome bar.png');
+    scene.load.image('biome_bar_fields', './assets/UI/biome bar.png');
+    scene.load.image('biome_cursor_fields', './assets/UI/biome bar cursor fields.png');
     scene.load.image('passenger_UI', './assets/UI/passenger UI.png');
 
     scene.load.image('mask', './assets/UI/circle mask test.png');
@@ -31,11 +32,16 @@ function LoadUI(scene){
     scene.load.image('fuel_meter', './assets/UI/fuel meter.png');
     scene.load.image('fuel_needle', './assets/UI/fuel needle.png');
    
+    //star
+    scene.load.image('star_4/4', './assets/UI/UI star full.png');
+    scene.load.image('star_3/4', './assets/UI/UI star three quarter.png');
+    scene.load.image('star_2/4', './assets/UI/UI star half.png');
+    scene.load.image('star_1/4', './assets/UI/UI star quarter.png');
+    scene.load.image('star_0/4', './assets/UI/UI star empty.png');
+
 }
 
 function StartUI(scene){
-    //console.log("started UI Display");
-    //let topBar;
     this.front = 60;
     this.IconGap = 80;
     this.iconScale = 0.5;
@@ -47,26 +53,15 @@ function StartUI(scene){
     }
     this.passengers = scene.add.group(groupConfig);
 
-    this.topBar = scene.add.rectangle(game.config.width/2, 60, game.config.width*0.8, 80, 0xFFFFFF).setOrigin(0.5);
-    this.bottomBarLeft= scene.add.image(game.config.width/2, this.bottomBarYpos, 'bottom_bar').setOrigin(0.5).setScale(1.35, 1.5);
+    this.topBar = scene.add.image(game.config.width/2 + 230, 60, 'bottom_bar').setOrigin(0.5).setScale(0.95, 1.4).setDepth(20);
+    this.bottomBarLeft= scene.add.image(game.config.width/2, this.bottomBarYpos, 'bottom_bar').setOrigin(0.5).setScale(1.35, 1.5).setDepth(20);
 
 
-    this.fuelMeter = scene.add.image(game.config.width - 200, this.bottomBarYpos-10, 'fuel_meter').setOrigin(0.5).setScale(0.55);
-    this.fuelNeedle = scene.add.image(game.config.width - 200, this.bottomBarYpos + 25, 'fuel_needle').setOrigin(0.5).setScale(0.55);
+    this.fuelMeter = scene.add.image(game.config.width - 200, this.bottomBarYpos-10, 'fuel_meter').setOrigin(0.5).setScale(0.55).setDepth(20);
+    this.fuelNeedle = scene.add.image(game.config.width - 200, this.bottomBarYpos + 25, 'fuel_needle').setOrigin(0.5).setScale(0.55).setDepth(21);
 
     this.fuelNeedle.angle = -90;
 
-
-    //this.passengerTriangle = scene.add.image(this.front, game.config.height-60, 'pass_tri').setOrigin(0.5);
-    //console.log("x: " + this.passengerTriangle.x + " y: " + this.passengerTriangle.y);
-    //this.passengerCircle = scene.add.image(this.front + this.IconGap, game.config.height-60, 'pass_circle').setOrigin(0.5);
-    //this.passengerSquare = scene.add.image(this.front + this.IconGap*2, game.config.height-60, 'pass_square').setOrigin(0.5);
-
-    //addPasengerUI(scene, 'pass_tri', 2000);
-    //addPasengerUI(scene, 'pass_tri', 2000);
-    //addPasengerUI(scene, 'pass_square', 2000);
-    //addPasengerUI(scene, 'pass_tri', 2000);
-    //addPasengerUI(scene, 'pass_circle', 2000);
 
     this.pass1 = new Passenger(scene, game.config.width*2, game.config.height, 'mask', null, 5000, "red square");
     this.pass1.boardTrain(scene);
@@ -74,9 +69,22 @@ function StartUI(scene){
     this.pass2 = new Passenger(scene, game.config.width*2, game.config.height, 'mask', null, 7000, "blue circle");
     this.pass2.boardTrain(scene);
     
-    this.dist = scene.add.text(game.config.width*0.8, this.topBar.y, "Dist: 20,000m", this.textConfig).setOrigin(0.5);
-    this.biomeBar = scene.add.image(game.config.width/2, this.topBar.y, 'biome_bar');
+    this.distDisplay = scene.add.text(game.config.width*0.85, this.topBar.y, "Dist: 20,000m", this.textConfig).setOrigin(0.5).setDepth(20);
+    this.distDisplay.setColor('#FFFFFF');
+    this.dist = 0;
+    this.biomeBar = scene.add.image(game.config.width/2 + 60, this.topBar.y, 'biome_bar_fields').setDepth(20);
+    this.biomeBarCursor = scene.add.image(game.config.width/2 + 60, this.topBar.y, 'biome_cursor_fields').setDepth(20);
 
+    let starWidth = 80;
+
+    this.star1 = scene.add.image(80, this.topBar.y - 10, 'star_4/4').setScale(0.7);
+    this.star2 = scene.add.image(this.star1.x + starWidth, this.topBar.y - 10, 'star_4/4').setScale(0.7);
+    this.star3 = scene.add.image(this.star1.x + starWidth*2, this.topBar.y - 10, 'star_4/4').setScale(0.7);
+    this.star4 = scene.add.image(this.star1.x + starWidth*3, this.topBar.y - 10, 'star_4/4').setScale(0.7);
+    this.star5 = scene.add.image(this.star1.x + starWidth*4, this.topBar.y - 10, 'star_4/4').setScale(0.7);
+
+    this.rating  = 20;
+    displayRating();
 }
 
 function UpdateUI(scene, delta){
@@ -85,7 +93,49 @@ function UpdateUI(scene, delta){
 
 
     this.fuelNeedle.angle = ( (scene.fuel.getRemaining()/scene.train.fuelCapacity) * 180) - 90;
+    this.dist += (delta/1000) * scene.speed;
+    biomeBarCursor.x += delta/200;
+    this.distDisplay.text = "Dist: " + Math.round(this.dist).toLocaleString(undefined) + "m";
 
+    if (this.rating != scene.train.health){
+        this.raiting = scene.train.health;
+        displayRating();
+    }
+    
+}
+
+function displayRating(){
+    this.star1.setTexture('star_0/4');
+    this.star2.setTexture('star_0/4');
+    this.star3.setTexture('star_0/4');
+    this.star4.setTexture('star_0/4');
+    this.star5.setTexture('star_0/4');
+
+    let partialStar = this.star1;
+
+    if (this.rating >= 4){
+        this.star1.setTexture('star_4/4');
+        partialStar = this.star2;
+    }
+    if (this.rating >= 8){
+        this.star2.setTexture('star_4/4');
+        partialStar = this.star3;
+    }
+    if (this.rating >= 8){
+        this.star3.setTexture('star_4/4');
+        partialStar = this.star4;
+    }
+    if (this.rating >= 16){
+        this.star4.setTexture('star_4/4');
+        partialStar = this.star5;
+    }
+    if (this.rating >= 20){
+        this.star5.setTexture('star_4/4');
+        return;
+    }
+    
+    partialStar.setTexture("star_" + rating%4 + "/4");
+           
 }
 
 function addPasengerUI(scene, passenger){
