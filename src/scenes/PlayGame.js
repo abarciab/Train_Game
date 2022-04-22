@@ -80,7 +80,7 @@ class PlayGame extends Phaser.Scene {
         this.train.update();
         this.updateEvents(delta);
         this.updateBackground();
-        //console.log('fuel: ' + this.fuel);
+        //console.log('fuel: ' + this.fuel.delay);
         UpdateUI(this, delta);
     }
 

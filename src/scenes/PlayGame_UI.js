@@ -54,7 +54,7 @@ function StartUI(scene){
     this.fuelMeter = scene.add.image(game.config.width - 200, this.bottomBarYpos-10, 'fuel_meter').setOrigin(0.5).setScale(0.55);
     this.fuelNeedle = scene.add.image(game.config.width - 200, this.bottomBarYpos + 25, 'fuel_needle').setOrigin(0.5).setScale(0.55);
 
-    this.fuelNeedle.angle = 90;
+    this.fuelNeedle.angle = -90;
 
 
     //this.passengerTriangle = scene.add.image(this.front, game.config.height-60, 'pass_tri').setOrigin(0.5);
@@ -80,11 +80,11 @@ function StartUI(scene){
 }
 
 function UpdateUI(scene, delta){
-    console.log(scene.fuel + " / " + scene.train.fuelCapacity);
+    //console.log(scene.fuel.getRemaining() + " / " + scene.train.fuelCapacity);
 
 
 
-    //this.fuelNeedle.angle = ( (scene.fuel/scene.train.fuelCapacity) * 180) - 90;
+    this.fuelNeedle.angle = ( (scene.fuel.getRemaining()/scene.train.fuelCapacity) * 180) - 90;
 
 }
 
