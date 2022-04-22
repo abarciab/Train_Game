@@ -53,12 +53,14 @@ class PlayGame extends Phaser.Scene {
             this.gameOver = true;
         }, null, this);
 
+        /*
         // Testing station logic (REMOVE IN FUTURE)
         this.temp = this.time.delayedCall(3000, () => {
             this.train.atStation = true;
         }, null, this);
         this.currentStation = new Station(this, config.width/5, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'station', 0);
-
+        */
+       
         StartUI(this);
     }
 
