@@ -8,7 +8,7 @@ class PlayGame extends Phaser.Scene {
         this.load.image('train', './assets/trains/basic locomotive.png');
 
         //sound effects
-        this.load.audio('junction_switch', './assets/sound effects/junction switched.ogg');
+        this.load.audio('junction_switch', './assets/sound effects/junction switched.mp3');
 
         LoadUI(this);
     }
@@ -16,7 +16,7 @@ class PlayGame extends Phaser.Scene {
     create() {
 
         //sound effects
-        this.junctionSwitchSfx = this.sound.add('junction_switch');
+        this.junctionSwitchSfx = this.sound.add('junction_switch', {volume: 0.5, rate: 1.5});
 
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0);
         W_key = this.input.keyboard.addKey('W');
