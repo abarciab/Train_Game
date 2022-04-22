@@ -6,10 +6,18 @@ class PlayGame extends Phaser.Scene {
     preload() {
         // load images/tile sprites
         this.load.image('train', './assets/trains/basic locomotive.png');
+
+        //sound effects
+        this.load.audio('junction_switch', './assets/sound effects/junction switched.ogg');
+
         LoadUI(this);
     }
 
     create() {
+
+        //sound effects
+        this.junctionSwitchSfx = this.sound.add('junction_switch');
+
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0);
         W_key = this.input.keyboard.addKey('W');
         A_key = this.input.keyboard.addKey('A');
@@ -25,6 +33,7 @@ class PlayGame extends Phaser.Scene {
         this.can_turn_N = false;    // whether the player can turn north or south
         this.can_turn_S = false;
 
+
         // initialize tracks and nodes to keys and empty lists
         for (let i = 0; i < this.num_tracks; i++) {
             this.tracks[i] = [];
@@ -38,7 +47,7 @@ class PlayGame extends Phaser.Scene {
         this.x_unit = 64 * this.global_scaling; // unit square of measurement
         this.node_interval = 20 * this.x_unit;  // interval between each node/track placement
         this.travel_interval = this.node_interval;
-        this.input_interval = 10 * this.x_unit; // interval user can input an action before a junction
+        this.input_interval = 18 * this.x_unit; // interval user can input an action before a junction
         this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
         this.speed = 5;    // speed of background
 
@@ -108,19 +117,29 @@ class PlayGame extends Phaser.Scene {
                             this.atJunction = false;
                             break;
                         case "north":
+                            /*if (this.atJunction){
+                                this.atJunction = false;
+                                this.train.turn("up", this.y_interval);
+                            }*/
+                            
                             this.train.turning = true;
                             this.train.onTrack--;
                             console.log("on track", this.train.onTrack);
-                            this.train.y -= this.y_interval/2
+                            //this.train.y -= this.y_interval/2
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
                             this.atJunction = false;
                             break;
                         case "south":
+                            /*if (this.atJunction){
+                                this.atJunction = false;
+                                this.train.turn("down", this.y_interval);
+                            }*/
+
                             this.atJunction = false;
                             this.train.onTrack++;
                             console.log("on track", this.train.onTrack);
                             this.train.turning = true;
-                            this.train.y += this.y_interval/2; // this.tracks[this.train.onTrack][0].y;
+                            //this.train.y += this.y_interval/2; // this.tracks[this.train.onTrack][0].y;
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
                             break;
                         default:
@@ -140,7 +159,7 @@ class PlayGame extends Phaser.Scene {
         this.dx += this.speed;
         if (this.dx >= this.travel_interval) {
             this.train.distanceTraveled++; // Increment # of Nodes passed
-            console.log("Nodes Passed: " + this.train.distanceTraveled);
+            //console.log("Nodes Passed: " + this.train.distanceTraveled);
             SpawnTracks(this, this.tracks, this.nodes, this.speed, this.node_interval, this.global_scaling);
             this.travel_interval = this.travel_interval - (this.dx-this.travel_interval);
             this.dx = 0;
@@ -149,18 +168,19 @@ class PlayGame extends Phaser.Scene {
 
     updateEvents(delta) {
         if (this.atJunction) {
-            if (W_key.isDown && this.can_turn_N) {
-                console.log("queue north");
+            if (W_key.isDown && this.can_turn_N && this.train.turn_dir != "north") {
+                console.log("train wants to go up at next junction");
                 this.train.turn_dir = "north";
-                //this.train.y = this.tracks[this.train.onTrack][0].y;
+                this.junctionSwitchSfx.play();
             }
-            if (S_key.isDown && this.can_turn_S) {
-                console.log("queue south")
+            if (S_key.isDown && this.can_turn_S && this.train.turn_dir != "south") {
+                this.junctionSwitchSfx.play();
+                console.log("train wants to go down at next junction");
                 this.train.turn_dir = "south";
-                //this.train.y = this.tracks[this.train.onTrack][0].y;
             }
-            if (D_key.isDown) {
-                console.log("queue straight")
+            if (D_key.isDown && this.train.turn_dir != "straight") {
+                console.log("train wants to go stright at next junction");
+                this.junctionSwitchSfx.play();
                 this.train.turn_dir = "straight";
             }
         }

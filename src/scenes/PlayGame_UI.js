@@ -49,6 +49,8 @@ function StartUI(scene){
 
     this.topBar = scene.add.rectangle(game.config.width/2, 60, game.config.width*0.8, 80, 0xFFFFFF).setOrigin(0.5);
     this.bottomBar = scene.add.image(game.config.width/2, this.bottomBarYpos, 'bottom_bar').setOrigin(0.5).setScale(1.2, 1.5);
+    this.leftBar = scene.add.image(game.config.width/2, this.bottomBarYpos, 'bottom_bar').setOrigin(0.5).setScale(1.2, 1.5);
+
 
     //this.passengerTriangle = scene.add.image(this.front, game.config.height-60, 'pass_tri').setOrigin(0.5);
     //console.log("x: " + this.passengerTriangle.x + " y: " + this.passengerTriangle.y);
@@ -90,11 +92,11 @@ function addPasengerUI(scene, passenger){
 
     this.numPassengers += 1;
 
-    console.log("added a passenger");
+    //console.log("added a passenger");
 
     let shape;
 
-    console.log(passenger.destination);
+    //console.log(passenger.destination);
 
     switch (passenger.destination){
         case "red square": 
@@ -123,7 +125,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
         this.patienceBar = scene.add.sprite(x, y + 20, 'patience_bar');
 
         this.patience = passenger.patience;
-        console.log("added a passenger with " + passenger.patience + " patience");
+        //console.log("added a passenger with " + passenger.patience + " patience");
 
         //this.patienceBar.anims.play('patience_bar_anim');
 

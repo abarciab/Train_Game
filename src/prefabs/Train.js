@@ -25,9 +25,21 @@ class Train extends Phaser.GameObjects.Sprite {
 
     update() {
         if (this.turning) {
-            console.log("turning...");
-            this.dx += this.speed;
-            if (this.dx >= this.junction_wid) {
+
+            if (this.turn_dir == "north"){
+                this.y -= 2.5;
+                if (this.y <= this.turn_dest){
+                    this.done = true;
+                }
+            } else if (this.turn_dir == "south") {
+                this.y += 2.5;
+                if (this.y >= this.turn_dest){
+                    this.done = true;
+                }
+            }
+
+            if (this.done) {
+                this.done = false;
                 console.log("done turning");
                 this.turning = false;
                 this.dx = 0;
@@ -40,5 +52,5 @@ class Train extends Phaser.GameObjects.Sprite {
     reset() {
 
     }
-    
+
 }
