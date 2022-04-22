@@ -5,10 +5,11 @@ class Train extends Phaser.GameObjects.Sprite {
         scene.add.existing(this);             // add object to existing scene
         this.atStation = false;               // tracks if train is at station
         this.onTrack = initial_track;         // tracks which track the train is on
-        this.health = 100;                    // tracks yelp rating
+        this.health = 20;                     // tracks yelp rating
         this.passengers = [];                 // list of passengers in train
         this.capacity = 6;                    // # of passengers the train can fit
-        this.fuelCapacity = 100000;            // max amount of fuel Train can hold
+        this.fuelCapacity = 100000;           // max amount of fuel Train can hold
+        this.moving = true;              // tracks if train needs to deplete fuel
         this.distanceTraveled = 0;            // # of nodes passed
         this.junction_wid = (1184-192)*scaling;
         this.turning = false;

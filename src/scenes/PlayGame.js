@@ -8,7 +8,7 @@ class PlayGame extends Phaser.Scene {
         this.load.image('train', './assets/trains/basic locomotive.png');
 
         //sound effects
-        this.load.audio('junction_switch', './assets/sound effects/junction switched.ogg');
+        this.load.audio('junction_switch', './assets/sound effects/junction switched.mp3');
 
         LoadUI(this);
     }
@@ -16,7 +16,7 @@ class PlayGame extends Phaser.Scene {
     create() {
 
         //sound effects
-        this.junctionSwitchSfx = this.sound.add('junction_switch');
+        this.junctionSwitchSfx = this.sound.add('junction_switch', {volume: 0.5, rate: 1.5});
 
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0);
         W_key = this.input.keyboard.addKey('W');
@@ -53,20 +53,23 @@ class PlayGame extends Phaser.Scene {
         // initial spawn:
         this.train = new Train(this, config.width/10, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'basic_locomotive', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
 
+        /*
         // tracks amount of fuel left
         this.fuel = this.time.delayedCall(this.train.fuelCapacity, () => {
             console.log("Ran out of fuel");
             this.speed = 0;
             this.gameOver = true;
         }, null, this);
+        */
+       // set fuel
+       this.fuel = this.train.fuelCapacity;
 
-        /*
+        
         // Testing station logic (REMOVE IN FUTURE)
         this.temp = this.time.delayedCall(3000, () => {
             this.train.atStation = true;
         }, null, this);
-        this.currentStation = new Station(this, config.width/5, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'station', 0);
-        */
+        this.currentStation = new Station(this, config.width/5, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'station', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
        
         StartUI(this);
     }
@@ -77,7 +80,6 @@ class PlayGame extends Phaser.Scene {
         this.train.update(timer, delta);
         //this.updateEvents(delta);
         this.updateBackground();
-        //console.log('fuel: ' + this.fuel.delay);
         UpdateUI(this, delta);
     }
 
@@ -200,21 +202,25 @@ class PlayGame extends Phaser.Scene {
         let stationTime = 5000;
         let tempSpeed = this.speed;
         this.speed = 0;
-        this.fuel.delay += stationTime;
+        //this.fuel.delay += stationTime;
+        this.train.moving = false;
+        this.fuel = this.train.fuelCapacity;
         console.log("Fuel sustained");
         this.train.passengers.forEach(passenger => {
             if (passenger.destination == station.location) {
                 passenger.onTrain = false;
                 if (passenger.goodReview == false) {
-                    this.train.health -= 10;
+                    this.train.health -= 2;
                     console.log("Bad review");
+                } else {
+                    this.train.health += 1;
+                    console.log("Good review");
                 }
                 this.train.passengers.remove(passenger);
                 console.log("Passenger got off train");
-            }
-            else if (!passenger.goodReview) {
+            } else if (!passenger.goodReview) {
                 passenger.onTrain = false;
-                this.train.health -= 20;
+                this.train.health -= 4;
                 console.log("Terrible review!");
                 this.train.passengers.remove(passenger);
                 console.log("Passenger got off train");
@@ -242,7 +248,8 @@ class PlayGame extends Phaser.Scene {
                 // Getting on animations
                 // Same as getting off
                 this.speed = tempSpeed;
-                this.fuel.delay = this.train.fuelCapacity;
+                this.fuel = this.train.fuelCapacity;
+                this.train.moving = true;
                 console.log("Refueled");
                 console.log("Station business done");
                 // start patience timers
