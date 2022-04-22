@@ -26,17 +26,17 @@ function LoadUI(scene){
     scene.load.image('pass_tri', './assets/UI/passenger triangle.png');
     scene.load.image('pass_circle', './assets/UI/passenger circle.png');
     scene.load.image('pass_square', './assets/UI/passenger square.png');
-
-    //scene.load.image('patience_bar', './assets/UI/passenger patience.png');
     scene.load.image('patience_bar', './assets/UI/passenger patience.png');
     scene.load.image('bottom_bar', './assets/UI/bottom bar.png');
+    scene.load.image('fuel_meter', './assets/UI/fuel meter.png');
+    scene.load.image('fuel_needle', './assets/UI/fuel needle.png');
    
 }
 
 function StartUI(scene){
     //console.log("started UI Display");
     //let topBar;
-    this.front = 130;
+    this.front = 60;
     this.IconGap = 80;
     this.iconScale = 0.5;
     this.bottomBarYpos = game.config.height - 60;
@@ -48,8 +48,13 @@ function StartUI(scene){
     this.passengers = scene.add.group(groupConfig);
 
     this.topBar = scene.add.rectangle(game.config.width/2, 60, game.config.width*0.8, 80, 0xFFFFFF).setOrigin(0.5);
-    this.bottomBar = scene.add.image(game.config.width/2, this.bottomBarYpos, 'bottom_bar').setOrigin(0.5).setScale(1.2, 1.5);
-    this.leftBar = scene.add.image(game.config.width/2, this.bottomBarYpos, 'bottom_bar').setOrigin(0.5).setScale(1.2, 1.5);
+    this.bottomBarLeft= scene.add.image(game.config.width/2, this.bottomBarYpos, 'bottom_bar').setOrigin(0.5).setScale(1.35, 1.5);
+
+
+    this.fuelMeter = scene.add.image(game.config.width - 200, this.bottomBarYpos-10, 'fuel_meter').setOrigin(0.5).setScale(0.55);
+    this.fuelNeedle = scene.add.image(game.config.width - 200, this.bottomBarYpos + 25, 'fuel_needle').setOrigin(0.5).setScale(0.55);
+
+    this.fuelNeedle.angle = 90;
 
 
     //this.passengerTriangle = scene.add.image(this.front, game.config.height-60, 'pass_tri').setOrigin(0.5);
@@ -63,11 +68,11 @@ function StartUI(scene){
     //addPasengerUI(scene, 'pass_tri', 2000);
     //addPasengerUI(scene, 'pass_circle', 2000);
 
-    /*this.pass1 = new Passenger(scene, game.config.width*2, game.config.height, 'mask', null, 5000, "red square");
+    this.pass1 = new Passenger(scene, game.config.width*2, game.config.height, 'mask', null, 5000, "red square");
     this.pass1.boardTrain(scene);
 
     this.pass2 = new Passenger(scene, game.config.width*2, game.config.height, 'mask', null, 7000, "blue circle");
-    this.pass2.boardTrain(scene);*/
+    this.pass2.boardTrain(scene);
     
     this.dist = scene.add.text(game.config.width*0.8, this.topBar.y, "Dist: 20,000m", this.textConfig).setOrigin(0.5);
     this.biomeBar = scene.add.image(game.config.width/2, this.topBar.y, 'biome_bar');
@@ -75,28 +80,18 @@ function StartUI(scene){
 }
 
 function UpdateUI(scene, delta){
-    //console.log("udpated UI Display: delata: " + delta);
+    console.log(scene.fuel + " / " + scene.train.fuelCapacity);
 
-    this.passengers.children.iterate((passenger) => {
-        if (passenger.patience == 2000){
-            
 
-        }
 
-        passenger.updatePatience(delta);
-    });
+    //this.fuelNeedle.angle = ( (scene.fuel/scene.train.fuelCapacity) * 180) - 90;
 
 }
 
 function addPasengerUI(scene, passenger){
 
     this.numPassengers += 1;
-
-    //console.log("added a passenger");
-
     let shape;
-
-    //console.log(passenger.destination);
 
     switch (passenger.destination){
         case "red square": 
@@ -125,9 +120,6 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
         this.patienceBar = scene.add.sprite(x, y + 20, 'patience_bar');
 
         this.patience = passenger.patience;
-        //console.log("added a passenger with " + passenger.patience + " patience");
-
-        //this.patienceBar.anims.play('patience_bar_anim');
 
         this.green = Phaser.Display.Color.ValueToColor('#03fc13');
         this.red = Phaser.Display.Color.ValueToColor('#fc0303');
@@ -144,7 +136,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
                 this.patienceBar.setScale(1-tween.getValue()/100, 1);
                 if (tween.getValue() == 100){
                     passenger.goodReview = false;
-                    this.setAlpha(0.2);
+                    this.setAlpha(0.4);
                     scene.cameras.main.shake(50, 0.003);
                 }
             }

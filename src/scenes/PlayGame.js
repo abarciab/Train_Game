@@ -80,6 +80,8 @@ class PlayGame extends Phaser.Scene {
         this.train.update();
         this.updateEvents(delta);
         this.updateBackground();
+        //console.log('fuel: ' + this.fuel);
+        UpdateUI(this, delta);
     }
 
     updateBackground(){
@@ -125,10 +127,6 @@ class PlayGame extends Phaser.Scene {
                             this.atJunction = false;
                             break;
                         case "north":
-                            /*if (this.atJunction){
-                                this.atJunction = false;
-                                this.train.turn("up", this.y_interval);
-                            }*/
                             
                             this.train.turning = true;
                             this.train.onTrack--;
