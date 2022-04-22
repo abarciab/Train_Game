@@ -174,14 +174,23 @@ class PlayGame extends Phaser.Scene {
 
     enterStation(station) {
         this.fuel = this.train.fuelCapacity;
+        console.log("Refueled");
         this.train.passengers.forEach(passenger => {
-            if (passenger.destination == station.location || !passenger.goodReview) {
-                passenger.reached = true;
+            if (passenger.destination == station.location) {
                 passenger.onTrain = false;
                 if (passenger.goodReview == false) {
-                    this.train.health -= 20;
+                    this.train.health -= 10;
+                    console.log("Bad review");
                 }
                 this.train.passengers.remove(passenger);
+                console.log("Passenger got off train");
+            }
+            else if (!passenger.goodReview) {
+                passenger.onTrain = false;
+                this.train.health -= 20;
+                console.log("Terrible review!");
+                this.train.passengers.remove(passenger);
+                console.log("Passenger got off train");
             }
         });
 
@@ -189,8 +198,8 @@ class PlayGame extends Phaser.Scene {
             if (this.train.passengers.length < this.train.capacity) {
                 passenger.onTrain = true;
                 this.train.passengers.push(passenger);
-
-            } 
+                console.log("Passenger got on train");
+            }
         });
     }
 }
