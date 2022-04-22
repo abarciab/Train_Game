@@ -12,23 +12,27 @@
 this.textConfig = {
     frontFamily: 'Courier',
     fontSize: '28px',
-    //backgroundColor: '#F3B141',
     color: '#000000',
     align: 'center',
 }
 
 function LoadUI(scene){
+    //biome assets
     scene.load.image('biome_bar_fields', './assets/UI/biome bar.png');
     scene.load.image('biome_cursor_fields', './assets/UI/biome bar cursor fields.png');
-    scene.load.image('passenger_UI', './assets/UI/passenger UI.png');
 
-    scene.load.image('mask', './assets/UI/circle mask test.png');
-
+    //passenger station shapes
     scene.load.image('pass_tri', './assets/UI/passenger triangle.png');
     scene.load.image('pass_circle', './assets/UI/passenger circle.png');
     scene.load.image('pass_square', './assets/UI/passenger square.png');
+
+    //passenger patience
     scene.load.image('patience_bar', './assets/UI/passenger patience.png');
-    scene.load.image('bottom_bar', './assets/UI/bottom bar.png');
+
+    //ggrey backdrop for top and bottom bar
+    scene.load.image('UI_bar_backgrounds', './assets/UI/bottom bar.png');
+
+    //fuel display
     scene.load.image('fuel_meter', './assets/UI/fuel meter.png');
     scene.load.image('fuel_needle', './assets/UI/fuel needle.png');
    
@@ -47,61 +51,54 @@ function StartUI(scene){
     this.iconScale = 0.5;
     this.bottomBarYpos = game.config.height - 60;
 
+    //passenger group
     this.numPassengers = 0;
     let groupConfig = {
         classType: PassengerIcon
     }
     this.passengers = scene.add.group(groupConfig);
 
-    this.topBar = scene.add.image(game.config.width/2 + 230, 60, 'bottom_bar').setOrigin(0.5).setScale(0.95, 1.4).setDepth(20);
-    this.bottomBarLeft= scene.add.image(game.config.width/2, this.bottomBarYpos, 'bottom_bar').setOrigin(0.5).setScale(1.35, 1.5).setDepth(20);
+    //UI background
+    this.topBar = scene.add.image(game.config.width/2 + 230, 60, 'UI_bar_backgrounds').setOrigin(0.5).setScale(0.95, 1.4).setDepth(20);
+    this.bottomBarLeft= scene.add.image(game.config.width/2, this.bottomBarYpos, 'UI_bar_backgrounds').setOrigin(0.5).setScale(1.35, 1.5).setDepth(20);
 
-
+    //fuel display
     this.fuelMeter = scene.add.image(game.config.width - 200, this.bottomBarYpos-10, 'fuel_meter').setOrigin(0.5).setScale(0.55).setDepth(20);
     this.fuelNeedle = scene.add.image(game.config.width - 200, this.bottomBarYpos + 25, 'fuel_needle').setOrigin(0.5).setScale(0.55).setDepth(21);
-
-    this.fuelNeedle.angle = -90;
-
-
-    this.pass1 = new Passenger(scene, game.config.width*2, game.config.height, 'mask', null, 5000, "red square");
-    this.pass1.boardTrain(scene);
-
-    this.pass2 = new Passenger(scene, game.config.width*2, game.config.height, 'mask', null, 7000, "blue circle");
-    this.pass2.boardTrain(scene);
     
+    //distance display
     this.distDisplay = scene.add.text(game.config.width*0.85, this.topBar.y, "Dist: 20,000m", this.textConfig).setOrigin(0.5).setDepth(20);
     this.distDisplay.setColor('#FFFFFF');
     this.dist = 0;
+    //biome display
     this.biomeBar = scene.add.image(game.config.width/2 + 60, this.topBar.y, 'biome_bar_fields').setDepth(20);
     this.biomeBarCursor = scene.add.image(game.config.width/2 + 60, this.topBar.y, 'biome_cursor_fields').setDepth(20);
 
+    //stars
     let starWidth = 80;
-
     this.star1 = scene.add.image(80, this.topBar.y - 10, 'star_4/4').setScale(0.7);
     this.star2 = scene.add.image(this.star1.x + starWidth, this.topBar.y - 10, 'star_4/4').setScale(0.7);
     this.star3 = scene.add.image(this.star1.x + starWidth*2, this.topBar.y - 10, 'star_4/4').setScale(0.7);
     this.star4 = scene.add.image(this.star1.x + starWidth*3, this.topBar.y - 10, 'star_4/4').setScale(0.7);
     this.star5 = scene.add.image(this.star1.x + starWidth*4, this.topBar.y - 10, 'star_4/4').setScale(0.7);
-
     this.rating  = 20;
     displayRating();
 }
 
 function UpdateUI(scene, delta){
-    //console.log(scene.fuel.getRemaining() + " / " + scene.train.fuelCapacity);
-
-
-
+    //update fuel display
     this.fuelNeedle.angle = ( (scene.fuel/scene.train.fuelCapacity) * 180) - 90;
+
+    //update distance display and biome display
     this.dist += (delta/1000) * scene.speed;
     biomeBarCursor.x += delta/200;
     this.distDisplay.text = "Dist: " + Math.round(this.dist).toLocaleString(undefined) + "m";
 
+    //update star display, if needed
     if (this.rating != scene.train.health){
         this.raiting = scene.train.health;
         displayRating();
     }
-    
 }
 
 function displayRating(){
@@ -134,12 +131,10 @@ function displayRating(){
         return;
     }
     
-    partialStar.setTexture("star_" + rating%4 + "/4");
-           
+    partialStar.setTexture("star_" + rating%4 + "/4"); 
 }
 
 function addPasengerUI(scene, passenger){
-
     this.numPassengers += 1;
     let shape;
 
@@ -156,24 +151,27 @@ function addPasengerUI(scene, passenger){
     }
 
     this.newPassIcon = new PassengerIcon(scene, this.front + (IconGap*numPassengers), bottomBarYpos, shape, passenger).setScale(this.iconScale);
-
     this.passengers.add(newPassIcon);
+}
+
+function RemovePassengerIcons(scene, station){
+    //loop through all passengers and remove any of them that have this station as their stop
+    console.log("function not written yet - remove PassengerIcons");
 }
 
 class PassengerIcon extends Phaser.GameObjects.Sprite {
     constructor(scene, x, y, texture, passenger) {
         super(scene, x, y, texture);
+        scene.add.existing(this);
+        this.passengerObj = passenger;
 
         this.setOrigin(0.5);
-        scene.add.existing(this);
-
         this.patienceBar = scene.add.sprite(x, y + 20, 'patience_bar');
-
         this.patience = passenger.patience;
 
+        //change color of patience bar from green to red and make it shrink over time
         this.green = Phaser.Display.Color.ValueToColor('#03fc13');
         this.red = Phaser.Display.Color.ValueToColor('#fc0303');
-
         scene.tweens.addCounter({
             from: 0, 
             to: 100,
@@ -184,22 +182,12 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
                 const colorObj = Phaser.Display.Color.Interpolate.ColorWithColor(this.green, this.red, 100, tween.getValue());
                 this.patienceBar.setTint(Phaser.Display.Color.GetColor(colorObj.r, colorObj.g, colorObj.b));
                 this.patienceBar.setScale(1-tween.getValue()/100, 1);
-                if (tween.getValue() == 100){
+                if (tween.getValue() == 100){       //this passenger is out of patience
                     passenger.goodReview = false;
                     this.setAlpha(0.4);
                     scene.cameras.main.shake(50, 0.003);
                 }
             }
         })
-    }
-
-    updatePatience(delta){
-        if (this.patience > 0){
-            this.patience -= delta;
-            if (this.patience <= 0){
-                console.log("PASSENGER HAS RUN OUT OF PATIENCE!!!");
-
-            }
-        }
     }
 }
