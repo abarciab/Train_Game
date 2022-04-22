@@ -49,6 +49,7 @@ class PlayGame extends Phaser.Scene {
 
         // tracks amount of fuel left
         this.fuel = this.time.delayedCall(this.train.fuelCapacity, () => {
+            console.log("Ran out of fuel");
             this.speed = 0;
             this.gameOver = true;
         }, null, this);
@@ -138,6 +139,8 @@ class PlayGame extends Phaser.Scene {
         }
         this.dx += this.speed;
         if (this.dx >= this.travel_interval) {
+            this.train.distanceTraveled++; // Increment # of Nodes passed
+            console.log("Nodes Passed: " + this.train.distanceTraveled);
             SpawnTracks(this, this.tracks, this.nodes, this.speed, this.node_interval, this.global_scaling);
             this.travel_interval = this.travel_interval - (this.dx-this.travel_interval);
             this.dx = 0;
