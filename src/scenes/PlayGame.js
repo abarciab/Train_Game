@@ -97,17 +97,15 @@ class PlayGame extends Phaser.Scene {
                             this.atJunction = false;
                             break;
                         case "north":
-                            this.train.turning = true;
+                            this.atJunction = false;
                             this.train.onTrack--;
-                            console.log("on track", this.train.onTrack);
+                            this.train.turning = true;
                             this.train.y -= this.y_interval/2
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
-                            this.atJunction = false;
                             break;
                         case "south":
                             this.atJunction = false;
                             this.train.onTrack++;
-                            console.log("on track", this.train.onTrack);
                             this.train.turning = true;
                             this.train.y += this.y_interval/2; // this.tracks[this.train.onTrack][0].y;
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
