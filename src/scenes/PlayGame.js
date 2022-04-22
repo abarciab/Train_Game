@@ -29,10 +29,6 @@ class PlayGame extends Phaser.Scene {
         this.dx = 0;                // delta x; how much the player has traveled
         this.tracks = {};           // key: track row, value: track images
         this.nodes = {};            // key: track row, value: node objects
-        this.atJunction = false;    // if the player is approaching a junction
-        this.can_turn_N = false;    // whether the player can turn north or south
-        this.can_turn_S = false;
-        this.turn_dir = "straight";
 
 
         // initialize tracks and nodes to keys and empty lists
@@ -50,7 +46,7 @@ class PlayGame extends Phaser.Scene {
         this.travel_interval = this.node_interval;
         this.input_interval = 18 * this.x_unit; // interval user can input an action before a junction
         this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
-        this.speed = 10;    // speed of world
+        this.speed = 30;    // speed of world
 
         // spawn the world initially
         initSpawn(this, this.tracks, this.nodes, this.speed, margin, this.node_interval, this.y_interval, this.num_chunks, this.global_scaling);
@@ -79,7 +75,7 @@ class PlayGame extends Phaser.Scene {
         this.updateTracks(delta);
         this.train.speed = this.speed;
         this.train.update(timer, delta);
-        this.updateEvents(delta);
+        //this.updateEvents(delta);
         this.updateBackground();
         //console.log('fuel: ' + this.fuel.delay);
         UpdateUI(this, delta);
@@ -89,6 +85,9 @@ class PlayGame extends Phaser.Scene {
         this.background.tilePositionX += this.speed;
     }
 
+    /*
+        - if the player is x distance before a node, can choose which direction the node goes
+    */
     updateTracks(delta) {
         // go by each row of tracks
         for (let i = 0; i < this.num_tracks; i++) {
@@ -109,42 +108,32 @@ class PlayGame extends Phaser.Scene {
                     - within x_distance of node
                     - same row as node
                     - not too close to the node
-                  let the player choose which direction they want to go before they get to the junction
+                  let the the direction the node will take the player
                 */
-                if (this.train.onTrack == i
+                if (this.train.onTrack == i && (this.nodes[i][j].exit_N || this.nodes[i][j].exit_S)
                 && this.nodes[i][j].x - this.train.x <= this.input_interval 
                 && this.nodes[i][j].x - this.train.x >= this.junction_offset) {
-                    // if the node has a north exit, can turn north
-                    if (this.nodes[i][j].exit_N) {
-                        this.atJunction=true;
-                        this.can_turn_N=true;
-                    }
-                    // if the node has a south exit, can turn south
-                    if (this.nodes[i][j].exit_S) {
-                        this.atJunction=true;
-                        this.can_turn_S=true;
-                    }
+                    this.updateJunctionDir(this.nodes[i][j]);
                 }
-                // when the train is close enough to turn on the node and is not turning yet
+                // when the train is close enough to turn on the node, turn the node's turn dir
                 else if (
-                    this.train.onTrack == i && !this.train.turning
+                    this.train.onTrack == i && !this.train.turning && this.nodes[i][j].turn_dir != "straight"
                     && this.train.x >= this.nodes[i][j].x-this.junction_offset 
                     && this.train.x <= this.nodes[i][j].x+this.junction_offset
                 ) {
-                    switch (this.turn_dir) {
+                    this.train.turn_dir = this.nodes[i][j].turn_dir;
+                    switch (this.nodes[i][j].turn_dir) {
                         // simply go straight; no longer at junction
                         case "straight":
                             break;
                         // turn north
                         case "north":
-                            this.train.turn_dir = "north";
                             this.train.onTrack--;
                             this.train.turning = true;
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
                             break;
                         // turn south
                         case "south":
-                            this.train.turn_dir = "south";
                             this.train.onTrack++;
                             this.train.turning = true;
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
@@ -153,10 +142,6 @@ class PlayGame extends Phaser.Scene {
                             console.log("invalid dir");
                             break;
                     }
-                    // reset turn variables
-                    this.atJunction = false;
-                    this.can_turn_N=false;
-                    this.can_turn_S=false;
                 }
                 // destroy the node once it's far enough off screen
                 if (this.nodes[i][j].x < -2*this.node_interval) {
@@ -178,34 +163,33 @@ class PlayGame extends Phaser.Scene {
         }
     }
 
-    updateEvents(delta) {
-        // if at a junction, can queue up whether to turn north, south, or straight
-        if (this.atJunction) {
-            if (W_key.isDown && this.can_turn_N && this.turn_dir != "north") {
-                //console.log("train wants to go up at next junction");
-                if (this.turn_dir != "north") 
-                    this.junctionSwitchSfx.play();
-                this.turn_dir = "north";
-                
-            }
-            if (S_key.isDown && this.can_turn_S && this.turn_dir != "south") {
-                if (this.turn_dir != "south") 
-                    this.junctionSwitchSfx.play();
-                //console.log("train wants to go down at next junction");
-                this.turn_dir = "south";
-            }
-            if (D_key.isDown && this.turn_dir != "straight") {
-                //console.log("train wants to go stright at next junction");
-                if (this.turn_dir != "straight") 
-                    this.junctionSwitchSfx.play();
-                this.turn_dir = "straight";
-            }
+    /*
+    update the direction the node will take the player
+        @ node: the node that is getting updated
+    */
+    updateJunctionDir(node) {
+        if (W_key.isDown && node.exit_N && node.turn_dir != "north") {
+            //console.log("train wants to go up at next junction");
+            this.junctionSwitchSfx.play();
+            node.turn_dir = "north";
         }
+        if (S_key.isDown && node.exit_S && node.turn_dir != "south") {
+            this.junctionSwitchSfx.play();
+            //console.log("train wants to go down at next junction");
+            node.turn_dir = "south";
+        }
+        if (D_key.isDown && node.turn_dir != "straight") {
+            //console.log("train wants to go stright at next junction");
+            this.junctionSwitchSfx.play();
+            node.turn_dir = "straight";
+        }
+    }
+
+    updateEvents(delta) {
         // A key exists for debug rn to test with variable speeds
         if (A_key.isDown && this.speed < 150) {
             this.speed += 10;
         }
-        
         if (this.train.atStation) {
             console.log("Entered station");
             this.enterStation(this.currentStation);

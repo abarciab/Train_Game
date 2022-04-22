@@ -8,6 +8,8 @@ class Node extends Phaser.GameObjects.Sprite {
         this.speed = speed;
         this.exit_N = exit_N;
         this.exit_S = exit_S;
+        this.turn_dir = "straight";
+        this.at_junction=false;
         
         this.obstacle_type = obstacle_type;
         // 0: nothing, 1: tree, 2: braches
