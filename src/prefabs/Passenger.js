@@ -5,7 +5,6 @@ class Passenger extends Phaser.GameObjects.Sprite {
         scene.add.existing(this);
 
         this.destination = station;   // Station the passenger gets off at
-        this.reached = false;     // Tracks if passenger reached destination
         this.onTrain = false;     // Tracks if passenger is on train
         this.goodReview = true;   // Tracks if passenger will give good review
         this.patience = patience; //the number of time this passenger is willing to wait on the train untill they get mad.

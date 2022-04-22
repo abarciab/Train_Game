@@ -63,6 +63,14 @@ class PlayGame extends Phaser.Scene {
             this.gameOver = true;
         }, null, this);
 
+        /*
+        // Testing station logic (REMOVE IN FUTURE)
+        this.temp = this.time.delayedCall(3000, () => {
+            this.train.atStation = true;
+        }, null, this);
+        this.currentStation = new Station(this, config.width/5, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'station', 0);
+        */
+       
         StartUI(this);
     }
 
@@ -184,24 +192,39 @@ class PlayGame extends Phaser.Scene {
                 this.train.turn_dir = "straight";
             }
         }
+        /*
         if (A_key.isDown && this.speed < 150) {
             this.speed += 10;
         }
+        */
         if (this.train.atStation) {
+            console.log("Entered station");
             this.enterStation(this.currentStation);
         }
     }
 
     enterStation(station) {
-        this.fuel = this.train.fuelCapacity;
+        let stationTime = 5000;
+        let tempSpeed = this.speed;
+        this.speed = 0;
+        this.fuel += stationTime;
+        console.log("Fuel sustained");
         this.train.passengers.forEach(passenger => {
-            if (passenger.destination == station.location || !passenger.goodReview) {
-                passenger.reached = true;
+            if (passenger.destination == station.location) {
                 passenger.onTrain = false;
                 if (passenger.goodReview == false) {
-                    this.train.health -= 20;
+                    this.train.health -= 10;
+                    console.log("Bad review");
                 }
                 this.train.passengers.remove(passenger);
+                console.log("Passenger got off train");
+            }
+            else if (!passenger.goodReview) {
+                passenger.onTrain = false;
+                this.train.health -= 20;
+                console.log("Terrible review!");
+                this.train.passengers.remove(passenger);
+                console.log("Passenger got off train");
             }
         });
 
@@ -209,8 +232,29 @@ class PlayGame extends Phaser.Scene {
             if (this.train.passengers.length < this.train.capacity) {
                 passenger.onTrain = true;
                 this.train.passengers.push(passenger);
-
-            } 
+                console.log("Passenger got on train");
+            }
         });
+
+        let gettingOff = this.time.delayedCall(stationTime/2, () => {
+            // Getting off animations
+            /*
+            Could do this by filling up list of passengers
+            who are getting off, and then showing all
+            their sprites leaving. Alternatively, could
+            have immediate train sprite change by
+            counting how many passengers got off.
+            */
+            let gettingOn = this.time.delayedCall(stationTime/2, () => {
+                // Getting on animations
+                // Same as getting off
+                this.speed = tempSpeed;
+                this.fuel = this.train.fuelCapacity;
+                console.log("Refueled");
+                console.log("Station business done");
+                // start patience timers
+            }, null, this);
+        }, null, this);
+        this.train.atStation = false;
     }
 }
