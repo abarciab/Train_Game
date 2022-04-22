@@ -92,7 +92,7 @@ function UpdateUI(scene, delta){
 
 
 
-    this.fuelNeedle.angle = ( (scene.fuel.getRemaining()/scene.train.fuelCapacity) * 180) - 90;
+    this.fuelNeedle.angle = ( (scene.fuel/scene.train.fuelCapacity) * 180) - 90;
     this.dist += (delta/1000) * scene.speed;
     biomeBarCursor.x += delta/200;
     this.distDisplay.text = "Dist: " + Math.round(this.dist).toLocaleString(undefined) + "m";

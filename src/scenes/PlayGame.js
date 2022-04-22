@@ -57,20 +57,23 @@ class PlayGame extends Phaser.Scene {
         // initial spawn:
         this.train = new Train(this, config.width/10, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'basic_locomotive', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
 
+        /*
         // tracks amount of fuel left
         this.fuel = this.time.delayedCall(this.train.fuelCapacity, () => {
             console.log("Ran out of fuel");
             this.speed = 0;
             this.gameOver = true;
         }, null, this);
+        */
+       // set fuel
+       this.fuel = this.train.fuelCapacity;
 
-        /*
+        
         // Testing station logic (REMOVE IN FUTURE)
         this.temp = this.time.delayedCall(3000, () => {
             this.train.atStation = true;
         }, null, this);
-        this.currentStation = new Station(this, config.width/5, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'station', 0);
-        */
+        this.currentStation = new Station(this, config.width/5, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'station', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
        
         StartUI(this);
     }
@@ -81,7 +84,6 @@ class PlayGame extends Phaser.Scene {
         this.train.update(timer, delta);
         this.updateEvents(delta);
         this.updateBackground();
-        //console.log('fuel: ' + this.fuel.delay);
         UpdateUI(this, delta);
     }
 
@@ -179,6 +181,11 @@ class PlayGame extends Phaser.Scene {
     }
 
     updateEvents(delta) {
+        // If train is moving, use fuel
+        if (this.train.moving) {
+            this.fuel -= delta;
+        }
+
         // if at a junction, can queue up whether to turn north, south, or straight
         if (this.atJunction) {
             if (W_key.isDown && this.can_turn_N && this.turn_dir != "north") {
@@ -216,7 +223,9 @@ class PlayGame extends Phaser.Scene {
         let stationTime = 5000;
         let tempSpeed = this.speed;
         this.speed = 0;
-        this.fuel.delay += stationTime;
+        //this.fuel.delay += stationTime;
+        this.train.moving = false;
+        this.fuel = this.train.fuelCapacity;
         console.log("Fuel sustained");
         this.train.passengers.forEach(passenger => {
             if (passenger.destination == station.location) {
@@ -260,7 +269,8 @@ class PlayGame extends Phaser.Scene {
                 // Getting on animations
                 // Same as getting off
                 this.speed = tempSpeed;
-                this.fuel.delay = this.train.fuelCapacity;
+                this.fuel = this.train.fuelCapacity;
+                this.train.moving = true;
                 console.log("Refueled");
                 console.log("Station business done");
                 // start patience timers
