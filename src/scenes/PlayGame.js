@@ -132,7 +132,7 @@ class PlayGame extends Phaser.Scene {
                             
                             this.train.turning = true;
                             this.train.onTrack--;
-                            console.log("on track", this.train.onTrack);
+                            //console.log("on track", this.train.onTrack);
                             //this.train.y -= this.y_interval/2
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
                             this.atJunction = false;
@@ -145,7 +145,7 @@ class PlayGame extends Phaser.Scene {
 
                             this.atJunction = false;
                             this.train.onTrack++;
-                            console.log("on track", this.train.onTrack);
+                            //console.log("on track", this.train.onTrack);
                             this.train.turning = true;
                             //this.train.y += this.y_interval/2; // this.tracks[this.train.onTrack][0].y;
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
@@ -177,17 +177,17 @@ class PlayGame extends Phaser.Scene {
     updateEvents(delta) {
         if (this.atJunction) {
             if (W_key.isDown && this.can_turn_N && this.train.turn_dir != "north") {
-                console.log("train wants to go up at next junction");
+                //console.log("train wants to go up at next junction");
                 this.train.turn_dir = "north";
                 this.junctionSwitchSfx.play();
             }
             if (S_key.isDown && this.can_turn_S && this.train.turn_dir != "south") {
                 this.junctionSwitchSfx.play();
-                console.log("train wants to go down at next junction");
+                //console.log("train wants to go down at next junction");
                 this.train.turn_dir = "south";
             }
             if (D_key.isDown && this.train.turn_dir != "straight") {
-                console.log("train wants to go stright at next junction");
+                //console.log("train wants to go stright at next junction");
                 this.junctionSwitchSfx.play();
                 this.train.turn_dir = "straight";
             }
