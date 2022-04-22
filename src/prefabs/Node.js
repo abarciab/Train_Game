@@ -3,11 +3,12 @@ class Node extends Phaser.GameObjects.Sprite {
     constructor(scene, x, y, texture, row, speed, scaling, exit_N=false, exit_S=false, obstacle_type) {
         super(scene, x, y, texture);
         scene.add.existing(this);
+
+        this.row = row;
         this.speed = speed;
-        this.scaleX = scaling;
-        this.scaleY = scaling;
         this.exit_N = exit_N;
         this.exit_S = exit_S;
+        
         this.obstacle_type = obstacle_type;
         // 0: nothing, 1: tree, 2: braches
         switch (this.obstacle_type) {
@@ -36,6 +37,9 @@ class Node extends Phaser.GameObjects.Sprite {
         this.back_E_track = scene.add.image(x, y, "basic_out-straight_track");
         this.back_E_track.setScale(scaling);
         this.back_E_track.setDepth(4);
+
+        this.scaleX = scaling;
+        this.scaleY = scaling;
         this.setDepth(4);
     }
 
@@ -55,17 +59,21 @@ class Node extends Phaser.GameObjects.Sprite {
 
     destroy() {
         console.log("destroy object");
-        super.destroy();
         this.back_E_track.destroy();
+        delete this.back_E_track;
         if (this.exit_N) {
             this.back_N_track.destroy();
+            delete this.back_N_track;
         }
         if (this.exit_S) {
             this.back_S_track.destroy();
+            delete this.back_S_track;
         }
         if (this.obstacle_type) {
             this.obstacle.destroy();
+            delete this.obstacle;
         }
+        super.destroy();
     }
 }
 
