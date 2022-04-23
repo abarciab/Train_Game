@@ -59,7 +59,7 @@ spawn a chunk of the world
     - x_interval: used to spawn tracks/nodes at right place
     - scaling: world size scaling
 */
-function SpawnTracks(scene, tracks, nodes, speed, x_interval, scaling) {
+function SpawnTracks(scene, tracks, nodes, stations, speed, x_interval, scaling) {
     // go through each row of tracks
     for (let i = 0; i < Object.keys(tracks).length; i++) {
         // add tracks to position relative to last track
@@ -74,20 +74,85 @@ function SpawnTracks(scene, tracks, nodes, speed, x_interval, scaling) {
         // random chance to spawn north or south junction
         let random_dir = Math.floor(Math.random()*100);
         if (random_dir <= 25) {
-            if (i > 0)
+            if (i > 0) {
                 n_junc=true;
+            }
         }
         if (random_dir >= 25 && random_dir <= 50) {
-            if (i < Object.keys(tracks).length-1)
+            if (i < Object.keys(tracks).length-1) {
                 s_junc=true;
+            }
         }
+
+        // update the stations every spawn timer (node interval)
+        // key: north or south. value: array of symbols
+        let junction_signs = {};
+        for (let j = 0; j < stations.length; j++) {
+            // decrement the spawn timer for each node interval passed
+            if (stations[j].spawn_timer > 0)
+                stations[j].spawn_timer--;
+            // once the spawn timer hits 0, set to visible
+            else if (!stations[j].visible) {
+                stations[j].setVisible(true);
+            }
+            // while the station hasn't "spawned" yet, update signs to the station
+            if (!stations[j].visible) {
+                // chance that a junction will have a sign for the station
+                let sign_chance = Math.floor(Math.random()*100) 
+                // if there is a junction
+                if (sign_chance <= 30 && (n_junc || s_junc)) {
+                    // if node has two junctions, randomly choose one of them to have a sign
+                    let sign_dir = "straight";
+                    if (n_junc && s_junc) {
+                        if (Math.floor(Math.random()*100)<=50 && stations[j].onTrack > 0) {
+                            sign_dir = "north";
+                            stations[j].onTrack--;
+                        }
+                        else if (stations[j].onTrack < Object.keys(tracks).length-1) {
+                            sign_dir = "south";
+                            stations[j].onTrack++;
+                        }
+                    }
+                    // if north junction, give the north junction a sign
+                    else if (n_junc && stations[j].onTrack > 0) {
+                        sign_dir = "north";
+                        stations[j].onTrack--;
+                    }
+                    // if south junction, give the south junction a sign
+                    else if (s_junc && stations[j].onTrack < Object.keys(tracks).length-1) {
+                        sign_dir = "south";
+                        stations[j].onTrack++;
+                    }
+                    if (sign_dir != "straight") {
+                        if (!(sign_dir in junction_signs))
+                            junction_signs[sign_dir] = new Set();
+                        stations[j].type.array.forEach(element => {
+                            junction_signs[sign_dir].add(element);
+                        });
+                    }  
+                    stations[j].y = tracks[stations[j].onTrack][0].y;
+                }
+            }
+        }
+
         // random chance to spawn obstacle
         let obstacle_chance = Math.floor(Math.random()*100);
         if (obstacle_chance <= 10 && (n_junc || s_junc)) {
             obstacle_type = 1;
         }
         nodes[i].push(new Node(scene, prev_x+(x_interval/2), nodes[i][0].y,
-            "basic_node_track", i, speed, scaling, n_junc, s_junc, obstacle_type
+            "basic_node_track", i, speed, scaling, n_junc, s_junc, junction_signs, obstacle_type
         ));
+
+        // random chance to spawn a station per row
+        let random_station = Math.floor(Math.random()*100);
+        if (random_station <= 1) {
+            console.log("spawn station");
+            stations.push(new Station(
+                scene, nodes[i][nodes[i].length-1].x, nodes[i][nodes[i].length-1].y,
+                 "station", 0, i, new Set("square"), 0, scaling
+            ));
+            stations[stations.length-1].setVisible(false);
+        }
     }
 }
