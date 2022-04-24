@@ -5,13 +5,9 @@ class PlayGame extends Phaser.Scene {
 
     preload() {
         // load images/tile sprites
-<<<<<<< HEAD
-
-=======
         this.load.image('train', './assets/trains/basic locomotive.png');
 
         LoadUI(this);
->>>>>>> 054336ba8b24871dc264512005ed7005920c18b7
     }
 
     create() {
@@ -33,22 +29,11 @@ class PlayGame extends Phaser.Scene {
             this.tracks[i] = [];
         }
         
-<<<<<<< HEAD
-        // this.train = new Train(this, 0, 300, 'train').setOrigin(0,0);
-        // animations
-        this.anims.create({
-            key: "train",
-            frames: this.anims.generateFrameNumbers("train"),
-            frameRate: 1,
-            repeat: -1
-        });
-=======
         this.train = new Train(this, 0, 400, 'train').setOrigin(0,0);
 
         
 
         StartUI(this);
->>>>>>> 054336ba8b24871dc264512005ed7005920c18b7
     }
 
     update(time, delta) {
@@ -85,5 +70,73 @@ class PlayGame extends Phaser.Scene {
         if (D_key.isDown) {
             testMethod();
         }
+        if (this.train.atStation == 1) {
+            console.log("Entered station");
+            this.enterStation(this.currentStation);
+        }
+    }
+
+    enterStation(station) {
+        this.train.atStation = 2;
+        let stationTime = 5000;
+        let tempSpeed = this.speed;
+        this.speed = 0;
+        this.train.moving = false;
+        this.fuel = this.train.fuelCapacity;
+        console.log("Fuel sustained");
+        this.train.passengers.forEach(passenger => {
+            if (station.type.has(passenger.destination)) {
+                passenger.onTrain = false;
+                if (passenger.goodReview == false) {
+                    this.train.health -= 2;
+                    console.log("Bad review");
+                } else {
+                    this.train.health += 1;
+                    console.log("Good review");
+                }
+                this.train.passengers.splice(this.train.passengers.indexOf(passenger), 1);
+                console.log("Passenger got off train");
+            } else if (!passenger.goodReview) {
+                passenger.onTrain = false;
+                this.train.health -= 4;
+                console.log("Terrible review!");
+                this.train.passengers.splice(this.train.passengers.indexOf(passenger), 1);
+                console.log("Passenger got off train");
+            }
+        });
+
+        station.passengers.forEach(passenger => {
+            if (this.train.passengers.length < this.train.capacity) {
+                passenger.onTrain = true;
+                passenger.boardTrain(this);
+                this.train.passengers.push(passenger);
+                console.log("Passenger got on train");
+            }
+            if (this.train.passengers.length == this.train.capacity) {
+                console.log("Full train!");
+            }
+        });
+
+        let gettingOff = this.time.delayedCall(stationTime/2, () => {
+            // Getting off animations
+            /*
+            Could do this by filling up list of passengers
+            who are getting off, and then showing all
+            their sprites leaving. Alternatively, could
+            have immediate train sprite change by
+            counting how many passengers got off.
+            */
+            let gettingOn = this.time.delayedCall(stationTime/2, () => {
+                // Getting on animations
+                // Same as getting off
+                this.speed = tempSpeed;
+                this.fuel = this.train.fuelCapacity;
+                this.train.moving = true;
+                console.log("Refueled");
+                console.log("Station business done");
+                this.train.atStation = 0;
+                // start patience timers
+            }, null, this);
+        }, null, this);
     }
 }
