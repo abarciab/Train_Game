@@ -101,7 +101,7 @@ function UpdateUI(scene, delta){
 
     //update star display, if needed
     if (this.rating != scene.train.health){
-        this.raiting = scene.train.health;
+        this.rating = scene.train.health;
         displayRating();
     }
 }

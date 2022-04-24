@@ -74,6 +74,7 @@ class PlayGame extends Phaser.Scene {
         this.updateTracks(delta);
         this.updateStations(delta);
         this.train.speed = this.speed;
+        this.fuel -= delta;
         this.train.update(timer, delta);
         this.updateEvents(delta);
         this.updateBackground();
@@ -107,7 +108,7 @@ class PlayGame extends Phaser.Scene {
 
                 // check if train collided with obstacle
                 if (this.train.onTrack == i && this.nodes[i][j].obstacle_type
-                && Math.abs(this.train.x - this.nodes[i][j].x) <= 2) {
+                && Math.abs(this.train.x - this.nodes[i][j].x) <= 2 && !this.train.turning) {
                     if (this.nodes[i][j].obstacle_type == 1) {
                         // this.speed = 0;
                         // GameOverUI(this);
@@ -116,6 +117,7 @@ class PlayGame extends Phaser.Scene {
                         this.train.health -= 4;
                     }
                 }
+                
                 /*if the player is:
                     - within x_distance of node
                     - same row as node
@@ -223,9 +225,7 @@ class PlayGame extends Phaser.Scene {
         // Check if train is at station
         if (this.train.atStation == 0) {
             for (let i = 0; i < this.stations.length; i++) {
-                if (this.train.onTrack == this.stations[i].onTrack) {
-                }
-                if (this.train.onTrack == this.stations[i].onTrack
+                if (this.train.onTrack == this.stations[i].onTrack && !this.train.turning
                 && Math.abs(this.train.x - this.stations[i].x) <= 2) {
                     this.currentStation = this.stations[i];
                     this.train.atStation = 1;

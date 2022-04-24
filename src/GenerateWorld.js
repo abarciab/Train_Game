@@ -181,6 +181,8 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
         let obstacle_chance = Math.floor(Math.random()*100);
         if (obstacle_chance <= 10 && (n_junc || s_junc)) {
             obstacle_type = 1;
+        } else if (obstacle_chance <= 20 && (n_junc || s_junc)) {
+            obstacle_type = 2;
         }
         nodes[i].push(new Node(scene, prev_x+(x_interval/2), nodes[i][0].y,
             "basic_node_track", i, speed, scaling, n_junc, s_junc, junction_signs, obstacle_type
