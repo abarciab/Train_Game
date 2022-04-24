@@ -6,13 +6,16 @@ class Node extends Phaser.GameObjects.Sprite {
 
         this.row = row;
         this.speed = speed;
-        this.exit_N = exit_N;
-        this.exit_S = exit_S;
-        this.signs = signs;
+        this.sign_types = signs;
         this.turn_dir = "straight";
         this.at_junction=false;
-        
+        this.obstacle;
+        this.to_tracks = new Set([this.row]);
         this.obstacle_type = obstacle_type;
+
+        this.junctions = {"straight": scene.add.image(x, y, "basic_out-straight_track").setScale(scaling).setDepth(4)};
+        this.signs = {};
+
         // 0: nothing, 1: tree, 2: braches
         switch (this.obstacle_type) {
             case 0:
@@ -30,21 +33,19 @@ class Node extends Phaser.GameObjects.Sprite {
                 console.log("unknown obstacle:", obstacle_type);
         }
         
-        if (this.exit_N) {
-            this.back_N_track = scene.add.image(x, y, "basic_out-up_track");
-            this.back_N_track.setScale(scaling);
-            this.back_N_track.setDepth(4);
+        if (exit_N) {
+            this.to_tracks.add(this.row-1)
+            this.junctions["north"] = scene.add.image(x, y, "basic_out-up_track").setScale(scaling).setDepth(4);
         }
-        if (this.exit_S) {
-            this.back_S_track = scene.add.image(x, y, "basic_out-down_track");
-            this.back_S_track.setScale(scaling);
-            this.back_S_track.setDepth(4);
+        if (exit_S) {
+            this.to_tracks.add(this.row+1);
+            this.junctions["south"] = scene.add.image(x, y, "basic_out-down_track").setScale(scaling).setDepth(4);
         }
-        for (const[key, value] of Object.entries(this.signs)) {
+        for (const[key, value] of Object.entries(this.sign_types)) {
             // spawn a sign with the approriate symbols (array of values)
             switch (key) {
                 case "straight":
-                    // shouldn't be possible
+                    
                     break;
                 case "north":
                     // spawn a sign at the north junction
@@ -60,9 +61,6 @@ class Node extends Phaser.GameObjects.Sprite {
                     break;
             }
         }
-        this.back_E_track = scene.add.image(x, y, "basic_out-straight_track");
-        this.back_E_track.setScale(scaling);
-        this.back_E_track.setDepth(4);
 
         this.scaleX = scaling;
         this.scaleY = scaling;
@@ -71,38 +69,29 @@ class Node extends Phaser.GameObjects.Sprite {
 
     update() {
         this.x -= this.speed;
-        this.back_E_track.x -= this.speed;
-        if (this.exit_N) {
-            this.back_N_track.x -= this.speed;
-        }
-        if (this.exit_S) {
-            this.back_S_track.x -= this.speed;
+        for (const[key, value] of Object.entries(this.junctions)) {
+            value.x -= this.speed;
         }
         if (this.obstacle_type) {
             this.obstacle.x -= this.speed;
         }
-        if (Object.keys(this.signs).length) {
-            // update sign position
+        for (const[key, value] of Object.entries(this.signs)) {
+            // update sign positions
         }
     }
 
     destroy() {
-        this.back_E_track.destroy();
-        delete this.back_E_track;
-        if (this.exit_N) {
-            this.back_N_track.destroy();
-            delete this.back_N_track;
-        }
-        if (this.exit_S) {
-            this.back_S_track.destroy();
-            delete this.back_S_track;
+        for (const[key, value] of Object.entries(this.junctions)) {
+            value.destroy();
+            delete this.junctions[key];
         }
         if (this.obstacle_type) {
             this.obstacle.destroy();
             delete this.obstacle;
         }
-        if (Object.keys(this.signs).length) {
-            // delete the sign
+        for (const[key, value] of Object.entries(this.signs)) {
+            value.destroy();
+            delete this.signs[key];
         }
         super.destroy();
     }

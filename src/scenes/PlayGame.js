@@ -115,7 +115,7 @@ class PlayGame extends Phaser.Scene {
                     - not too close to the node
                   let the the direction the node will take the player
                 */
-                if (this.train.onTrack == i && (this.nodes[i][j].exit_N || this.nodes[i][j].exit_S)
+                if (this.train.onTrack == i && ("north" in this.nodes[i][j].junctions || "south" in this.nodes[i][j].junctions)
                 && this.nodes[i][j].x - this.train.x <= this.input_interval 
                 && this.nodes[i][j].x - this.train.x >= this.junction_offset) {
                     this.updateJunctionDir(this.nodes[i][j]);
@@ -160,7 +160,7 @@ class PlayGame extends Phaser.Scene {
         }
         // spawn the tracks if tracks have been deleted to ensure consistent number of tracks
         if (spawn_tracks)
-            SpawnTracks(this, this.tracks, this.nodes, this.stations, this.speed, this.node_interval, this.global_scaling);
+            SpawnTracks(this, this.train, this.tracks, this.nodes, this.stations, this.speed, this.node_interval, this.global_scaling);
     }
 
     /*
@@ -168,12 +168,12 @@ class PlayGame extends Phaser.Scene {
         @ node: the node that is getting updated
     */
     updateJunctionDir(node) {
-        if (W_key.isDown && node.exit_N && node.turn_dir != "north") {
+        if (W_key.isDown && "north" in node.junctions && node.turn_dir != "north") {
             //console.log("train wants to go up at next junction");
             this.junctionSwitchSfx.play();
             node.turn_dir = "north";
         }
-        if (S_key.isDown && node.exit_S && node.turn_dir != "south") {
+        if (S_key.isDown && "south" in node.junctions && node.turn_dir != "south") {
             this.junctionSwitchSfx.play();
             //console.log("train wants to go down at next junction");
             node.turn_dir = "south";
