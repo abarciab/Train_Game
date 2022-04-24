@@ -39,6 +39,8 @@ function initSpawn(scene, tracks, nodes, speed, margin, x_interval, y_interval, 
                 let obstacle_chance = Math.floor(Math.random()*100);
                 if (obstacle_chance <= 10 && (n_junc || s_junc)) {
                     obstacle_type = 1;
+                } else if (obstacle_chance <= 20 && (n_junc || s_junc)) {
+                    obstacle_type = 2;
                 }
             }
             // add a node to the scene
