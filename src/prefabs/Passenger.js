@@ -4,7 +4,7 @@ class Passenger extends Phaser.GameObjects.Sprite {
 
         scene.add.existing(this);
 
-        let choices = ["square", "circle", "triangle"];
+        let choices = ["red square", "blue circle", "green triangle"];
         this.destination = choices[(Math.floor(Math.random() * choices.length))];   // Station the passenger gets off at
         this.onTrain = false;     // Tracks if passenger is on train
         this.goodReview = true;   // Tracks if passenger will give good review
