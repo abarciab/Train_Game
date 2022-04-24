@@ -2,7 +2,6 @@ let config = {
     type: Phaser.AUTO,
     width: 1800,
     height: 900,
-    pixelArt: true,
     scene: [Menu, PlayGame]
 }
 

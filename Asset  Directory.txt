@@ -27,8 +27,6 @@ stations
             ex: "desert full station.png"
         to place a station that is visually below the track, place "<biome> down station.png"
             ex: desert down station.png"
-    Stations all have signs that denote what they are. the signs are named: "<color> <shape> station sign.png"
-        ex: "red square station sign.png"
 
 locomotives and wagons
     To add the front of a train, place "<tech> locomotive.png"
@@ -68,17 +66,11 @@ Obstacles
     The debris obstacles are named "<biome> debris obstacle.png"
         ex: "desert debris obstacle.png"
 
-passengers
-    passengers are named "<level> passenger <number>.png"
-        ex: "basic passenger 1.png"
-
 list of biomes:
    field
 
 list of tech levels:
     basic
-
-
 
 
 ASSET DIRECTORY:
@@ -107,6 +99,5 @@ obstacles:
     "field deadly obstacle.png"
     "field debris obstacle.png"
 
-passengers:
-    "basic passenger 1.png"
+
 
