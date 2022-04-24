@@ -29,8 +29,9 @@ function LoadUI(scene){
     //passenger patience
     scene.load.image('patience_bar', './assets/UI/passenger patience.png');
 
-    //ggrey backdrop for top and bottom bar
+    //ggrey backdrop for UI
     scene.load.image('UI_bar_backgrounds', './assets/UI/bottom bar.png');
+    scene.load.image('GO_background', './assets/UI/game over background.png');
 
     //fuel display
     scene.load.image('fuel_meter', './assets/UI/fuel meter.png');
@@ -83,6 +84,10 @@ function StartUI(scene){
     this.star5 = scene.add.image(this.star1.x + starWidth*4, this.topBar.y - 10, 'star_4/4').setScale(0.7);
     this.rating  = 20;
     displayRating();
+
+
+    
+
 }
 
 function UpdateUI(scene, delta){
@@ -96,7 +101,7 @@ function UpdateUI(scene, delta){
 
     //update star display, if needed
     if (this.rating != scene.train.health){
-        this.raiting = scene.train.health;
+        this.rating = scene.train.health;
         displayRating();
     }
 }
@@ -190,4 +195,19 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
             }
         })
     }
+}
+
+function EndGameUI(scene){
+
+    scene.add.rectangle(0, 0, game.config.width, game.config.height, '#000000').setAlpha(0.6).setScale(4).setDepth(22.9);
+    this.gameOverBackground = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5);
+    this.gameOverText = scene.add.text(game.config.width/2, game.config.height/2, "GAME OVER\nDistance travelled: " + Math.round(this.dist).toLocaleString(undefined), this.textConfig)
+        .setDepth(23.1)
+        .setColor('#FFFFFF')
+        .setOrigin(0.5);
+
+    this.restartText = scene.add.text(game.config.width/2, game.config.height/2 + this.gameOverText.y, "Press SPACE to restart", this.textConfig)
+        .setDepth(23.1)
+        .setColor('#FFFFFF')
+        .setOrigin(0.5);
 }

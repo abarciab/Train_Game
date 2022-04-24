@@ -54,26 +54,18 @@ class PlayGame extends Phaser.Scene {
         // initial spawn:
         this.train = new Train(this, config.width/10, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'basic_locomotive', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
 
-        /*
-        // tracks amount of fuel left
-        this.fuel = this.time.delayedCall(this.train.fuelCapacity, () => {
-            console.log("Ran out of fuel");
-            this.speed = 0;
-            this.gameOver = true;
-        }, null, this);
-        */
-       // set fuel
-       this.fuel = this.train.fuelCapacity;
-       this.currentStation;
+        // set fuel
+        this.fuel = this.train.fuelCapacity;
+        this.currentStation;
 
         
-       /*
+        /*
         // Testing station logic (REMOVE IN FUTURE)
         this.temp = this.time.delayedCall(3000, () => {
             this.train.atStation = true;
         }, null, this);
         this.currentStation = new Station(this, config.width/5, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'station', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
-       */
+        */
 
         StartUI(this);
     }
@@ -82,6 +74,7 @@ class PlayGame extends Phaser.Scene {
         this.updateTracks(delta);
         this.updateStations(delta);
         this.train.speed = this.speed;
+        this.fuel -= delta;
         this.train.update(timer, delta);
         this.updateEvents(delta);
         this.updateBackground();
@@ -112,8 +105,20 @@ class PlayGame extends Phaser.Scene {
             for (let j = 0; j < this.nodes[i].length; j++) {
                 this.nodes[i][j].speed = this.speed;
                 this.nodes[i][j].update();
-                /*
-                if the player is:
+
+                // check if train collided with obstacle
+                if (this.train.onTrack == i && this.nodes[i][j].obstacle_type
+                && Math.abs(this.train.x - this.nodes[i][j].x) <= 2 && !this.train.turning) {
+                    if (this.nodes[i][j].obstacle_type == 1) {
+                        // this.speed = 0;
+                        // GameOverUI(this);
+                        this.train.health = 0;
+                    } else if (this.nodes[i][j].obstacle_type == 2) {
+                        this.train.health -= 4;
+                    }
+                }
+                
+                /*if the player is:
                     - within x_distance of node
                     - same row as node
                     - not too close to the node
@@ -209,12 +214,17 @@ class PlayGame extends Phaser.Scene {
         if (D_key.isDown && this.speed < 50) {
             this.speed += 1;
         }
+
+        // Check if player lost
+        if (this.train.health <= 0) {
+            this.speed = 0;
+            EndGameUI(this);
+        }
+
         // Check if train is at station
         if (this.train.atStation == 0) {
             for (let i = 0; i < this.stations.length; i++) {
-                if (this.train.onTrack == this.stations[i].onTrack) {
-                }
-                if (this.train.onTrack == this.stations[i].onTrack
+                if (this.train.onTrack == this.stations[i].onTrack && !this.train.turning
                 && Math.abs(this.train.x - this.stations[i].x) <= 2) {
                     this.currentStation = this.stations[i];
                     this.train.atStation = 1;
@@ -233,12 +243,11 @@ class PlayGame extends Phaser.Scene {
         let stationTime = 5000;
         let tempSpeed = this.speed;
         this.speed = 0;
-        //this.fuel.delay += stationTime;
         this.train.moving = false;
         this.fuel = this.train.fuelCapacity;
         console.log("Fuel sustained");
         this.train.passengers.forEach(passenger => {
-            if (passenger.destination == station.location) {
+            if (station.type.has(passenger.destination)) {
                 passenger.onTrain = false;
                 if (passenger.goodReview == false) {
                     this.train.health -= 2;
@@ -263,6 +272,9 @@ class PlayGame extends Phaser.Scene {
                 passenger.onTrain = true;
                 this.train.passengers.push(passenger);
                 console.log("Passenger got on train");
+            }
+            if (this.train.passengers.length == this.train.capacity) {
+                console.log("Full train!");
             }
         });
 

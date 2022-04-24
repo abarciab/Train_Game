@@ -9,7 +9,6 @@ class Station extends Phaser.GameObjects.Sprite {
         this.type = type;
         this.speed = speed;
         this.dir_sign=false;
-        this.location = "";        // location of Station
         this.passengers = passengers;      // list of passengers at station
         this.onTrack = initial_track;
         this.moved=false;
