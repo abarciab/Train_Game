@@ -18,6 +18,7 @@ class Menu extends Phaser.Scene {
 
         //trees
         this.load.image('field_deadly_obstacle', './assets/obstacles/field deadly obstacle.png');
+        this.load.image('field_debris_obstacle', './assets/obstacles/field debris obstacle.png');
 
         // passengers
         this.load.image('passenger 1', './assets/passengers/basic passenger 1.png');

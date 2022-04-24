@@ -27,7 +27,10 @@ class Node extends Phaser.GameObjects.Sprite {
                 this.obstacle.setDepth(5);
                 break;
             case 2:
-                console.log("branch");
+                this.obstacle = scene.add.image(x+(10*64*scaling), y, "field_debris_obstacle");
+                this.obstacle.y -= this.displayHeight/2;
+                this.obstacle.setScale(scaling);
+                this.obstacle.setDepth(5);
                 break;
             default:
                 console.log("unknown obstacle:", obstacle_type);
