@@ -264,6 +264,9 @@ class PlayGame extends Phaser.Scene {
                 this.train.passengers.push(passenger);
                 console.log("Passenger got on train");
             }
+            if (this.train.passengers.length == this.train.capacity) {
+                console.log("Full train!");
+            }
         });
 
         let gettingOff = this.time.delayedCall(stationTime/2, () => {
