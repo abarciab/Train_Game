@@ -257,13 +257,13 @@ class PlayGame extends Phaser.Scene {
                     this.train.health += 1;
                     console.log("Good review");
                 }
-                this.train.passengers.remove(passenger);
+                this.train.passengers.splice(this.train.passengers.indexOf(passenger), 1);
                 console.log("Passenger got off train");
             } else if (!passenger.goodReview) {
                 passenger.onTrain = false;
                 this.train.health -= 4;
                 console.log("Terrible review!");
-                this.train.passengers.remove(passenger);
+                this.train.passengers.splice(this.train.passengers.indexOf(passenger), 1);
                 console.log("Passenger got off train");
             }
         });
