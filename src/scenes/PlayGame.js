@@ -247,7 +247,7 @@ class PlayGame extends Phaser.Scene {
         this.fuel = this.train.fuelCapacity;
         console.log("Fuel sustained");
         this.train.passengers.forEach(passenger => {
-            if (passenger.destination in station.type) {
+            if (station.type.has(passenger.destination)) {
                 passenger.onTrain = false;
                 if (passenger.goodReview == false) {
                     this.train.health -= 2;
