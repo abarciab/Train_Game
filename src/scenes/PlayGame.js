@@ -270,6 +270,7 @@ class PlayGame extends Phaser.Scene {
         station.passengers.forEach(passenger => {
             if (this.train.passengers.length < this.train.capacity) {
                 passenger.onTrain = true;
+                passenger.boardTrain(this);
                 this.train.passengers.push(passenger);
                 console.log("Passenger got on train");
             }

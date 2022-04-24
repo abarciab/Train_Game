@@ -220,7 +220,7 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
         console.log("spawn station");
         stations.push(new Station(
             scene, nodes[train.onTrack][nodes[train.onTrack].length-1].x, nodes[train.onTrack][nodes[train.onTrack].length-1].y,
-            "station", 0, train.onTrack, new Set("square"), passengers, 0, scaling
+            "station", 0, train.onTrack, new Set("red square", "blue circle"), passengers, 0, scaling
         ));
     }
 }
