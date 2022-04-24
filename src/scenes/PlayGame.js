@@ -26,9 +26,10 @@ class PlayGame extends Phaser.Scene {
         this.base_interval = 64*6;  // base unscaled interval between rows of tracks
         this.num_tracks = 5;        // number of rows of tracks
         this.num_chunks = 8;        // number of chunks that are loaded
-        this.dx = 0;                // delta x; how much the player has traveled
+        // this.dx = 0;                // delta x; how much the player has traveled
         this.tracks = {};           // key: track row, value: track images
         this.nodes = {};            // key: track row, value: node objects
+        this.stations = [];         // list of stations.
 
 
         // initialize tracks and nodes to keys and empty lists
@@ -43,42 +44,38 @@ class PlayGame extends Phaser.Scene {
         this.global_scaling = this.y_interval / this.base_interval; // scaling of all objects
         this.x_unit = 64 * this.global_scaling; // unit square of measurement
         this.node_interval = 20 * this.x_unit;  // interval between each node/track placement
-        this.travel_interval = this.node_interval;
+        // this.travel_interval = this.node_interval;
         this.input_interval = 18 * this.x_unit; // interval user can input an action before a junction
         this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
-        this.speed = 30;    // speed of world
+        this.speed = 5;    // speed of world
 
         // spawn the world initially
         initSpawn(this, this.tracks, this.nodes, this.speed, margin, this.node_interval, this.y_interval, this.num_chunks, this.global_scaling);
         // initial spawn:
         this.train = new Train(this, config.width/10, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'basic_locomotive', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
 
-        /*
-        // tracks amount of fuel left
-        this.fuel = this.time.delayedCall(this.train.fuelCapacity, () => {
-            console.log("Ran out of fuel");
-            this.speed = 0;
-            this.gameOver = true;
-        }, null, this);
-        */
-       // set fuel
-       this.fuel = this.train.fuelCapacity;
+        // set fuel
+        this.fuel = this.train.fuelCapacity;
+        this.currentStation;
 
         
+        /*
         // Testing station logic (REMOVE IN FUTURE)
         this.temp = this.time.delayedCall(3000, () => {
             this.train.atStation = true;
         }, null, this);
         this.currentStation = new Station(this, config.width/5, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'station', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
-       
+        */
+
         StartUI(this);
     }
 
     update(timer, delta) {
         this.updateTracks(delta);
+        this.updateStations(delta);
         this.train.speed = this.speed;
         this.train.update(timer, delta);
-        //this.updateEvents(delta);
+        this.updateEvents(delta);
         this.updateBackground();
         UpdateUI(this, delta);
     }
@@ -91,38 +88,51 @@ class PlayGame extends Phaser.Scene {
         - if the player is x distance before a node, can choose which direction the node goes
     */
     updateTracks(delta) {
+        let spawn_tracks=false;
         // go by each row of tracks
         for (let i = 0; i < this.num_tracks; i++) {
             // move the tracks
-            for (let j = 0; j < this.tracks[i].length; j++) {
-                this.tracks[i][j].x -= this.speed;
+            for (let k = 0; k < this.tracks[i].length; k++) {
+                this.tracks[i][k].x -= this.speed;
                 // delete the tracks when out of range
-                if (this.tracks[i][j].x < -2*this.node_interval) {
-                    delete this.tracks[i][j];
-                    this.tracks[i].splice(j, 1);
+                if (this.tracks[i][k].x < -2*this.node_interval) {
+                    delete this.tracks[i][k];
+                    this.tracks[i].splice(k, 1);
                 }
             }
             // move and update the nodes
             for (let j = 0; j < this.nodes[i].length; j++) {
                 this.nodes[i][j].speed = this.speed;
                 this.nodes[i][j].update();
+
+                if (this.train.onTrack == i && this.nodes[i][j].obstacle_type
+                && Math.abs(this.train.x - this.nodes[i][j].x) <= 2) {
+                    if (this.nodes[i][j].obstacle_type == 1) {
+                        // this.speed = 0;
+                        // GameOverUI(this);
+                        this.train.health = 0;
+                    } else if (this.nodes[i][j].obstacle_type == 2) {
+                        this.train.health -= 4;
+                    }
+                }
                 /*if the player is:
                     - within x_distance of node
                     - same row as node
                     - not too close to the node
                   let the the direction the node will take the player
                 */
-                if (this.train.onTrack == i && (this.nodes[i][j].exit_N || this.nodes[i][j].exit_S)
+                if (this.train.onTrack == i && ("north" in this.nodes[i][j].junctions || "south" in this.nodes[i][j].junctions)
                 && this.nodes[i][j].x - this.train.x <= this.input_interval 
                 && this.nodes[i][j].x - this.train.x >= this.junction_offset) {
                     this.updateJunctionDir(this.nodes[i][j]);
                 }
                 // when the train is close enough to turn on the node, turn the node's turn dir
                 else if (
-                    this.train.onTrack == i && !this.train.turning && this.nodes[i][j].turn_dir != "straight"
+                    this.train.onTrack == i && !this.train.turning
                     && this.train.x >= this.nodes[i][j].x-this.junction_offset 
                     && this.train.x <= this.nodes[i][j].x+this.junction_offset
                 ) {
+                    this.train.distanceTraveled++;
                     this.train.turn_dir = this.nodes[i][j].turn_dir;
                     switch (this.nodes[i][j].turn_dir) {
                         // simply go straight; no longer at junction
@@ -150,19 +160,13 @@ class PlayGame extends Phaser.Scene {
                     this.nodes[i][j].destroy();
                     delete this.nodes[i][j];
                     this.nodes[i].splice(j, 1);
+                    spawn_tracks=true;
                 }
             }
         }
-
-        // check distance the train has traveled. if greater than travel_interval, spawn tracks
-        this.dx += this.speed;
-        if (this.dx >= this.travel_interval) {
-            this.train.distanceTraveled++; // Increment # of Nodes passed
-            SpawnTracks(this, this.tracks, this.nodes, this.speed, this.node_interval, this.global_scaling);
-            // update the travel interval to match the frame rate
-            this.travel_interval = this.travel_interval - (this.dx-this.travel_interval);
-            this.dx = 0;
-        }
+        // spawn the tracks if tracks have been deleted to ensure consistent number of tracks
+        if (spawn_tracks)
+            SpawnTracks(this, this.train, this.tracks, this.nodes, this.stations, this.speed, this.node_interval, this.global_scaling);
     }
 
     /*
@@ -170,12 +174,12 @@ class PlayGame extends Phaser.Scene {
         @ node: the node that is getting updated
     */
     updateJunctionDir(node) {
-        if (W_key.isDown && node.exit_N && node.turn_dir != "north") {
+        if (W_key.isDown && "north" in node.junctions && node.turn_dir != "north") {
             //console.log("train wants to go up at next junction");
             this.junctionSwitchSfx.play();
             node.turn_dir = "north";
         }
-        if (S_key.isDown && node.exit_S && node.turn_dir != "south") {
+        if (S_key.isDown && "south" in node.junctions && node.turn_dir != "south") {
             this.junctionSwitchSfx.play();
             //console.log("train wants to go down at next junction");
             node.turn_dir = "south";
@@ -187,27 +191,63 @@ class PlayGame extends Phaser.Scene {
         }
     }
 
-    updateEvents(delta) {
-        // A key exists for debug rn to test with variable speeds
-        if (A_key.isDown && this.speed < 150) {
-            this.speed += 10;
+    updateStations() {
+        for (let i = 0; i < this.stations.length; i++) {
+            this.stations[i].speed = this.speed;
+            this.stations[i].update();
+            if (this.stations[i].x < -2*this.node_interval) {
+                this.stations[i].destroy();
+                delete this.stations[i];
+                this.stations.splice(i, 1);
+                console.log(this.stations);
+            }
         }
-        if (this.train.atStation) {
+    }
+
+    updateEvents(delta) {
+        // A and D key exists for debug rn to test with variable speeds
+        if (A_key.isDown && this.speed > 5){
+            this.speed -= 1;
+        }
+        if (D_key.isDown && this.speed < 50) {
+            this.speed += 1;
+        }
+
+        // Check if player lost
+        if (this.train.health <= 0) {
+            this.speed = 0;
+            GameOverUI(this);
+        }
+
+        // Check if train is at station
+        if (this.train.atStation == 0) {
+            for (let i = 0; i < this.stations.length; i++) {
+                if (this.train.onTrack == this.stations[i].onTrack) {
+                }
+                if (this.train.onTrack == this.stations[i].onTrack
+                && Math.abs(this.train.x - this.stations[i].x) <= 2) {
+                    this.currentStation = this.stations[i];
+                    this.train.atStation = 1;
+                    break;
+                }
+            }
+        }
+        if (this.train.atStation == 1) {
             console.log("Entered station");
             this.enterStation(this.currentStation);
         }
     }
 
     enterStation(station) {
+        this.train.atStation = 2;
         let stationTime = 5000;
         let tempSpeed = this.speed;
         this.speed = 0;
-        //this.fuel.delay += stationTime;
         this.train.moving = false;
         this.fuel = this.train.fuelCapacity;
         console.log("Fuel sustained");
         this.train.passengers.forEach(passenger => {
-            if (passenger.destination == station.location) {
+            if (passenger.destination in station.type) {
                 passenger.onTrain = false;
                 if (passenger.goodReview == false) {
                     this.train.health -= 2;
@@ -233,6 +273,9 @@ class PlayGame extends Phaser.Scene {
                 this.train.passengers.push(passenger);
                 console.log("Passenger got on train");
             }
+            if (this.train.passengers.length == this.train.capacity) {
+                console.log("Full train!");
+            }
         });
 
         let gettingOff = this.time.delayedCall(stationTime/2, () => {
@@ -252,9 +295,9 @@ class PlayGame extends Phaser.Scene {
                 this.train.moving = true;
                 console.log("Refueled");
                 console.log("Station business done");
+                this.train.atStation = 0;
                 // start patience timers
             }, null, this);
         }, null, this);
-        this.train.atStation = false;
     }
 }
