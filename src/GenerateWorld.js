@@ -63,19 +63,22 @@ spawn a chunk of the world
 */
 function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, scaling) {
     let num_rows = Object.keys(tracks).length;
+    let station_row = new Set;
     // the x position all objects should be spawning at relatively for this column
     let prev_x = tracks[num_rows-1][tracks[num_rows-1].length-1].x
     for (let i = 0; i < stations.length; i++) {
         // decrement the spawn timer for each node interval passed
         if (stations[i].spawn_timer > 0) {
             stations[i].spawn_timer--;
+            // when the station is about to spawn, make sure that nodes cannot point to it's row
+            // specifically the nodes on the rows above and below it
             if (stations[i].spawn_timer == 0) {
-                
+                station_row.add(stations[i].onTrack);
             }
         }
         // once the spawn timer hits 0, set to visible
         else if (!stations[i].visible) {
-            console.log("set to visible");
+            console.log("officially spawn station at.",prev_x+(x_interval/2));
             stations[i].setVisible(true);
             stations[i].x = prev_x+(x_interval/2);
         }
@@ -92,16 +95,31 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
         let obstacle_type = 0;
         // random chance to spawn north or south junction
         let random_dir = Math.floor(Math.random()*100);
-        if (random_dir <= 25) {
+        // can't have north junc if below station spawn
+        if (random_dir <= 25 && !(station_row.has(i+1))) {
+            ///console.log("N:",i+1,station_row);
             if (i > 0) {
                 n_junc=true;
             }
         }
-        if (random_dir >= 25 && random_dir <= 50) {
+        if (random_dir >= 15 && random_dir <= 40 && !(station_row.has(i-1))) {
+            //console.log("S",i+1,station_row);
             if (i < Object.keys(tracks).length-1) {
                 s_junc=true;
             }
         }
+        Array.from(station_row).forEach(element => {
+            // if the upper row, s_junc is false
+            if (element-1 == i) {
+                console.log("node at row",i,"cannot have south junc.",station_row);
+                s_junc = false;
+            }
+            else if (element+1 == i) {
+                console.log("node at row",i,"cannot have north junc,",station_row)
+                n_junc = false;
+            }
+            console.log("next node station will spawn at.", prev_x+(x_interval))
+        })
 
         // update the stations every spawn timer (node interval)
         // key: north or south. value: array of symbols
@@ -114,12 +132,9 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
                 - the station is on the current track that has a junction
             */
             // while the station hasn't "spawned" yet & hasn't been moved
-            console.log(stations[j].visible);
-            if (!stations[j].visible && !stations[j].moved && stations[j].onTrack == i) {
-                console.log("check for station");
+            if (!stations[j].visible && !stations[j].moved && stations[j].onTrack == i && stations[j].spawn_timer > 0) {
                 let sign_chance = Math.floor(Math.random()*100);
                 if (sign_chance <= 50 && (n_junc || s_junc)) {
-                    console.log("move station");
                     // if node has two junctions, randomly choose one of them to have a sign
                     let sign_dir;
                     if (n_junc && s_junc) {

@@ -1,6 +1,6 @@
 class Node extends Phaser.GameObjects.Sprite {
     // can be straight track, node track, or junction
-    constructor(scene, x, y, texture, row, speed, scaling, exit_N=false, exit_S=false, signs, obstacle_type) {
+    constructor(scene, x, y, texture, row, speed, scaling, exit_N, exit_S, signs, obstacle_type) {
         super(scene, x, y, texture);
         scene.add.existing(this);
 
@@ -52,12 +52,10 @@ class Node extends Phaser.GameObjects.Sprite {
                     break;
                 case "north":
                     // spawn a sign at the north junction
-                    console.log("tint red");
                     this.tint = 0xff0000;
                     break;
                 case "south":
                     // spawn a sign at the south junction
-                    console.log("tint purple");
                     this.tint = 0xff00ff;
                     break;
                 default:
