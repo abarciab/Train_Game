@@ -148,9 +148,17 @@ function SpawnTracks(scene, tracks, nodes, stations, speed, x_interval, scaling)
         let random_station = Math.floor(Math.random()*100);
         if (random_station <= 1) {
             console.log("spawn station");
+            let stationCount = Math.ceil(Math.random() * 6); // Possible 1-6 Passengers
+            let passengers = [];
+            for (let i = 0; i < stationCount; i++) {
+                passengers.push(new Passenger(
+                    scene, nodes[i][nodes[i].length-1].x, nodes[i][nodes[i].length-1].y,
+                    "passenger 1", 0, i, 10000, 0, scaling 
+                ));
+            }
             stations.push(new Station(
                 scene, nodes[i][nodes[i].length-1].x, nodes[i][nodes[i].length-1].y,
-                 "station", 0, i, new Set("square"), 0, scaling
+                 "station", 0, i, new Set("square"), passengers, 0, scaling
             ));
             stations[stations.length-1].setVisible(false);
         }

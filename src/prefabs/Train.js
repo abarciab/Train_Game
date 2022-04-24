@@ -3,7 +3,7 @@ class Train extends Phaser.GameObjects.Sprite {
         super(scene, x, y, texture, frame);
     
         scene.add.existing(this);             // add object to existing scene
-        this.atStation = false;               // tracks if train is at station
+        this.atStation = 0;               // tracks if train is at station
         this.onTrack = initial_track;         // tracks which track the train is on
         this.health = 20;                     // tracks yelp rating
         this.passengers = [];                 // list of passengers in train

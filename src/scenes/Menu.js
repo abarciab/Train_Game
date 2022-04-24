@@ -19,6 +19,9 @@ class Menu extends Phaser.Scene {
         //trees
         this.load.image('field_deadly_obstacle', './assets/obstacles/field deadly obstacle.png');
 
+        // passengers
+        this.load.image('passenger 1', './assets/passengers/basic passenger 1.png');
+        
         //sounds
         this.load.audio('train_on_rails', './assets/sound effects/train on rails 2.mp3');
         this.load.audio('menu_music', './assets/music/menu music.mp3');
@@ -77,13 +80,12 @@ class Menu extends Phaser.Scene {
         this.verticalTrack.angle = 90;
         this.add.image(0, this.startButton.y + buttonGap, 'basic_out-down_track').setOrigin(0, 0.5).setDepth(-1);
         this.add.image(0, topGap, 'basic_out-up_track').setOrigin(0.5, 0.5).setDepth(-1);
-        //trains
+        // trains
         this.locomotiveA = this.add.image(-300, topGap, 'basic_locomotive').setOrigin(0.5).setDepth(1);
         this.locomotiveB = this.add.image(game.config.width*1.4, this.titleBar.y + buttonGap*3, 'basic_locomotive').setOrigin(.85, 0.5);
         this.wagonB1 = this.add.image(game.config.width*1.4 + 350, this.titleBar.y + buttonGap*3, 'basic_passenger_wagon').setOrigin(.85, 0.5);
         this.locomotiveB.flipX = true;
         this.wagonB1.flipX = true;
-
         //this.add.image(-600, this.startButton.y + buttonGap, 'station').setOrigin(0.5).setDepth(-1.5);
 
         this.trainSound = this.sound.add('train_on_rails', {volume: .3, loop: true});

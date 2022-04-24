@@ -64,14 +64,17 @@ class PlayGame extends Phaser.Scene {
         */
        // set fuel
        this.fuel = this.train.fuelCapacity;
+       this.currentStation;
 
         
+       /*
         // Testing station logic (REMOVE IN FUTURE)
         this.temp = this.time.delayedCall(3000, () => {
             this.train.atStation = true;
         }, null, this);
         this.currentStation = new Station(this, config.width/5, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'station', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
-       
+       */
+
         StartUI(this);
     }
 
@@ -206,13 +209,27 @@ class PlayGame extends Phaser.Scene {
         if (D_key.isDown && this.speed < 50) {
             this.speed += 1;
         }
-        if (this.train.atStation) {
+        // Check if train is at station
+        if (this.train.atStation == 0) {
+            for (let i = 0; i < this.stations.length; i++) {
+                if (this.train.onTrack == this.stations[i].onTrack) {
+                }
+                if (this.train.onTrack == this.stations[i].onTrack
+                && Math.abs(this.train.x - this.stations[i].x) <= 2) {
+                    this.currentStation = this.stations[i];
+                    this.train.atStation = 1;
+                    break;
+                }
+            }
+        }
+        if (this.train.atStation == 1) {
             console.log("Entered station");
             this.enterStation(this.currentStation);
         }
     }
 
     enterStation(station) {
+        this.train.atStation = 2;
         let stationTime = 5000;
         let tempSpeed = this.speed;
         this.speed = 0;
@@ -266,9 +283,9 @@ class PlayGame extends Phaser.Scene {
                 this.train.moving = true;
                 console.log("Refueled");
                 console.log("Station business done");
+                this.train.atStation = 0;
                 // start patience timers
             }, null, this);
         }, null, this);
-        this.train.atStation = false;
     }
 }
