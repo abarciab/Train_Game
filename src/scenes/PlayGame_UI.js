@@ -169,7 +169,7 @@ function RemovePassengerIcons(scene, stationName){
     console.log("stopping at station: " + stationName);
 
     this.passengers.getChildren().forEach(function(passengerIcon) {
-        if (passengerIcon.passenger.stationName == stationName){
+        if (passengerIcon.passenger.destination == stationName){
             console.log("removed passengerUI");
             passengerIcon.passenger.disembark(scene);
             emptySlots.push(passengerIcon.slot);

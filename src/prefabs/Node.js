@@ -83,23 +83,4 @@ class Node extends Phaser.GameObjects.Sprite {
         }
         this.junction_arrow.x -= this.speed;
     }
-
-    destroy() {
-        for (const[key, value] of Object.entries(this.junctions)) {
-            value.destroy();
-            delete this.junctions[key];
-        }
-        if (this.obstacle_type) {
-            this.obstacle.destroy();
-            delete this.obstacle;
-        }
-        for (let i = 0; i < this.signs.length; i++) {
-            this.signs[i].destroy();
-            this.signs.splice(i, 1);
-        }
-        this.junction_arrow.destroy();
-        delete this.junction_arrow;
-        
-        super.destroy();
-    }
 }
