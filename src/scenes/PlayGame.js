@@ -10,7 +10,7 @@ class PlayGame extends Phaser.Scene {
         //sound effects
         this.load.audio('junction_switch', './assets/sound effects/junction switched.mp3');
         this.load.audio('backgroundMusic', './assets/music/main game song.wav');
-
+        this.load.audio('crash_sound', './assets/sound effects/train crash.mp3');
         LoadUI(this);
     }
 
@@ -19,6 +19,7 @@ class PlayGame extends Phaser.Scene {
         //sound effects
         this.junctionSwitchSfx = this.sound.add('junction_switch', {volume: 0.5, rate: 1.5});
         this.backgroundMusic = this.sound.add('backgroundMusic', {volume: 1});
+        this.crashSound = this.sound.add('crash_sound');
         this.backgroundMusic.play();
 
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0);
@@ -115,8 +116,10 @@ class PlayGame extends Phaser.Scene {
                 if (this.train.onTrack == i && this.nodes[i][j].obstacle_type
                 && Math.abs(this.train.x - this.nodes[i][j].x) <= 2 && !this.train.turning) {
                     if (this.nodes[i][j].obstacle_type == 1) {
+                        this.crashSound.play();
                         this.train.health = 0;
                     } else if (this.nodes[i][j].obstacle_type == 2) {
+                        this.crashSound.play();
                         this.train.health -= 4;
                     }
                 }
