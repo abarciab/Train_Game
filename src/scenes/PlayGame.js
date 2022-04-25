@@ -226,7 +226,6 @@ class PlayGame extends Phaser.Scene {
             this.speed += 1;
         }
 
-        console.log(this.gameOver);
         // Check if player lost
         if (this.train.health <= 0 && !this.gameOver) {
             this.speed = 0;
