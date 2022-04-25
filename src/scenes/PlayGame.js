@@ -23,6 +23,7 @@ class PlayGame extends Phaser.Scene {
         A_key = this.input.keyboard.addKey('A');
         S_key = this.input.keyboard.addKey('S');
         D_key = this.input.keyboard.addKey('D');
+        space_bar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.base_interval = 64*6;  // base unscaled interval between rows of tracks
         this.num_tracks = 5;        // number of rows of tracks
         this.num_chunks = 8;        // number of chunks that are loaded
@@ -30,6 +31,7 @@ class PlayGame extends Phaser.Scene {
         this.tracks = {};           // key: track row, value: track images
         this.nodes = {};            // key: track row, value: node objects
         this.stations = [];         // list of stations.
+        this.gameOver = true;
 
 
         // initialize tracks and nodes to keys and empty lists
@@ -208,6 +210,10 @@ class PlayGame extends Phaser.Scene {
     }
 
     updateEvents(delta) {
+        if (this.gameOver && Phaser.Input.Keyboard.JustDown(space_bar)) {
+            this.scene.restart();
+        }
+
         // A and D key exists for debug rn to test with variable speeds
         if (A_key.isDown && this.speed > 0){
             this.speed -= 1;
@@ -219,6 +225,7 @@ class PlayGame extends Phaser.Scene {
         // Check if player lost
         if (this.train.health <= 0) {
             this.speed = 0;
+            this.gameOver = true;
             EndGameUI(this);
         }
 
