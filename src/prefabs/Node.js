@@ -12,6 +12,7 @@ class Node extends Phaser.GameObjects.Sprite {
         this.obstacle;
         this.to_tracks = new Set([this.row]);
         this.obstacle_type = obstacle_type;
+        this.obstacleHit = false;
         this.has_arrow = false;
 
         this.junctions = {"straight": scene.add.image(x, y, "basic_out-straight_track").setScale(scaling).setDepth(4)};
