@@ -199,7 +199,7 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
         for (let j = 0; j < stationCount; j++) {
             passengers.push(new Passenger(
                 scene, nodes[train.onTrack][nodes[train.onTrack].length-1].x, nodes[train.onTrack][nodes[train.onTrack].length-1].y,
-                "passenger 1", 0, train.onTrack, 10000, 0, scaling 
+                "passenger 1", 0, train.onTrack, 30000, 0, scaling 
             ));
         }
         console.log("spawn station");

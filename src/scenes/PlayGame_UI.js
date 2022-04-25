@@ -144,13 +144,16 @@ function addPasengerUI(scene, passenger){
     let shape;
 
     switch (passenger.destination){
-        case "red square": 
+        case "red square":
+            console.log("Is A Square.");
             shape = 'pass_square';
             break;
-        case "blue circle": 
+        case "blue circle":
+            console.log("Is A Circle.");
             shape = 'pass_circle';
             break;
         default:
+            console.log("Is A Triangle.");
             shape = 'pass_tri';
             break;
     }
@@ -175,6 +178,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
         this.patience = passenger.patience;
 
         //change color of patience bar from green to red and make it shrink over time
+        console.log("JDKYTDKJDKUDJT");
         this.green = Phaser.Display.Color.ValueToColor('#03fc13');
         this.red = Phaser.Display.Color.ValueToColor('#fc0303');
         scene.tweens.addCounter({
