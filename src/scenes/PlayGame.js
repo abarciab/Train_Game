@@ -30,6 +30,7 @@ class PlayGame extends Phaser.Scene {
         this.tracks = {};           // key: track row, value: track images
         this.nodes = {};            // key: track row, value: node objects
         this.stations = [];         // list of stations.
+        this.junction_arrows = []
 
 
         // initialize tracks and nodes to keys and empty lists
@@ -38,14 +39,13 @@ class PlayGame extends Phaser.Scene {
             this.nodes[i] = [];
         }
 
-
         let margin = 0; // margin; no use right now
         this.y_interval = (config.height-(2*margin))/(Object.keys(this.tracks).length+1); // interval that rows of tracks should be seperated
         this.global_scaling = this.y_interval / this.base_interval; // scaling of all objects
         this.x_unit = 64 * this.global_scaling; // unit square of measurement
         this.node_interval = 20 * this.x_unit;  // interval between each node/track placement
         // this.travel_interval = this.node_interval;
-        this.input_interval = 18 * this.x_unit; // interval user can input an action before a junction
+        this.input_interval = this.node_interval    ; // interval user can input an action before a junction
         this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
         this.speed = 5;    // speed of world
 
@@ -127,6 +127,8 @@ class PlayGame extends Phaser.Scene {
                 if (this.train.onTrack == i && ("north" in this.nodes[i][j].junctions || "south" in this.nodes[i][j].junctions)
                 && this.nodes[i][j].x - this.train.x <= this.input_interval 
                 && this.nodes[i][j].x - this.train.x >= this.junction_offset) {
+                    if (!this.nodes[i][j].has_arrow)
+                        this.nodes[i][j].has_arrow = true;
                     this.updateJunctionDir(this.nodes[i][j]);
                 }
                 // when the train is close enough to turn on the node, turn the node's turn dir
@@ -179,6 +181,7 @@ class PlayGame extends Phaser.Scene {
     updateJunctionDir(node) {
         if (W_key.isDown && "north" in node.junctions && node.turn_dir != "north") {
             //console.log("train wants to go up at next junction");
+            // this.junction_arrows.setTexture('junction_arrows-up');
             this.junctionSwitchSfx.play();
             node.turn_dir = "north";
         }
