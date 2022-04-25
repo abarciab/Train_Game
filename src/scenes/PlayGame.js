@@ -112,8 +112,6 @@ class PlayGame extends Phaser.Scene {
                 if (this.train.onTrack == i && this.nodes[i][j].obstacle_type
                 && Math.abs(this.train.x - this.nodes[i][j].x) <= 2 && !this.train.turning) {
                     if (this.nodes[i][j].obstacle_type == 1) {
-                        // this.speed = 0;
-                        // GameOverUI(this);
                         this.train.health = 0;
                     } else if (this.nodes[i][j].obstacle_type == 2) {
                         this.train.health -= 4;
@@ -252,7 +250,7 @@ class PlayGame extends Phaser.Scene {
         let tempSpeed = this.speed;
         this.speed = 0;
         this.train.moving = false;
-        station.RemovePassengerIcons(this);
+        RemovePassengerIcons(this, station);
         this.fuel = this.train.fuelCapacity;
         console.log("Fuel sustained");
         this.train.passengers.forEach(passenger => {
