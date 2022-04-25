@@ -63,17 +63,13 @@ spawn a chunk of the world
 */
 function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, scaling) {
     let num_rows = Object.keys(tracks).length;
+    let station_row = new Set();
     // the x position all objects should be spawning at relatively for this column
     let prev_x = tracks[num_rows-1][tracks[num_rows-1].length-1].x
     for (let i = 0; i < stations.length; i++) {
         // decrement the spawn timer for each node interval passed
         if (stations[i].spawn_timer > 0) {
             stations[i].spawn_timer--;
-            // when the station is about to spawn, make sure that nodes cannot point to it's row
-            // specifically the nodes on the rows above and below it
-            /*if (stations[i].spawn_timer == 0) {
-                station_row.add(stations[i].onTrack);
-            }*/
         }
         // once the spawn timer hits 0, set to visible
         else if (!stations[i].visible) {
