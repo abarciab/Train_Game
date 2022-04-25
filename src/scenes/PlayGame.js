@@ -255,7 +255,7 @@ class PlayGame extends Phaser.Scene {
         let tempSpeed = this.speed;
         this.speed = 0;
         this.train.moving = false;
-        RemovePassengerIcons(this, station);
+        RemovePassengerIcons(this, station.type);
         this.fuel = this.train.fuelCapacity;
         console.log("Fuel sustained");
         this.train.passengers.forEach(passenger => {
