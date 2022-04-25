@@ -9,6 +9,7 @@ class PlayGame extends Phaser.Scene {
 
         //sound effects
         this.load.audio('junction_switch', './assets/sound effects/junction switched.mp3');
+        this.load.audio('backgroundMusic', './assets/music/main game song.wav');
 
         LoadUI(this);
     }
@@ -17,6 +18,8 @@ class PlayGame extends Phaser.Scene {
 
         //sound effects
         this.junctionSwitchSfx = this.sound.add('junction_switch', {volume: 0.5, rate: 1.5});
+        this.backgroundMusic = this.sound.add('backgroundMusic', {volume: 1});
+        this.backgroundMusic.play();
 
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0);
         W_key = this.input.keyboard.addKey('W');

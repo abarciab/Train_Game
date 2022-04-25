@@ -2,7 +2,10 @@ let config = {
     type: Phaser.AUTO,
     width: 1800,
     height: 900,
-    //pixelArt: true,
+    physics: {
+        default: "arcade",
+        arcade: { fps: 60 } 
+    },
     scene: [Menu, PlayGame]
 }
 
