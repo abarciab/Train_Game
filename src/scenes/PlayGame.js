@@ -35,7 +35,7 @@ class PlayGame extends Phaser.Scene {
         this.nodes = {};            // key: track row, value: node objects
         this.stations = [];         // list of stations.
         this.junction_arrows = []
-        this.gameOver = true;
+        this.gameOver = false;
 
 
         // initialize tracks and nodes to keys and empty lists
@@ -226,10 +226,12 @@ class PlayGame extends Phaser.Scene {
             this.speed += 1;
         }
 
+        console.log(this.gameOver);
         // Check if player lost
         if (this.train.health <= 0 && !this.gameOver) {
             this.speed = 0;
             this.gameOver = true;
+            console.log("YOU DIED");
             EndGameUI(this);
         }
 
