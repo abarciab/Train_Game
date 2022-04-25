@@ -12,8 +12,10 @@ class Node extends Phaser.GameObjects.Sprite {
         this.obstacle;
         this.to_tracks = new Set([this.row]);
         this.obstacle_type = obstacle_type;
+        this.has_arrow = false;
 
         this.junctions = {"straight": scene.add.image(x, y, "basic_out-straight_track").setScale(scaling).setDepth(4)};
+        this.junction_arrow = scene.add.image(x, y, "junction_arrows-straight").setScale(scaling).setVisible(false).setDepth(5);
         this.signs = [];
 
         // 0: nothing, 1: tree, 2: braches
@@ -67,6 +69,19 @@ class Node extends Phaser.GameObjects.Sprite {
         for (let i = 0; i < this.signs.length; i++) {
             this.signs[i].x -= this.speed;
         }
+        if (this.has_arrow) {
+            this.junction_arrow.setVisible(true);
+            if (this.turn_dir == "north") {
+                this.junction_arrow.setTexture("junction_arrows-up");
+            }
+            else if (this.turn_dir == "south") {
+                this.junction_arrow.setTexture("junction_arrows-down");
+            }
+            else if (this.turn_dir == "straight") {
+                this.junction_arrow.setTexture("junction_arrows-straight");
+            }
+        }
+        this.junction_arrow.x -= this.speed;
     }
 
     destroy() {
@@ -82,7 +97,9 @@ class Node extends Phaser.GameObjects.Sprite {
             this.signs[i].destroy();
             this.signs.splice(i, 1);
         }
+        this.junction_arrow.destroy();
+        delete this.junction_arrow;
+        
         super.destroy();
     }
 }
-
