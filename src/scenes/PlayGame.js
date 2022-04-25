@@ -113,8 +113,9 @@ class PlayGame extends Phaser.Scene {
                 this.nodes[i][j].update();
 
                 // check if train collided with obstacle
-                if (this.train.onTrack == i && this.nodes[i][j].obstacle_type
-                && Math.abs(this.train.x - this.nodes[i][j].x) <= 2 && !this.train.turning) {
+                if (this.train.onTrack == i && this.nodes[i][j].obstacle_type && !this.nodes[i][j].obstacleHit
+                && Math.abs(this.train.x - this.nodes[i][j].x) <= this.speed && !this.train.turning) {
+                    this.nodes[i][j].obstacleHit = true;
                     if (this.nodes[i][j].obstacle_type == 1) {
                         this.crashSound.play();
                         this.train.health = 0;
