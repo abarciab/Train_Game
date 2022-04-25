@@ -166,7 +166,7 @@ function addPasengerUI(scene, passenger){
 let emptySlots = [];
 
 function RemovePassengerIcons(scene, station){
-    this.passengers.foreach(passengerIcon => {
+    this.passengers.forEach(passengerIcon => {
         if (passengerIcon.passenger.station == station){
             console.log("removed passengerUI");
             passengerIcon.passenger.disembark(scene);
@@ -175,7 +175,7 @@ function RemovePassengerIcons(scene, station){
         }
     });
     
-    this.passenngers.foreach(passengerIcon => {
+    this.passenngers.forEach(passengerIcon => {
         for (i = 0; i < length(emptySlots); i++){
             if (passengerIcon.slot > emptySlots[i]){
                 passengerIcon.slot -= 1;
@@ -224,8 +224,8 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
 
 function EndGameUI(scene){
 
-    scene.add.rectangle(0, 0, game.config.width, game.config.height, '#000000').setAlpha(0.6).setScale(4).setDepth(22.9);
-    this.gameOverBackground = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5);
+    scene.add.rectangle(0, 0, game.config.width, game.config.height, '#000000').setAlpha(0.1).setScale(4).setDepth(22.9);
+    this.gameOverBackground = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5).setAlpha;
     this.gameOverText = scene.add.text(game.config.width/2, game.config.height/2, "GAME OVER\nDistance travelled: " + Math.round(this.dist).toLocaleString(undefined), this.textConfig)
         .setDepth(23.1)
         .setColor('#FFFFFF')
