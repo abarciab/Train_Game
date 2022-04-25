@@ -37,7 +37,7 @@ class PlayGame extends Phaser.Scene {
         this.tracks = {};           // key: track row, value: track images
         this.nodes = {};            // key: track row, value: node objects
         this.stations = [];         // list of stations.
-        this.gameOver = true;
+        this.gameOver = false;
 
         // initialize tracks and nodes to keys and empty lists
         for (let i = 0; i < this.num_tracks; i++) {
