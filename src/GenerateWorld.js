@@ -72,15 +72,15 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
             stations[i].spawn_timer--;
             // when the station is about to spawn, make sure that nodes cannot point to it's row
             // specifically the nodes on the rows above and below it
-            if (stations[i].spawn_timer == 0) {
+            /*if (stations[i].spawn_timer == 0) {
                 station_row.add(stations[i].onTrack);
-            }
+            }*/
         }
         // once the spawn timer hits 0, set to visible
         else if (!stations[i].visible) {
-            console.log("officially spawn station at.",prev_x+(x_interval/2));
             stations[i].setVisible(true);
             stations[i].x = prev_x+(x_interval/2);
+            station_row.add(stations[i].onTrack);
         }
     }
     // go through each row of tracks
@@ -97,13 +97,11 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
         let random_dir = Math.floor(Math.random()*100);
         // can't have north junc if below station spawn
         if (random_dir <= 25 && !(station_row.has(i+1))) {
-            ///console.log("N:",i+1,station_row);
             if (i > 0) {
                 n_junc=true;
             }
         }
         if (random_dir >= 15 && random_dir <= 40 && !(station_row.has(i-1))) {
-            //console.log("S",i+1,station_row);
             if (i < Object.keys(tracks).length-1) {
                 s_junc=true;
             }
@@ -111,14 +109,11 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
         Array.from(station_row).forEach(element => {
             // if the upper row, s_junc is false
             if (element-1 == i) {
-                console.log("node at row",i,"cannot have south junc.",station_row);
                 s_junc = false;
             }
             else if (element+1 == i) {
-                console.log("node at row",i,"cannot have north junc,",station_row)
                 n_junc = false;
             }
-            console.log("next node station will spawn at.", prev_x+(x_interval))
         })
 
         // update the stations every spawn timer (node interval)
@@ -130,7 +125,7 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
                 - station has not spawned yet
                 - station has not moved yet per the column
                 - the station is on the current track that has a junction
-            */
+            */ 
             // while the station hasn't "spawned" yet & hasn't been moved
             if (!stations[j].visible && !stations[j].moved && stations[j].onTrack == i && stations[j].spawn_timer > 0) {
                 let sign_chance = Math.floor(Math.random()*100);
@@ -139,23 +134,26 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
                     let sign_dir;
                     if (n_junc && s_junc) {
                         if (Math.floor(Math.random()*100)<=50 && stations[j].onTrack > 0) {
-                            sign_dir = "north";
+                            sign_dir = "up";
                             stations[j].onTrack--;
                         }
                         else if (stations[j].onTrack < num_rows-1) {
-                            sign_dir = "south";
+                            sign_dir = "down";
                             stations[j].onTrack++;
                         }
                     }
                     // if north junction, give the north junction a sign
                     else if (n_junc && stations[j].onTrack > 0) {
-                        sign_dir = "north";
+                        sign_dir = "up";
                         stations[j].onTrack--;
                     }
                     // if south junction, give the south junction a sign
                     else if (s_junc && stations[j].onTrack < num_rows-1) {
-                        sign_dir = "south";
+                        sign_dir = "down";
                         stations[j].onTrack++;
+                    }
+                    else if (!(n_junc || s_junc)) {
+                        sign_dir = "straight";
                     }
                     // only make the sign if within a certain distance
                     if (sign_dir != undefined && stations[j].spawn_timer < stations[j].sign_distance) {
@@ -173,10 +171,10 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
             else if (!stations[j].visible && stations[j].moved && stations[j].spawn_timer < stations[j].sign_distance) {
                 let sign_dir;
                 if (n_junc && stations[j].onTrack == i+1) {
-                    sign_dir = "north";
+                    sign_dir = "up";
                 }
                 else if (s_junc && stations[j].onTrack == i-1) {
-                    sign_dir = "south";
+                    sign_dir = "down";
                 }
                 else if ((n_junc || s_junc) && stations[j].onTrack == i) {
                     sign_dir = "straight";
@@ -202,12 +200,13 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
         nodes[i].push(new Node(scene, prev_x+(x_interval/2), nodes[i][0].y,
             "basic_node_track", i, speed, scaling, n_junc, s_junc, junction_signs, obstacle_type
         ));
-    }
+    } // end of row for loop
+
     stations.forEach(element => {
         element.moved=false;
     });
     // chance to spawn a station on player's row per spawn
-    let random_station = Math.floor(Math.random()*100);
+    let random_station = Math.floor(Math.random() * 100);
     if (random_station <= 10) {
         let stationCount = Math.ceil(Math.random() * 6); // Possible 1-6 Passengers
         let passengers = [];
@@ -217,10 +216,17 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
                 "passenger 1", 0, train.onTrack, 10000, 0, scaling 
             ));
         }
-        console.log("spawn station");
+        // determine station types
+        let types = ["red square", "blue circle", "green triangle"];
+        let station_types = new Set();
+        let max_num_types = 1;
+        for (let i = 0; i < max_num_types; i++) {
+            let type = Math.floor(Math.random() * 100) % 3;
+            station_types.add(types[type]);
+        }
         stations.push(new Station(
             scene, nodes[train.onTrack][nodes[train.onTrack].length-1].x, nodes[train.onTrack][nodes[train.onTrack].length-1].y,
-            "station", 0, train.onTrack, new Set("red square", "blue circle"), passengers, 0, scaling
+            "station", 0, train.onTrack, station_types, passengers, 0, scaling
         ));
     }
 }
