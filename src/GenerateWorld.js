@@ -70,6 +70,8 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
         // decrement the spawn timer for each node interval passed
         if (stations[i].spawn_timer > 0) {
             stations[i].spawn_timer--;
+            // when the station is about to spawn, make sure that nodes cannot point to it's row
+            // specifically the nodes on the rows above and below it
         }
         // once the spawn timer hits 0, set to visible
         else if (!stations[i].visible) {
@@ -101,7 +103,7 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
                 s_junc=true;
             }
         }
-        Array.from(station_row).forEach(element => {
+        /*Array.from(station_row).forEach(element => {
             // if the upper row, s_junc is false
             if (element-1 == i) {
                 s_junc = false;
@@ -109,7 +111,7 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
             else if (element+1 == i) {
                 n_junc = false;
             }
-        })
+        })*/
 
         // update the stations every spawn timer (node interval)
         // key: north or south. value: array of symbols
@@ -186,6 +188,9 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
                     });
                 }
             }
+            /*if (stations[j].visible && stations[j].onTrack == i && stations[j].no_junc) {
+
+            }*/
         }
 
         // random chance to spawn obstacle
@@ -202,6 +207,7 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
 
     stations.forEach(element => {
         element.moved=false;
+        
     });
     // chance to spawn a station on player's row per spawn
     let random_station = Math.floor(Math.random() * 100);
@@ -211,7 +217,7 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
         for (let j = 0; j < stationCount; j++) {
             passengers.push(new Passenger(
                 scene, nodes[train.onTrack][nodes[train.onTrack].length-1].x, nodes[train.onTrack][nodes[train.onTrack].length-1].y,
-                "passenger 1", 0, train.onTrack, 10000, 0, scaling 
+                "passenger 1", 0, train.onTrack, 30000, 0, scaling 
             ));
         }
         // determine station types

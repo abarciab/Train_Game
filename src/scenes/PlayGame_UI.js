@@ -61,7 +61,7 @@ function StartUI(scene){
 
     //UI background
     this.topBar = scene.add.image(game.config.width/2 + 230, 60, 'UI_bar_backgrounds').setOrigin(0.5).setScale(0.95, 1.4).setDepth(20);
-    this.bottomBarLeft= scene.add.image(game.config.width/2, this.bottomBarYpos, 'UI_bar_backgrounds').setOrigin(0.5).setScale(1.35, 1.5).setDepth(20);
+    this.bottomBar= scene.add.image(game.config.width/2, this.bottomBarYpos, 'UI_bar_backgrounds').setOrigin(0.5).setScale(1.35, 1.5).setDepth(20);
 
     //fuel display
     this.fuelMeter = scene.add.image(game.config.width - 200, this.bottomBarYpos-10, 'fuel_meter').setOrigin(0.5).setScale(0.55).setDepth(20);
@@ -85,7 +85,8 @@ function StartUI(scene){
     this.rating  = 20;
     displayRating();
 
-
+    //let passenger1 = new Passenger(scene, 0, 0, 'pass_square', null, null, 2000, null, 1);
+    //passenger1.boardTrain(scene);
     
 
 }
@@ -144,18 +145,21 @@ function addPasengerUI(scene, passenger){
     let shape;
 
     switch (passenger.destination){
-        case "red square": 
+        case "red square":
+            //console.log("Is A Square.");
             shape = 'pass_square';
             break;
-        case "blue circle": 
+        case "blue circle":
+            //console.log("Is A Circle.");
             shape = 'pass_circle';
             break;
         default:
+            //console.log("Is A Triangle.");
             shape = 'pass_tri';
             break;
     }
 
-    this.newPassIcon = new PassengerIcon(scene, this.front + (IconGap*numPassengers), bottomBarYpos, shape, passenger).setScale(this.iconScale);
+    this.newPassIcon = new PassengerIcon(scene, this.front + (IconGap*numPassengers), bottomBarYpos, shape, passenger).setScale(this.iconScale).setDepth(25);
     this.passengers.add(newPassIcon);
 }
 
@@ -175,6 +179,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
         this.patience = passenger.patience;
 
         //change color of patience bar from green to red and make it shrink over time
+        //console.log("adding passengerUI")
         this.green = Phaser.Display.Color.ValueToColor('#03fc13');
         this.red = Phaser.Display.Color.ValueToColor('#fc0303');
         scene.tweens.addCounter({
