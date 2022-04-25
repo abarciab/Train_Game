@@ -26,6 +26,9 @@ class PlayGame extends Phaser.Scene {
         A_key = this.input.keyboard.addKey('A');
         S_key = this.input.keyboard.addKey('S');
         D_key = this.input.keyboard.addKey('D');
+        // key code 37 = left key, 39 = right key
+        left_key = this.input.keyboard.addKey(37);
+        right_key = this.input.keyboard.addKey(39);
         space_bar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.base_interval = 64*6;  // base unscaled interval between rows of tracks
         this.num_tracks = 3;        // number of rows of tracks
@@ -216,10 +219,10 @@ class PlayGame extends Phaser.Scene {
         }
 
         // A and D key exists for debug rn to test with variable speeds
-        if (A_key.isDown && this.speed > 0){
+        if (left_key.isDown && this.speed > 0){
             this.speed -= 1;
         }
-        if (D_key.isDown && this.speed < 50) {
+        if (right_key.isDown && this.speed < 50) {
             this.speed += 1;
         }
 
