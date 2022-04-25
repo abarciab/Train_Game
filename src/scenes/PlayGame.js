@@ -267,7 +267,9 @@ class PlayGame extends Phaser.Scene {
                     this.train.health -= 2;
                     console.log("Bad review");
                 } else {
-                    this.train.health += 1;
+                    if (this.train.health < this.train.healthCapacity) {
+                        this.train.health += 1;
+                    }
                     console.log("Good review");
                 }
                 this.train.passengers.splice(this.train.passengers.indexOf(passenger), 1);

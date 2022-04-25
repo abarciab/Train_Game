@@ -169,16 +169,16 @@ function RemovePassengerIcons(scene, stationName){
     console.log("stopping at station: " + stationName);
 
     this.passengers.getChildren().forEach(function(passengerIcon) {
-        if (passengerIcon.passenger.destination == stationName){
+        if (passengerIcon.passengerObj.destination == stationName){
             console.log("removed passengerUI");
-            passengerIcon.passenger.disembark(scene);
+            passengerIcon.passengerObj.disembark(scene);
             emptySlots.push(passengerIcon.slot);
-            destroy(passengerIcon);
+            passengerIcon.destroy();
         }
     });
     
     this.passengers.getChildren().forEach(function(passengerIcon) {
-        for (i = 0; i < length(emptySlots); i++){
+        for (i = 0; i < emptySlots.length; i++){
             if (passengerIcon.slot > emptySlots[i]){
                 passengerIcon.slot -= 1;
                 passengerIcon.x -= IconGap;
