@@ -14,7 +14,6 @@ class PlayGame extends Phaser.Scene {
     }
 
     create() {
-
         //sound effects
         this.junctionSwitchSfx = this.sound.add('junction_switch', {volume: 0.5, rate: 1.5});
 
@@ -31,9 +30,7 @@ class PlayGame extends Phaser.Scene {
         this.tracks = {};           // key: track row, value: track images
         this.nodes = {};            // key: track row, value: node objects
         this.stations = [];         // list of stations.
-        this.junction_arrows = []
         this.gameOver = true;
-
 
         // initialize tracks and nodes to keys and empty lists
         for (let i = 0; i < this.num_tracks; i++) {
@@ -41,18 +38,18 @@ class PlayGame extends Phaser.Scene {
             this.nodes[i] = [];
         }
 
-        let margin = 0; // margin; no use right now
-        this.y_interval = (config.height-(2*margin))/(Object.keys(this.tracks).length+1); // interval that rows of tracks should be seperated
+        this.margin = config.height/15; // margin; no use right now
+        this.y_interval = (config.height-(2*this.margin))/(Object.keys(this.tracks).length+1); // interval that rows of tracks should be seperated
         this.global_scaling = this.y_interval / this.base_interval; // scaling of all objects
         this.x_unit = 64 * this.global_scaling; // unit square of measurement
         this.node_interval = 20 * this.x_unit;  // interval between each node/track placement
         // this.travel_interval = this.node_interval;
-        this.input_interval = this.node_interval    ; // interval user can input an action before a junction
+        this.input_interval = this.node_interval; // interval user can input an action before a junction
         this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
         this.speed = 5;    // speed of world
 
         // spawn the world initially
-        initSpawn(this, this.tracks, this.nodes, this.speed, margin, this.node_interval, this.y_interval, this.num_chunks, this.global_scaling);
+        initSpawn(this, this.tracks, this.nodes, this.speed, this.margin, this.node_interval, this.y_interval, this.num_chunks, this.global_scaling);
         // initial spawn:
         this.train = new Train(this, config.width/10, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'basic_locomotive', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
 
@@ -93,7 +90,7 @@ class PlayGame extends Phaser.Scene {
     updateTracks(delta) {
         let spawn_tracks=false;
         // go by each row of tracks
-        for (let i = 0; i < this.num_tracks; i++) {
+        for (let i = 0; i < Object.keys(this.tracks).length; i++) {
             // move the tracks
             for (let k = 0; k < this.tracks[i].length; k++) {
                 this.tracks[i][k].x -= this.speed;
@@ -180,8 +177,6 @@ class PlayGame extends Phaser.Scene {
     */
     updateJunctionDir(node) {
         if (W_key.isDown && "north" in node.junctions && node.turn_dir != "north") {
-            //console.log("train wants to go up at next junction");
-            // this.junction_arrows.setTexture('junction_arrows-up');
             this.junctionSwitchSfx.play();
             node.turn_dir = "north";
         }
@@ -205,7 +200,6 @@ class PlayGame extends Phaser.Scene {
                 this.stations[i].destroy();
                 delete this.stations[i];
                 this.stations.splice(i, 1);
-                console.log(this.stations);
             }
         }
     }

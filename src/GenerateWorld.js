@@ -86,7 +86,9 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
         tracks[i].push(scene.add.image(prev_x + x_interval, tracks[i][0].y, "basic_straight_track"));
         tracks[i][tracks[i].length-1].setScale(scaling);
         tracks[i][tracks[i].length-1].setDepth(3);
-
+        if (nodes[i][nodes[i].length-1].obstacle_type == 1) {
+            //tracks[i][nodes[i].length-1].setTexture("gap wt track")
+        }
         let n_junc=false;
         let s_junc=false;
         let obstacle_type = 0;
@@ -103,15 +105,6 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
                 s_junc=true;
             }
         }
-        /*Array.from(station_row).forEach(element => {
-            // if the upper row, s_junc is false
-            if (element-1 == i) {
-                s_junc = false;
-            }
-            else if (element+1 == i) {
-                n_junc = false;
-            }
-        })*/
 
         // update the stations every spawn timer (node interval)
         // key: north or south. value: array of symbols
@@ -124,12 +117,9 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
                 - the station is on the current track that has a junction
             */ 
             // while the station hasn't "spawned" yet & hasn't been moved
-            console.log(stations[j].visible);
             if (!stations[j].visible && !stations[j].moved && stations[j].onTrack == i) {
-                console.log("check for station");
                 let sign_chance = Math.floor(Math.random()*100);
                 if (sign_chance <= 50 && (n_junc || s_junc)) {
-                    console.log("move station");
                     // if node has two junctions, randomly choose one of them to have a sign
                     let sign_dir;
                     if (n_junc && s_junc) {
@@ -188,9 +178,6 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
                     });
                 }
             }
-            /*if (stations[j].visible && stations[j].onTrack == i && stations[j].no_junc) {
-
-            }*/
         }
 
         // random chance to spawn obstacle
@@ -207,7 +194,6 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
 
     stations.forEach(element => {
         element.moved=false;
-        
     });
     // chance to spawn a station on player's row per spawn
     let random_station = Math.floor(Math.random() * 100);
