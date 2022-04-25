@@ -9,13 +9,17 @@ class PlayGame extends Phaser.Scene {
 
         //sound effects
         this.load.audio('junction_switch', './assets/sound effects/junction switched.mp3');
-
+        this.load.audio('backgroundMusic', './assets/music/main game song.wav');
+        this.load.audio('crash_sound', './assets/sound effects/train crash.mp3');
         LoadUI(this);
     }
 
     create() {
         //sound effects
         this.junctionSwitchSfx = this.sound.add('junction_switch', {volume: 0.5, rate: 1.5});
+        this.backgroundMusic = this.sound.add('backgroundMusic', {volume: 1});
+        this.crashSound = this.sound.add('crash_sound');
+        this.backgroundMusic.play();
 
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0);
         W_key = this.input.keyboard.addKey('W');
@@ -24,7 +28,7 @@ class PlayGame extends Phaser.Scene {
         D_key = this.input.keyboard.addKey('D');
         space_bar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.base_interval = 64*6;  // base unscaled interval between rows of tracks
-        this.num_tracks = 5;        // number of rows of tracks
+        this.num_tracks = 3;        // number of rows of tracks
         this.num_chunks = 8;        // number of chunks that are loaded
         // this.dx = 0;                // delta x; how much the player has traveled
         this.tracks = {};           // key: track row, value: track images
@@ -109,8 +113,10 @@ class PlayGame extends Phaser.Scene {
                 if (this.train.onTrack == i && this.nodes[i][j].obstacle_type
                 && Math.abs(this.train.x - this.nodes[i][j].x) <= 2 && !this.train.turning) {
                     if (this.nodes[i][j].obstacle_type == 1) {
+                        this.crashSound.play();
                         this.train.health = 0;
                     } else if (this.nodes[i][j].obstacle_type == 2) {
+                        this.crashSound.play();
                         this.train.health -= 4;
                     }
                 }
@@ -217,10 +223,12 @@ class PlayGame extends Phaser.Scene {
             this.speed += 1;
         }
 
+        console.log(this.gameOver);
         // Check if player lost
-        if (this.train.health <= 0) {
+        if (this.train.health <= 0 && !this.gameOver) {
             this.speed = 0;
             this.gameOver = true;
+            console.log("YOU DIED");
             EndGameUI(this);
         }
 
@@ -247,7 +255,7 @@ class PlayGame extends Phaser.Scene {
         let tempSpeed = this.speed;
         this.speed = 0;
         this.train.moving = false;
-        RemovePassengerIcons(this, station);
+        RemovePassengerIcons(this, station.type);
         this.fuel = this.train.fuelCapacity;
         console.log("Fuel sustained");
         this.train.passengers.forEach(passenger => {
