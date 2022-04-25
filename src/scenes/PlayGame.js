@@ -25,7 +25,7 @@ class PlayGame extends Phaser.Scene {
         D_key = this.input.keyboard.addKey('D');
         space_bar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.base_interval = 64*6;  // base unscaled interval between rows of tracks
-        this.num_tracks = 5;        // number of rows of tracks
+        this.num_tracks = 3;        // number of rows of tracks
         this.num_chunks = 8;        // number of chunks that are loaded
         // this.dx = 0;                // delta x; how much the player has traveled
         this.tracks = {};           // key: track row, value: track images
