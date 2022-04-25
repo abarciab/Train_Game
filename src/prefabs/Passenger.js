@@ -19,4 +19,8 @@ class Passenger extends Phaser.GameObjects.Sprite {
     boardTrain(scene){
         addPasengerUI(scene, this);
     }
+
+    Disembark(scene){
+        console.log("I got off the train!");
+    }
 }
