@@ -227,7 +227,6 @@ class PlayGame extends Phaser.Scene {
             this.speed += 1;
         }
 
-        console.log(this.gameOver);
         // Check if player lost
         if (this.train.health <= 0 && !this.gameOver) {
             this.speed = 0;
@@ -269,7 +268,9 @@ class PlayGame extends Phaser.Scene {
                     this.train.health -= 2;
                     console.log("Bad review");
                 } else {
-                    this.train.health += 1;
+                    if (this.train.health < this.train.healthCapacity) {
+                        this.train.health += 1;
+                    }
                     console.log("Good review");
                 }
                 this.train.passengers.splice(this.train.passengers.indexOf(passenger), 1);
