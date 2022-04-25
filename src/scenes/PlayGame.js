@@ -209,7 +209,7 @@ class PlayGame extends Phaser.Scene {
 
     updateEvents(delta) {
         // A and D key exists for debug rn to test with variable speeds
-        if (A_key.isDown && this.speed > 5){
+        if (A_key.isDown && this.speed > 0){
             this.speed -= 1;
         }
         if (D_key.isDown && this.speed < 50) {

@@ -14,7 +14,7 @@ class Node extends Phaser.GameObjects.Sprite {
         this.obstacle_type = obstacle_type;
 
         this.junctions = {"straight": scene.add.image(x, y, "basic_out-straight_track").setScale(scaling).setDepth(4)};
-        this.signs = {};
+        this.signs = [];
 
         // 0: nothing, 1: tree, 2: braches
         switch (this.obstacle_type) {
@@ -45,24 +45,10 @@ class Node extends Phaser.GameObjects.Sprite {
             this.junctions["south"] = scene.add.image(x, y, "basic_out-down_track").setScale(scaling).setDepth(4);
         }
         for (const[key, value] of Object.entries(this.sign_types)) {
-            // spawn a sign with the approriate symbols (array of values)
-            switch (key) {
-                case "straight":
-                    
-                    break;
-                case "north":
-                    // spawn a sign at the north junction
-                    console.log("tint red");
-                    this.tint = 0xff0000;
-                    break;
-                case "south":
-                    // spawn a sign at the south junction
-                    console.log("tint purple");
-                    this.tint = 0xff00ff;
-                    break;
-                default:
-                    break;
-            }
+            this.signs.push(scene.add.image(x, y, `track sign ${key}`).setScale(scaling).setDepth(5));
+            Array.from(value).forEach(element => {
+                this.signs.push(scene.add.image(x, y, `${element} ${key} sign`).setScale(scaling).setDepth(6));
+            })
         }
 
         this.scaleX = scaling;
@@ -78,8 +64,8 @@ class Node extends Phaser.GameObjects.Sprite {
         if (this.obstacle_type) {
             this.obstacle.x -= this.speed;
         }
-        for (const[key, value] of Object.entries(this.signs)) {
-            // update sign positions
+        for (let i = 0; i < this.signs.length; i++) {
+            this.signs[i].x -= this.speed;
         }
     }
 
@@ -92,9 +78,9 @@ class Node extends Phaser.GameObjects.Sprite {
             this.obstacle.destroy();
             delete this.obstacle;
         }
-        for (const[key, value] of Object.entries(this.signs)) {
-            value.destroy();
-            delete this.signs[key];
+        for (let i = 0; i < this.signs.length; i++) {
+            this.signs[i].destroy();
+            this.signs.splice(i, 1);
         }
         super.destroy();
     }

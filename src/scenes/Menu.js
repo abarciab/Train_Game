@@ -22,6 +22,18 @@ class Menu extends Phaser.Scene {
 
         // passengers
         this.load.image('passenger 1', './assets/passengers/basic passenger 1.png');
+
+        // signs
+        let sign_shapes = ["blue circle", "green triangle", "red square", "track sign"];
+        let sign_dirs = ["straight", "up", "down"];
+        for (let i = 0; i < sign_shapes.length; i++) {
+            for (let j = 0; j < sign_dirs.length; j++) {
+                if (sign_shapes[i] != "track sign")
+                    this.load.image(`${sign_shapes[i]} ${sign_dirs[j]} sign`, `./assets/track signs/${sign_shapes[i]} ${sign_dirs[j]} sign.png`);
+                else
+                    this.load.image(`${sign_shapes[i]} ${sign_dirs[j]}`, `./assets/track signs/${sign_shapes[i]} ${sign_dirs[j]}.png`);
+            }
+        }
         
         //sounds
         this.load.audio('train_on_rails', './assets/sound effects/train on rails 2.mp3');
