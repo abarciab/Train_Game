@@ -122,10 +122,10 @@ class PlayGame extends Phaser.Scene {
                     - within x_distance of node
                     - same row as node
                     - not too close to the node
-                let the the direction the node will take the player
+                  let the the direction the node will take the player
                 */
                 if (this.train.onTrack == i && ("north" in this.nodes[i][j].junctions || "south" in this.nodes[i][j].junctions)
-                && this.nodes[i][j].x - this.train.x <= this.input_interval
+                && this.nodes[i][j].x - this.train.x <= this.input_interval 
                 && this.nodes[i][j].x - this.train.x >= this.junction_offset) {
                     this.updateJunctionDir(this.nodes[i][j]);
                 }
@@ -202,6 +202,7 @@ class PlayGame extends Phaser.Scene {
                 this.stations[i].destroy();
                 delete this.stations[i];
                 this.stations.splice(i, 1);
+                console.log(this.stations);
             }
         }
     }

@@ -63,7 +63,6 @@ spawn a chunk of the world
 */
 function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, scaling) {
     let num_rows = Object.keys(tracks).length;
-    let station_row = new Set;
     // the x position all objects should be spawning at relatively for this column
     let prev_x = tracks[num_rows-1][tracks[num_rows-1].length-1].x
     for (let i = 0; i < stations.length; i++) {
@@ -127,9 +126,12 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
                 - the station is on the current track that has a junction
             */ 
             // while the station hasn't "spawned" yet & hasn't been moved
-            if (!stations[j].visible && !stations[j].moved && stations[j].onTrack == i && stations[j].spawn_timer > 0) {
+            console.log(stations[j].visible);
+            if (!stations[j].visible && !stations[j].moved && stations[j].onTrack == i) {
+                console.log("check for station");
                 let sign_chance = Math.floor(Math.random()*100);
                 if (sign_chance <= 50 && (n_junc || s_junc)) {
+                    console.log("move station");
                     // if node has two junctions, randomly choose one of them to have a sign
                     let sign_dir;
                     if (n_junc && s_junc) {
