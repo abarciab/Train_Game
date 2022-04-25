@@ -221,7 +221,7 @@ class PlayGame extends Phaser.Scene {
         }
 
         // Check if player lost
-        if (this.train.health <= 0) {
+        if (this.train.health <= 0 && !this.gameOver) {
             this.speed = 0;
             this.gameOver = true;
             EndGameUI(this);
