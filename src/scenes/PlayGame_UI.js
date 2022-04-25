@@ -159,23 +159,40 @@ function addPasengerUI(scene, passenger){
             break;
     }
 
-    this.newPassIcon = new PassengerIcon(scene, this.front + (IconGap*numPassengers), bottomBarYpos, shape, passenger).setScale(this.iconScale).setDepth(25);
+    this.newPassIcon = new PassengerIcon(scene, this.front + (IconGap*numPassengers), bottomBarYpos, shape, passenger, numPassengers).setScale(this.iconScale).setDepth(25);
     this.passengers.add(newPassIcon);
 }
 
+let emptySlots = [];
+
 function RemovePassengerIcons(scene, station){
-    //loop through all passengers and remove any of them that have this station as their stop
-    console.log("function not written yet - remove PassengerIcons");
+    this.passengers.forEach(passengerIcon => {
+        if (passengerIcon.passenger.station == station){
+            console.log("removed passengerUI");
+            passengerIcon.passenger.disembark(scene);
+            emptySlots.push(passengerIcon.slot);
+            destroy(passengerIcon);
+        }
+    });
+    
+    this.passenngers.forEach(passengerIcon => {
+        for (i = 0; i < length(emptySlots); i++){
+            if (passengerIcon.slot > emptySlots[i]){
+                passengerIcon.slot -= 1;
+                passengerIcon.x -= IconGap;
+            }
+        }
+    })
 }
 
 class PassengerIcon extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, texture, passenger) {
+    constructor(scene, x, y, texture, passenger, slot) {
         super(scene, x, y, texture);
         scene.add.existing(this);
         this.passengerObj = passenger;
 
         this.setOrigin(0.5);
-        this.patienceBar = scene.add.sprite(x, y + 20, 'patience_bar');
+        this.patienceBar = scene.add.sprite(x, y + 20, 'patience_bar').setDepth(25);
         this.patience = passenger.patience;
 
         //change color of patience bar from green to red and make it shrink over time
@@ -199,19 +216,22 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
                 }
             }
         })
+
+        this.slot = slot;
     }
+
 }
 
 function EndGameUI(scene){
 
-    scene.add.rectangle(0, 0, game.config.width, game.config.height, '#000000').setAlpha(0.6).setScale(4).setDepth(22.9);
-    this.gameOverBackground = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5);
+    scene.add.rectangle(0, 0, game.config.width, game.config.height, '#000000').setAlpha(0.1).setScale(4).setDepth(22.9);
+    this.gameOverBackground = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5).setAlpha;
     this.gameOverText = scene.add.text(game.config.width/2, game.config.height/2, "GAME OVER\nDistance travelled: " + Math.round(this.dist).toLocaleString(undefined), this.textConfig)
         .setDepth(23.1)
         .setColor('#FFFFFF')
         .setOrigin(0.5);
 
-    this.restartText = scene.add.text(game.config.width/2, game.config.height/2 + this.gameOverText.y, "Press SPACE to restart", this.textConfig)
+    this.restartText = scene.add.text(game.config.width/2, game.config.height/2 + this.gameOverText.displayHeight, "Press SPACE to restart", this.textConfig)
         .setDepth(23.1)
         .setColor('#FFFFFF')
         .setOrigin(0.5);
