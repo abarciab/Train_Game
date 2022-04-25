@@ -231,6 +231,7 @@ class PlayGame extends Phaser.Scene {
         if (this.train.health <= 0 && !this.gameOver) {
             this.speed = 0;
             this.gameOver = true;
+            this.backgroundMusic.stop();
             console.log("YOU DIED");
             EndGameUI(this);
         }
