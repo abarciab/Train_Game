@@ -5,7 +5,7 @@ class PlayGame extends Phaser.Scene {
 
     preload() {
         // load images/tile sprites
-        this.load.image('train', './assets/trains/basic locomotive.png');
+        this.load.spritesheet('train', './assets/trains/basic locomotive spritesheet.png', {frameWidth: 400, frameHeight: 446, startFrame: 0, endFrame: 2});
 
         //sound effects
         this.load.audio('junction_switch', './assets/sound effects/junction switched.mp3');
