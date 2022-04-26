@@ -5,7 +5,8 @@ class Train extends Phaser.GameObjects.Sprite {
         scene.add.existing(this);             // add object to existing scene
         this.atStation = 0;               // tracks if train is at station
         this.onTrack = initial_track;         // tracks which track the train is on
-        this.health = 20;                     // tracks yelp rating
+        this.health = 12;                     // tracks yelp rating
+        this.healthCapacity = 20;             // tracks max health of train
         this.passengers = [];                 // list of passengers in train
         this.capacity = 6;                    // # of passengers the train can fit
         this.fuelCapacity = 100000;           // max amount of fuel Train can hold
@@ -25,7 +26,7 @@ class Train extends Phaser.GameObjects.Sprite {
         this.setDepth(10);
     }
 
-    update(timer, delta) {
+    update(scene, timer, delta) {
         /*
         if turning
             1.) increment dt by secs/frame 
@@ -37,12 +38,35 @@ class Train extends Phaser.GameObjects.Sprite {
             - I did it like this so that the y position change remains consistent despite frame rate, and works with variable speeds
         */
         if (this.turning) {
-            this.dt += delta/1000;
+            this.dt += delta/1000 * 1.5;
             let turn_timer = (delta/1000)*(this.junction_wid / this.speed);
-            let dy = this.track_y_interval / (turn_timer/(delta/1000));
+            let dy = this.track_y_interval / (turn_timer/(delta/1000)) * 1.5;
+
+            if (this.turn_dir == "north" && this.tweening != true){
+                this.tweening = true;
+                console.log("starting tween");
+
+                scene.tweens.addCounter({
+                    from: 0, 
+                    to: 100,
+                    duration: turn_timer * 1000,
+                    startDelay: 0,
+                    ease: Phaser.Math.Easing.Sine.InOut,
+                    //ease: Phaser.Math.Easing.Linear,
+                    repeat: 0,
+                    onUpdate: tween => {
+                        this.angle -= 10;
+                    }
+                })
+            }
+            
             if (this.dt < turn_timer) {
                 if (this.turn_dir == "north"){
                     this.y -= dy;
+                    console.log("moving up");
+                    //turning
+                    this.angle = 0;
+
                 } else if (this.turn_dir == "south") {
                     this.y += dy;
                 }

@@ -16,6 +16,24 @@ this.textConfig = {
     align: 'center',
 }
 
+this.instrctionConfig =  {
+    align: 'center', 
+    color: '#FFFFFF', 
+    stroke: '#000000', 
+    strokeThickness:'2',
+    fontSize: '35px'
+}
+
+
+function DisplayNextInstruction(scene) {
+    if (this.instructionStage == 0){
+        instructionStage += 1;
+        this.instructionText = scene.add.text(game.config.width/2, game.config.height/2, "USE W, S, and D to change junction direction", instrctionConfig)
+        .setDepth(25)
+        .setOrigin(0.5);
+    }
+}
+
 function LoadUI(scene){
     //biome assets
     scene.load.image('biome_bar_fields', './assets/UI/biome bar.png');
@@ -47,6 +65,8 @@ function LoadUI(scene){
 }
 
 function StartUI(scene){
+
+    //variables
     this.front = 60;
     this.IconGap = 80;
     this.iconScale = 0.5;
@@ -85,13 +105,15 @@ function StartUI(scene){
     this.rating  = 20;
     displayRating();
 
-    //let passenger1 = new Passenger(scene, 0, 0, 'pass_square', null, null, 2000, null, 1);
-    //passenger1.boardTrain(scene);
-    
-
+    this.instructionStage = 0;
 }
 
 function UpdateUI(scene, delta){
+    //display instructions
+    if (this.instructionStage == 0){
+        DisplayNextInstruction(scene);
+    }
+
     //update fuel display
     this.fuelNeedle.angle = ( (scene.fuel/scene.train.fuelCapacity) * 180) - 90;
 
@@ -169,16 +191,16 @@ function RemovePassengerIcons(scene, stationName){
     console.log("stopping at station: " + stationName);
 
     this.passengers.getChildren().forEach(function(passengerIcon) {
-        if (passengerIcon.passenger.stationName == stationName){
+        if (passengerIcon.passengerObj.destination == stationName){
             console.log("removed passengerUI");
-            passengerIcon.passenger.disembark(scene);
+            passengerIcon.passengerObj.disembark(scene);
             emptySlots.push(passengerIcon.slot);
-            destroy(passengerIcon);
+            passengerIcon.destroy();
         }
     });
     
     this.passengers.getChildren().forEach(function(passengerIcon) {
-        for (i = 0; i < length(emptySlots); i++){
+        for (i = 0; i < emptySlots.length; i++){
             if (passengerIcon.slot > emptySlots[i]){
                 passengerIcon.slot -= 1;
                 passengerIcon.x -= IconGap;

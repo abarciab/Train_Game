@@ -87,7 +87,7 @@ class PlayGame extends Phaser.Scene {
         this.updateStations(delta);
         this.train.speed = this.speed;
         this.fuel -= delta;
-        this.train.update(timer, delta);
+        this.train.update(this, timer, delta);
         this.updateEvents(delta);
         this.updateBackground();
         UpdateUI(this, delta);
@@ -119,8 +119,9 @@ class PlayGame extends Phaser.Scene {
                 this.nodes[i][j].update();
 
                 // check if train collided with obstacle
-                if (this.train.onTrack == i && this.nodes[i][j].obstacle_type
-                && Math.abs(this.train.x - this.nodes[i][j].x) <= 2 && !this.train.turning) {
+                if (this.train.onTrack == i && this.nodes[i][j].obstacle_type && !this.nodes[i][j].obstacleHit
+                && Math.abs(this.train.x - this.nodes[i][j].x) <= (this.speed / 2) && !this.train.turning) {
+                    this.nodes[i][j].obstacleHit = true;
                     if (this.nodes[i][j].obstacle_type == 1) {
                         this.crashSound.play();
                         this.train.health = 0;
@@ -243,6 +244,7 @@ class PlayGame extends Phaser.Scene {
         if (this.train.health <= 0 && !this.gameOver) {
             this.speed = 0;
             this.gameOver = true;
+            this.backgroundMusic.stop();
             console.log("YOU DIED");
             EndGameUI(this);
         }
@@ -251,7 +253,8 @@ class PlayGame extends Phaser.Scene {
         if (this.train.atStation == 0) {
             for (let i = 0; i < this.stations.length; i++) {
                 if (this.train.onTrack == this.stations[i].onTrack && !this.train.turning
-                && Math.abs(this.train.x - this.stations[i].x) <= 2) {
+                && Math.abs(this.train.x - (this.stations[i].x + 500)) <= (this.speed / 2) && !this.stations[i].stoppedAt) {
+                    this.stations[i].stoppedAt = true;
                     this.currentStation = this.stations[i];
                     this.train.atStation = 1;
                     break;
@@ -270,7 +273,7 @@ class PlayGame extends Phaser.Scene {
         let tempSpeed = this.speed;
         this.speed = 0;
         this.train.moving = false;
-        RemovePassengerIcons(this, station.type);
+        RemovePassengerIcons(this, Array.from(station.type)[0]);
         this.fuel = this.train.fuelCapacity;
         console.log("Fuel sustained");
         this.train.passengers.forEach(passenger => {
@@ -280,7 +283,9 @@ class PlayGame extends Phaser.Scene {
                     this.train.health -= 2;
                     console.log("Bad review");
                 } else {
-                    this.train.health += 1;
+                    if (this.train.health < this.train.healthCapacity) {
+                        this.train.health += 1;
+                    }
                     console.log("Good review");
                 }
                 this.train.passengers.splice(this.train.passengers.indexOf(passenger), 1);
