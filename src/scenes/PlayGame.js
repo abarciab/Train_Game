@@ -78,7 +78,6 @@ class PlayGame extends Phaser.Scene {
         }, null, this);
         this.currentStation = new Station(this, config.width/5, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'station', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
         */
-
         StartUI(this);
     }
 

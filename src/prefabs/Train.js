@@ -39,7 +39,7 @@ class Train extends Phaser.GameObjects.Sprite {
             - I did it like this so that the y position change remains consistent despite frame rate, and works with variable speeds
         */
         if (this.turning) {
-            let offsetMod = 1.5;        //an offset that changes the steepness of the train's diagonal movement
+            let offsetMod = 1;        //an offset that changes the steepness of the train's diagonal movement
 
             this.dt += delta/1000 * offsetMod;
             let turn_timer = (delta/1000)*(this.junction_wid / this.speed);
