@@ -58,7 +58,7 @@ class PlayGame extends Phaser.Scene {
         // spawn the world initially
         initSpawn(this, this.tracks, this.nodes, this.speed, this.margin, this.node_interval, this.y_interval, this.num_chunks, this.global_scaling);
         // initial spawn:
-        this.train = new Train(this, config.width/10, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'basic_locomotive', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
+        this.train = new Train(this, config.width/10, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'basic_locomotive', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling).setOrigin(0.5);
 
         // set fuel
         this.fuel = this.train.fuelCapacity;
@@ -81,7 +81,7 @@ class PlayGame extends Phaser.Scene {
         this.updateStations(delta);
         this.train.speed = this.speed;
         this.fuel -= delta;
-        this.train.update(timer, delta);
+        this.train.update(this, timer, delta);
         this.updateEvents(delta);
         this.updateBackground();
         UpdateUI(this, delta);
