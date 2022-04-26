@@ -14,6 +14,7 @@ class Station extends Phaser.GameObjects.Sprite {
         this.moved = false;
         this.visible = false;
         this.no_junc = true;
+        this.spawned = false;
         this.stoppedAt = false;
         //this.stopX = this.x + 1300;
 
