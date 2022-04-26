@@ -1,6 +1,7 @@
 /*
 the initial spawn for the world
     - scene: scene to spawn objects
+    - train_row: the row the train is on
     - tracks: dict of tracks
     - nodes: dict of nodes
     - speed: initial speed of world
@@ -9,201 +10,251 @@ the initial spawn for the world
     - y_interval: the distance between rows of tracks
     - num_chunks: number of node/track objects to spawn initally
     - scaling: world size scaling
+    - spawn_table: table of station spawn chances
+    - spawn_index: index position within the spawn table
 */
-function initSpawn(scene, tracks, nodes, speed, margin, x_interval, y_interval, num_chunks, scaling) {
-    // go through each row of tracks
-    for (let i = 0; i < Object.keys(tracks).length; i++) {
-        // go through the chunks per row
-        for (let j = 0; j < num_chunks; j++) {
-            // add the track to the scene
-            tracks[i].push(scene.add.image(j*x_interval, margin+(y_interval*(i+1)), "basic_straight_track"));
-            tracks[i][tracks[i].length-1].setScale(scaling);
-            tracks[i][tracks[i].length-1].setDepth(3);
-            
-            let n_junc=false;
-            let s_junc=false;
-            let obstacle_type = 0;
-            // only spawn junctions and objects for nodes past the 2nd chunk
-            if (j > 1) {
-                // random chance to let a node have a north/south junction
-                let random_dir = Math.floor(Math.random()*100);
-                if (random_dir <= 25) {
-                    if (i > 0)
-                        n_junc=true;
-                }
-                if (random_dir >= 25 && random_dir <= 50) {
-                    if (i < Object.keys(tracks).length-1)
-                        s_junc=true;
-                }
-                // random chance to spawn an obstacle after a node
-                let obstacle_chance = Math.floor(Math.random()*100);
-                if (obstacle_chance <= 10 && (n_junc || s_junc)) {
-                    obstacle_type = 1;
-                } else if (obstacle_chance <= 20 && (n_junc || s_junc)) {
-                    obstacle_type = 2;
-                }
-            }
-            // add a node to the scene
-            nodes[i].push(new Node(
-                scene, x_interval/2+(j*x_interval), margin+(y_interval*(i+1)), 
-                "basic_node_track", i, speed, scaling, n_junc, s_junc,
-                obstacle_type
-            ));
-        }
+function initSpawn(scene, train_row, tracks, nodes, stations, speed, margin, x_interval, y_interval, num_chunks, scaling, spawn_table, spawn_index) {
+    // spawn one column of initial tracks first
+    let num_rows = Object.keys(tracks).length;
+    for (let i = 0; i < num_rows; i++) {
+        spawnTracks(scene, 0, margin+(y_interval*(i+1)), tracks, i, scaling);
+        spawnNodes(scene, x_interval/2, margin+(y_interval*(i+1)), speed, scaling, nodes, stations, new Set(), i, num_rows);
     }
+    // spawn the rest of tracks using the positions of the prespawned tracks
+    for (let i = 0; i < num_chunks-1; i++) {
+        spawn_index = spawnWorldChunk(scene, train_row, tracks, nodes, stations, speed, x_interval, scaling, spawn_table, spawn_index);
+    }
+    // return the current spawn index of the stations spawn table
+    return spawn_index;
 }
 
 /*
 spawn a chunk of the world
     - scene to spawn chunk
+    - train_row: row the train is on
     - tracks/nodes: dict of track/nodes
+    - stations: array of stations
     - speed: speed of world
     - x_interval: used to spawn tracks/nodes at right place
     - scaling: world size scaling
+    - spawn_table: table of station spawn chances
+    - spawn_index: index position within the spawn table
 */
-function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, scaling) {
-    let num_rows = Object.keys(tracks).length;
-    let station_row = new Set();
-    // the x position all objects should be spawning at relatively for this column
-    let prev_x = tracks[num_rows-1][tracks[num_rows-1].length-1].x
+function spawnWorldChunk(scene, train_row, tracks, nodes, stations, speed, x_interval, scaling, spawn_table, spawn_index) {
+    let num_rows = Object.keys(tracks).length;  // number of rows
+    let station_row = new Set();                // when a station spawns, what row it's on
+    let prev_x = tracks[num_rows-1][tracks[num_rows-1].length-1].x; // x of previous track
+    
+    // reduce spawn timer for the stations, and check if one of them spawns
+    checkStationSpawn(stations, station_row, prev_x+(x_interval/2));
+
+    // go through each row of tracks
+    for (let i = 0; i < num_rows; i++) {
+        // spawn the tracks
+        spawnTracks(scene, prev_x + x_interval, tracks[i][0].y, tracks, i, scaling);
+        // spawn the nodes
+        spawnNodes(scene, prev_x+(x_interval/2), nodes[i][0].y, speed, scaling, nodes, stations, station_row, i, num_rows);
+    }
+        
+    // reset the stations
+    stations.forEach(element => {
+        element.moved=false;    // let stations move again
+        if (element.spawned) {  // if the station just spawned, make it so next junction cannot collide with station
+            element.spawned = false;
+            element.no_junc = true;
+        }
+    });
+
+    // try to spawn a station, return the spawn index depending on success of failure.
+    spawn_index = spawnStation(scene, stations, 
+        nodes[train_row][nodes[train_row].length-1].x, nodes[train_row][nodes[train_row].length-1].y,
+        train_row, scaling, spawn_table, spawn_index
+    );
+
+    // return station spawn index
+    return spawn_index;
+}
+
+/*
+reduce station spawn timer and spawn if low enough
+    - stations: list of stations
+    - station_row: contains the rows of stations that just spawned.
+    - x: x position of station when they spawn
+*/
+function checkStationSpawn(stations, station_row, x) {
     for (let i = 0; i < stations.length; i++) {
+        // add the station's row if no_junc or when it just spawns
+        if (stations[i].no_junc) {
+            station_row.add(stations[i].onTrack);
+            stations[i].no_junc = false;
+        }
         // decrement the spawn timer for each node interval passed
         if (stations[i].spawn_timer > 0) {
             stations[i].spawn_timer--;
-            // when the station is about to spawn, make sure that nodes cannot point to it's row
-            // specifically the nodes on the rows above and below it
         }
-        // once the spawn timer hits 0, set to visible
+        // once the spawn timer hits 0, have the station be visible
         else if (!stations[i].visible) {
+            stations[i].spawned = true;
             stations[i].setVisible(true);
-            stations[i].x = prev_x+(x_interval/2);
+            stations[i].x = x;
             station_row.add(stations[i].onTrack);
         }
     }
-    // go through each row of tracks
-    for (let i = 0; i < num_rows; i++) {
-        // add tracks to position relative to last track
-        tracks[i].push(scene.add.image(prev_x + x_interval, tracks[i][0].y, "basic_straight_track"));
-        tracks[i][tracks[i].length-1].setScale(scaling);
-        tracks[i][tracks[i].length-1].setDepth(3);
-        if (nodes[i][nodes[i].length-1].obstacle_type == 1) {
-            //tracks[i][nodes[i].length-1].setTexture("gap wt track")
-        }
-        let n_junc=false;
-        let s_junc=false;
-        let obstacle_type = 0;
-        // random chance to spawn north or south junction
-        let random_dir = Math.floor(Math.random()*100);
-        // can't have north junc if below station spawn
-        if (random_dir <= 25 && !(station_row.has(i+1))) {
-            if (i > 0) {
-                n_junc=true;
-            }
-        }
-        if (random_dir >= 15 && random_dir <= 40 && !(station_row.has(i-1))) {
-            if (i < Object.keys(tracks).length-1) {
-                s_junc=true;
-            }
-        }
+}
 
-        // update the stations every spawn timer (node interval)
-        // key: north or south. value: array of symbols
-        let junction_signs = {};
-        for (let j = 0; j < stations.length; j++) {
-            /*
-            can move the station if:
-                - station has not spawned yet
-                - station has not moved yet per the column
-                - the station is on the current track that has a junction
-            */ 
-            // while the station hasn't "spawned" yet & hasn't been moved
-            if (!stations[j].visible && !stations[j].moved && stations[j].onTrack == i) {
-                let sign_chance = Math.floor(Math.random()*100);
-                if (sign_chance <= 50 && (n_junc || s_junc)) {
-                    // if node has two junctions, randomly choose one of them to have a sign
-                    let sign_dir;
-                    if (n_junc && s_junc) {
-                        if (Math.floor(Math.random()*100)<=50 && stations[j].onTrack > 0) {
-                            sign_dir = "up";
-                            stations[j].onTrack--;
-                        }
-                        else if (stations[j].onTrack < num_rows-1) {
-                            sign_dir = "down";
-                            stations[j].onTrack++;
-                        }
-                    }
-                    // if north junction, give the north junction a sign
-                    else if (n_junc && stations[j].onTrack > 0) {
+/*
+spawn a set of tracks on a row
+*/
+function spawnTracks(scene, x, y, tracks, row, scaling) {
+    tracks[row].push(scene.add.image(x, y, "basic_straight_track"));
+    tracks[row][tracks[row].length-1].setScale(scaling);
+    tracks[row][tracks[row].length-1].setDepth(3);
+}
+
+/*
+spawn a set of nodes and generate junctions, obstacles, and signs for them
+*/
+function spawnNodes(scene, x, y, speed, scaling, nodes, stations, station_row, row, num_rows) {
+    let n_junc=false;
+    let s_junc=false;
+    let obstacle_type = 0;
+
+    // 25% chance to spawn each junc, and 10% chance for both
+    let random_dir = Math.floor(Math.random()*100);
+    if (random_dir <= 25) {
+        if (row > 0) {
+            n_junc=true;
+        }
+    }
+    if (random_dir >= 15 && random_dir <= 40) {
+        if (row < num_rows-1) {
+            s_junc=true;
+        }
+    }
+
+    // determine if rows are valid to have junctions or not depending on station
+    Array.from(station_row).forEach(element => {
+        // junc cannot point to row with station or row of station
+        if (element-1 == row) {
+            s_junc = false;
+        }
+        else if (element+1 == row) {
+            n_junc = false;
+        }
+        else if (element == row) {
+            n_junc = false;
+            s_junc = false;
+        }
+    });
+
+    // 10% chance to spawn an obstacle if there is a junction to avoid it
+    let obstacle_chance = Math.floor(Math.random()*100);
+    if (obstacle_chance <= 10 && (n_junc || s_junc)) {
+        obstacle_type = 1;
+    } else if (obstacle_chance <= 20 && (n_junc || s_junc)) {
+        obstacle_type = 2;
+    }
+
+    // generate possible route to station
+    // key: north or south. value: array of symbols
+    let junction_signs = {};
+    generateStationRoute(junction_signs, stations, nodes, row, num_rows, n_junc, s_junc);
+
+    // push the node
+    nodes[row].push(new Node(
+        scene, x, y, "basic_node_track", row, speed, scaling, n_junc, s_junc, junction_signs, obstacle_type
+    ));
+}
+
+/*
+generate a possible route to a station along with signs
+    - junction_signs: the signs of a node
+    - stations/nodes: list of stations/nodes
+    - row: row that node is currently being spawned for
+    - num_rows: number of rows
+    - n_junc/s_junc if node has a north or south junction
+*/
+function generateStationRoute(junction_signs, stations, nodes, row, num_rows, n_junc, s_junc) {
+    for (let j = 0; j < stations.length; j++) {
+        /*
+        can move the station if:
+            - station has not spawned(been made visible) yet
+            - station has not moved yet per the column
+            - the station is on the current track that has a junction
+        */ 
+        if (!stations[j].visible && !stations[j].moved && stations[j].onTrack == row) {
+            // 50% chance to spawn a sign if junctions exist
+            let sign_chance = Math.floor(Math.random()*100);
+            let sign_dir = "straight";
+            if (sign_chance <= 50 && (n_junc || s_junc)) {
+                // if node has two junctions, randomly choose one of them to have a sign
+                if (n_junc && s_junc) {
+                    if (Math.floor(Math.random()*100)<=50 && stations[j].onTrack > 0) {
                         sign_dir = "up";
                         stations[j].onTrack--;
                     }
-                    // if south junction, give the south junction a sign
-                    else if (s_junc && stations[j].onTrack < num_rows-1) {
+                    else if (stations[j].onTrack < num_rows-1) {
                         sign_dir = "down";
                         stations[j].onTrack++;
                     }
-                    else if (!(n_junc || s_junc)) {
-                        sign_dir = "straight";
-                    }
-                    // only make the sign if within a certain distance
-                    if (sign_dir != undefined && stations[j].spawn_timer < stations[j].sign_distance) {
-                        if (!(sign_dir in junction_signs))
-                            junction_signs[sign_dir] = new Set();
-                        Array.from(stations[j].type).forEach(element => {
-                            junction_signs[sign_dir].add(element);
-                        });
-                        stations[j].moved=true;
-                    }
-                    stations[j].y = tracks[stations[j].onTrack][0].y;
                 }
-            }
-            // if the station has been moved, make it so all nodes w/ junctions that point to the station has a sign as well.
-            else if (!stations[j].visible && stations[j].moved && stations[j].spawn_timer < stations[j].sign_distance) {
-                let sign_dir;
-                if (n_junc && stations[j].onTrack == i+1) {
+                // if north junction, give the north junction a sign and move the station up
+                else if (n_junc && stations[j].onTrack > 0) {
                     sign_dir = "up";
+                    stations[j].onTrack--;
                 }
-                else if (s_junc && stations[j].onTrack == i-1) {
+                // if south junction, give the south junction a sign and move the station down
+                else if (s_junc && stations[j].onTrack < num_rows-1) {
                     sign_dir = "down";
+                    stations[j].onTrack++;
                 }
-                else if ((n_junc || s_junc) && stations[j].onTrack == i) {
-                    sign_dir = "straight";
-                }
-                // only make the sign if within sign distance
-                if (sign_dir != undefined) {
+                // only make the sign if within the distance for signs to spawn; add station types to the junction sign
+                if (stations[j].spawn_timer < stations[j].sign_distance) {
                     if (!(sign_dir in junction_signs))
                         junction_signs[sign_dir] = new Set();
                     Array.from(stations[j].type).forEach(element => {
                         junction_signs[sign_dir].add(element);
                     });
+                    stations[j].moved = true; // make it so station can't move multiple times per column
                 }
+                // set the station's y to the row it's now on
+                stations[j].y = nodes[stations[j].onTrack][0].y;
             }
         }
-
-        // random chance to spawn obstacle
-        let obstacle_chance = Math.floor(Math.random()*100);
-        if (obstacle_chance <= 10 && (n_junc || s_junc)) {
-            obstacle_type = 1;
-        } else if (obstacle_chance <= 20 && (n_junc || s_junc)) {
-            obstacle_type = 2;
+        // if the station has been moved, make it so all nodes w/ junctions that point to the station has a sign as well.
+        else if (!stations[j].visible && stations[j].moved && stations[j].spawn_timer < stations[j].sign_distance) {
+            let sign_dir;
+            if (n_junc && stations[j].onTrack == row+1) {
+                sign_dir = "up";
+            }
+            else if (s_junc && stations[j].onTrack == row-1) {
+                sign_dir = "down";
+            }
+            else if ((n_junc || s_junc) && stations[j].onTrack == row) {
+                sign_dir = "straight";
+            }
+            // only make the sign if within sign distance
+            if (sign_dir != undefined) {
+                if (!(sign_dir in junction_signs))
+                    junction_signs[sign_dir] = new Set();
+                Array.from(stations[j].type).forEach(element => {
+                    junction_signs[sign_dir].add(element);
+                });
+            }
         }
-        nodes[i].push(new Node(scene, prev_x+(x_interval/2), nodes[i][0].y,
-            "basic_node_track", i, speed, scaling, n_junc, s_junc, junction_signs, obstacle_type
-        ));
-    } // end of row for loop
+    }
+}
 
-    stations.forEach(element => {
-        element.moved=false;
-    });
+function spawnStation(scene, stations, x, y, init_track, scaling, spawn_table, spawn_index) {
     // chance to spawn a station on player's row per spawn
     let random_station = Math.floor(Math.random() * 100);
-    if (random_station <= 10) {
+    if (random_station <= spawn_table[spawn_index]) {
+        spawn_index = 0;
         let stationCount = Math.ceil(Math.random() * 6); // Possible 1-6 Passengers
         let passengers = [];
         for (let j = 0; j < stationCount; j++) {
             passengers.push(new Passenger(
-                scene, nodes[train.onTrack][nodes[train.onTrack].length-1].x, nodes[train.onTrack][nodes[train.onTrack].length-1].y,
-                "passenger 1", 0, train.onTrack, 30000, 0, scaling 
+                scene, x, y, "passenger 1", 0, init_track, 30000, 0, scaling 
             ));
         }
         // determine station types
@@ -215,8 +266,11 @@ function SpawnTracks(scene, train, tracks, nodes, stations, speed, x_interval, s
             station_types.add(types[type]);
         }
         stations.push(new Station(
-            scene, nodes[train.onTrack][nodes[train.onTrack].length-1].x, nodes[train.onTrack][nodes[train.onTrack].length-1].y,
-            "station", 0, train.onTrack, station_types, passengers, 0, scaling
+            scene, x, y, "station", 0, init_track, station_types, passengers, 0, scaling
         ));
     }
+    else if (spawn_index < spawn_table.length-1){
+        spawn_index++;
+    }
+    return spawn_index;
 }

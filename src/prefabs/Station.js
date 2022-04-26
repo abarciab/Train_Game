@@ -14,6 +14,7 @@ class Station extends Phaser.GameObjects.Sprite {
         this.moved = false;
         this.visible = false;
         this.no_junc = true;
+        this.spawned = false;
 
         this.scaleX = scaling;
         this.scaleY = scaling;

@@ -37,6 +37,8 @@ class PlayGame extends Phaser.Scene {
         this.tracks = {};           // key: track row, value: track images
         this.nodes = {};            // key: track row, value: node objects
         this.stations = [];         // list of stations.
+        this.station_spawn_table = [0, 0, 0, 10, 10, 10, 20, 20, 20, 30];
+        this.station_spawn_index = 0;
         this.gameOver = true;
 
         // initialize tracks and nodes to keys and empty lists
@@ -54,10 +56,14 @@ class PlayGame extends Phaser.Scene {
         this.input_interval = this.node_interval; // interval user can input an action before a junction
         this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
         this.speed = 5;    // speed of world
-
         // spawn the world initially
-        initSpawn(this, this.tracks, this.nodes, this.speed, this.margin, this.node_interval, this.y_interval, this.num_chunks, this.global_scaling);
-        // initial spawn:
+        this.station_spawn_index = initSpawn(
+            this, Math.floor(this.num_tracks/2), this.tracks, this.nodes, this.stations,
+            this.speed, this.margin, this.node_interval, 
+            this.y_interval, this.num_chunks, this.global_scaling,
+            this.station_spawn_table, this.station_spawn_index
+        );
+        
         this.train = new Train(this, config.width/10, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'basic_locomotive', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
 
         // set fuel
@@ -176,8 +182,15 @@ class PlayGame extends Phaser.Scene {
             }
         }
         // spawn the tracks if tracks have been deleted to ensure consistent number of tracks
-        if (spawn_tracks)
-            SpawnTracks(this, this.train, this.tracks, this.nodes, this.stations, this.speed, this.node_interval, this.global_scaling);
+        if (spawn_tracks) {
+            this.station_spawn_index = spawnWorldChunk(
+                this, this.train.onTrack, this.tracks, 
+                this.nodes, this.stations, this.speed, 
+                this.node_interval, this.global_scaling,
+                this.station_spawn_table, this.station_spawn_index
+            );
+            console.log(this.station_spawn_index);
+        }
     }
 
     /*
@@ -226,7 +239,6 @@ class PlayGame extends Phaser.Scene {
             this.speed += 1;
         }
 
-        console.log(this.gameOver);
         // Check if player lost
         if (this.train.health <= 0 && !this.gameOver) {
             this.speed = 0;
