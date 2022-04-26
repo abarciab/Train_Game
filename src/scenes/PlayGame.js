@@ -58,8 +58,8 @@ class PlayGame extends Phaser.Scene {
         // spawn the world initially
         initSpawn(this, this.tracks, this.nodes, this.speed, this.margin, this.node_interval, this.y_interval, this.num_chunks, this.global_scaling);
         // initial spawn:
-        this.train = new Train(this, config.width/10, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'basic_locomotive', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling).setOrigin(0.5);
-
+        this.train = new Train(this, config.width/10, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'basic_locomotive', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
+ 
         // set fuel
         this.fuel = this.train.fuelCapacity;
         this.currentStation;
@@ -124,6 +124,7 @@ class PlayGame extends Phaser.Scene {
                         this.train.health -= 4;
                     }
                 }
+
                 
                 /*if the player is:
                     - within x_distance of node
@@ -141,7 +142,7 @@ class PlayGame extends Phaser.Scene {
                 // when the train is close enough to turn on the node, turn the node's turn dir
                 else if (
                     this.train.onTrack == i && !this.train.turning
-                    && this.train.x >= this.nodes[i][j].x-this.junction_offset 
+                    && this.train.x>= this.nodes[i][j].x-this.junction_offset 
                     && this.train.x <= this.nodes[i][j].x+this.junction_offset
                 ) {
                     this.train.distanceTraveled++;
