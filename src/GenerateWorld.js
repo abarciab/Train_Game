@@ -18,7 +18,7 @@ function initSpawn(scene, train_row, tracks, nodes, stations, speed, margin, x_i
     let num_rows = Object.keys(tracks).length;
     for (let i = 0; i < num_rows; i++) {
         spawnTracks(scene, 0, margin+(y_interval*(i+1)), tracks, i, scaling);
-        spawnNodes(scene, x_interval/2, margin+(y_interval*(i+1)), speed, scaling, nodes, stations, new Set(), i, num_rows);
+        spawnNodes(scene, x_interval/2, margin+(y_interval*(i+1)), speed, scaling, nodes, stations, new Set(), i, num_rows, false);
     }
     // spawn the rest of tracks using the positions of the prespawned tracks
     for (let i = 0; i < num_chunks-1; i++) {
@@ -53,7 +53,7 @@ function spawnWorldChunk(scene, train_row, tracks, nodes, stations, speed, x_int
         // spawn the tracks
         spawnTracks(scene, prev_x + x_interval, tracks[i][0].y, tracks, i, scaling);
         // spawn the nodes
-        spawnNodes(scene, prev_x+(x_interval/2), nodes[i][0].y, speed, scaling, nodes, stations, station_row, i, num_rows);
+        spawnNodes(scene, prev_x+(x_interval/2), nodes[i][0].y, speed, scaling, nodes, stations, station_row, i, num_rows, true);
     }
         
     // reset the stations
@@ -81,6 +81,9 @@ reduce station spawn timer and spawn if low enough
     - station_row: contains the rows of stations that just spawned.
     - x: x position of station when they spawn
 */
+/*
+sign spawning: should display straight signs around 3 times before reaching it
+*/
 function checkStationSpawn(stations, station_row, x) {
     for (let i = 0; i < stations.length; i++) {
         // add the station's row if no_junc or when it just spawns
@@ -90,6 +93,7 @@ function checkStationSpawn(stations, station_row, x) {
         }
         // decrement the spawn timer for each node interval passed
         if (stations[i].spawn_timer > 0) {
+            // in intervals of sign_spawn / 3
             stations[i].spawn_timer--;
         }
         // once the spawn timer hits 0, have the station be visible
@@ -114,7 +118,7 @@ function spawnTracks(scene, x, y, tracks, row, scaling) {
 /*
 spawn a set of nodes and generate junctions, obstacles, and signs for them
 */
-function spawnNodes(scene, x, y, speed, scaling, nodes, stations, station_row, row, num_rows) {
+function spawnNodes(scene, x, y, speed, scaling, nodes, stations, station_row, row, num_rows, can_have_obstacles) {
     let n_junc=false;
     let s_junc=false;
     let obstacle_type = 0;
@@ -147,12 +151,14 @@ function spawnNodes(scene, x, y, speed, scaling, nodes, stations, station_row, r
         }
     });
 
-    // 10% chance to spawn an obstacle if there is a junction to avoid it
-    let obstacle_chance = Math.floor(Math.random()*100);
-    if (obstacle_chance <= 10 && (n_junc || s_junc)) {
-        obstacle_type = 1;
-    } else if (obstacle_chance <= 20 && (n_junc || s_junc)) {
-        obstacle_type = 2;
+    if (can_have_obstacles) {
+        // 10% chance to spawn an obstacle if there is a junction to avoid it
+        let obstacle_chance = Math.floor(Math.random()*100);
+        if (obstacle_chance <= 10 && (n_junc || s_junc)) {
+            obstacle_type = 1;
+        } else if (obstacle_chance <= 20 && (n_junc || s_junc)) {
+            obstacle_type = 2;
+        }
     }
 
     // generate possible route to station

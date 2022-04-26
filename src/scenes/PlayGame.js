@@ -31,15 +31,15 @@ class PlayGame extends Phaser.Scene {
         right_key = this.input.keyboard.addKey(39);
         space_bar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.base_interval = 64*6;  // base unscaled interval between rows of tracks
-        this.num_tracks = 3;        // number of rows of tracks
-        this.num_chunks = 8;        // number of chunks that are loaded
+        this.num_tracks = 4;        // number of rows of tracks
+        this.num_chunks = 20;        // number of chunks that are loaded
         // this.dx = 0;                // delta x; how much the player has traveled
         this.tracks = {};           // key: track row, value: track images
         this.nodes = {};            // key: track row, value: node objects
         this.stations = [];         // list of stations.
         this.station_spawn_table = [0, 0, 0, 10, 10, 10, 20, 20, 20, 30];
         this.station_spawn_index = 0;
-        this.gameOver = true;
+        this.gameOver = false;
 
         // initialize tracks and nodes to keys and empty lists
         for (let i = 0; i < this.num_tracks; i++) {
@@ -190,7 +190,6 @@ class PlayGame extends Phaser.Scene {
                 this.node_interval, this.global_scaling,
                 this.station_spawn_table, this.station_spawn_index
             );
-            console.log(this.station_spawn_index);
         }
     }
 
