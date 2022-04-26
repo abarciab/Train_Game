@@ -8,7 +8,7 @@ class Node extends Phaser.GameObjects.Sprite {
         this.speed = speed;
         this.sign_types = signs;
         this.turn_dir = "straight";
-        this.at_junction=false;
+        this.at_junction = false;
         this.obstacle;
         this.to_tracks = new Set([this.row]);
         this.obstacle_type = obstacle_type;
@@ -32,7 +32,7 @@ class Node extends Phaser.GameObjects.Sprite {
             case 2:
                 this.obstacle = scene.add.image(x+(10*64*scaling), y, "field_debris_obstacle");
                 this.obstacle.y -= this.displayHeight/6;
-                this.obstacle.setScale(scaling*2);
+                this.obstacle.setScale(scaling*1.5);
                 this.obstacle.setDepth(5);
                 break;
             default:
@@ -40,7 +40,7 @@ class Node extends Phaser.GameObjects.Sprite {
         }
         
         if (exit_N) {
-            this.to_tracks.add(this.row-1)
+            this.to_tracks.add(this.row-1);
             this.junctions["north"] = scene.add.image(x, y, "basic_out-up_track").setScale(scaling).setDepth(4);
         }
         if (exit_S) {

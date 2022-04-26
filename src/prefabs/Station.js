@@ -4,8 +4,8 @@ class Station extends Phaser.GameObjects.Sprite {
         super(scene, x, y, texture, frame);
 
         scene.add.existing(this);
-        this.spawn_timer = 20;    // number of nodes it takes to spawn a station
-        this.sign_distance = 10;
+        this.spawn_timer = 15;    // number of nodes it takes to spawn a station
+        this.sign_distance = 15;
         this.type = type;
         this.speed = speed;
         this.dir_sign = false;
@@ -16,7 +16,17 @@ class Station extends Phaser.GameObjects.Sprite {
         this.no_junc = true;
         this.spawned = false;
         this.stoppedAt = false;
+        this.sign;
         //this.stopX = this.x + 1300;
+
+        switch (Array.from(this.type)[0]) {
+            case "red square":
+                this.sign = scene.add.image(x, y, "red square station sign").setScale(scaling).setDepth(8);
+                break;
+            default:
+                this.sign = scene.add.image(x, y, "red square station sign").setScale(scaling).setDepth(8);
+                break;
+        }
 
         this.scaleX = scaling;
         this.scaleY = scaling;
@@ -25,6 +35,10 @@ class Station extends Phaser.GameObjects.Sprite {
     update() {
         if (this.visible) {
             this.x -= this.speed;
+            if (this.sign != undefined) {
+                this.sign.x = this.x;
+                this.sign.y = this.y;
+            }
             //this.stopX -= this.speed;
         }
     }
