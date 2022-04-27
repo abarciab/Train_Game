@@ -55,6 +55,8 @@ class PlayGame extends Phaser.Scene {
         this.input_interval = this.node_interval; // interval user can input an action before a junction
         this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
         this.speed = 5;    // speed of world
+        this.speedLock = this.speed; // holds speed while speed changes when entering stations
+        this.lock = false; // traces when speed is locked
         this.dist = 0;
         // spawn the world initially
         this.train = new Train(this, config.width/10, 0, 'basic_locomotive', Math.floor(this.num_tracks/2));
@@ -99,9 +101,25 @@ class PlayGame extends Phaser.Scene {
             console.log("YOU DIED");
             EndGameUI(this);
         }
+
         // Check if train is at station
         if (this.train.atStation == 0) {
             for (let i = 0; i < this.stations.length; i++) {
+                // Slow down before entering station
+                if ((this.stations[i].x + 500) - this.train.x < this.node_interval && this.stations[i].onTrack == this.train.onTrack
+                    && this.stations[i].x > this.train.x) {
+                    if (this.lock == false) {
+                        this.speedLock = this.speed;
+                        this.lock = true;
+                    }
+                    this.speed = 3;
+                }
+                else if (this.currentStation == this.stations[i] && this.lock) {
+                    this.speed = this.speedLock;
+                    this.lock = false;
+                }
+
+                // Enter station
                 if (this.train.onTrack == this.stations[i].onTrack && !this.train.turning
                 && Math.abs(this.train.x - (this.stations[i].x + 500)) <= (this.speed / 2) && !this.stations[i].stoppedAt) {
                     this.stations[i].stoppedAt = true;
@@ -111,6 +129,7 @@ class PlayGame extends Phaser.Scene {
                 }
             }
         }
+
         if (this.train.atStation == 1) {
             console.log("Entered station");
             this.enterStation(this.currentStation);
