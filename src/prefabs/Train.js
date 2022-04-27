@@ -18,6 +18,12 @@ class Train extends Phaser.GameObjects.Sprite {
         this.dt = 0;
         this.turn_dir = "straight";
         this.track_y_interval = 64*6*scene.scaling;
+
+        this.wagons = scene.add.container(x, y);
+        scene.add.existing(this.wagons);
+        this.wagons.setDepth(10);
+        this.wagons.scaleX =  scene.scaling;
+        this.wagons.scaleY = scene.scaling;
         
         this.displayOriginX = 1;
         this.scaleX = scene.scaling;
@@ -27,6 +33,9 @@ class Train extends Phaser.GameObjects.Sprite {
     }
 
     update(scene, timer, delta) {
+
+        this.wagons.y = this.y; // Update wagon positions
+
         /*
         if turning
             1.) increment dt by secs/frame 
