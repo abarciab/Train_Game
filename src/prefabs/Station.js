@@ -17,14 +17,19 @@ class Station extends Phaser.GameObjects.Sprite {
         this.spawned = false;
         this.stoppedAt = false;
         this.sign;
+        this.indicator;
         //this.stopX = this.x + 1300;
 
         switch (Array.from(this.type)[0]) {
             case "red square":
                 this.sign = scene.add.image(x, y, "red square station sign").setScale(scaling).setDepth(8);
+                this.indicator = scene.add.image(config.width-200, y, "red square station indicator").setScale(2).setDepth(9).setVisible(false);
                 break;
+            case "blue circle":
+            case "green triangle":
             default:
                 this.sign = scene.add.image(x, y, "red square station sign").setScale(scaling).setDepth(8);
+                this.indicator = scene.add.image(config.width-200, y, "red square station indicator").setScale(2).setDepth(9).setVisible(false);
                 break;
         }
 
@@ -38,6 +43,14 @@ class Station extends Phaser.GameObjects.Sprite {
             if (this.sign != undefined) {
                 this.sign.x = this.x;
                 this.sign.y = this.y;
+            }
+            if (this.x < config.width) {
+                this.indicator.setVisible(false);
+            } 
+            else if (this.x < config.width*2) {
+                console.log("show indicator");
+                this.indicator.y = this.y;
+                this.indicator.setVisible(true);
             }
             //this.stopX -= this.speed;
         }

@@ -55,7 +55,7 @@ function spawnWorldChunk(scene, train_row, tracks, nodes, stations, speed, x_int
         // spawn the nodes
         spawnNodes(scene, prev_x+(x_interval/2), nodes[i][0].y, speed, scaling, nodes, stations, station_row, i, num_rows, true);
     }
-        
+    
     // reset the stations
     stations.forEach(element => {
         element.moved=false;    // let stations move again
@@ -93,10 +93,9 @@ function checkStationSpawn(stations, station_row, x) {
         }
         // decrement the spawn timer for each node interval passed
         if (stations[i].spawn_timer > 0) {
-            // in intervals of sign_spawn / 3
             stations[i].spawn_timer--;
         }
-        // once the spawn timer hits 0, have the station be visible
+        // once the spawn timer hits 0, have the station be visible,
         else if (!stations[i].visible) {
             stations[i].spawned = true;
             stations[i].setVisible(true);
@@ -117,6 +116,7 @@ function spawnTracks(scene, x, y, tracks, row, scaling) {
 
 /*
 spawn a set of nodes and generate junctions, obstacles, and signs for them
+    - can_have_obstacles: whether the node can have obstacles or not
 */
 function spawnNodes(scene, x, y, speed, scaling, nodes, stations, station_row, row, num_rows, can_have_obstacles) {
     let n_junc=false;

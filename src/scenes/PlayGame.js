@@ -85,9 +85,7 @@ class PlayGame extends Phaser.Scene {
     update(timer, delta) {
         this.updateTracks(delta);
         this.updateStations(delta);
-        this.train.speed = this.speed;
-        this.fuel -= delta;
-        this.train.update(this, timer, delta);
+        this.updateTrain(timer, delta);
         this.updateEvents(delta);
         this.updateBackground();
         UpdateUI(this, delta);
@@ -95,6 +93,36 @@ class PlayGame extends Phaser.Scene {
 
     updateBackground(){
         this.background.tilePositionX += this.speed;
+    }
+
+    updateTrain(timer, delta) {
+        this.train.speed = this.speed;
+        this.fuel -= delta;
+        this.train.update(this, timer, delta);
+        // Check if player lost
+        if (this.train.health <= 0 && !this.gameOver) {
+            this.speed = 0;
+            this.gameOver = true;
+            this.backgroundMusic.stop();
+            console.log("YOU DIED");
+            EndGameUI(this);
+        }
+        // Check if train is at station
+        if (this.train.atStation == 0) {
+            for (let i = 0; i < this.stations.length; i++) {
+                if (this.train.onTrack == this.stations[i].onTrack && !this.train.turning
+                && Math.abs(this.train.x - (this.stations[i].x + 500)) <= (this.speed / 2) && !this.stations[i].stoppedAt) {
+                    this.stations[i].stoppedAt = true;
+                    this.currentStation = this.stations[i];
+                    this.train.atStation = 1;
+                    break;
+                }
+            }
+        }
+        if (this.train.atStation == 1) {
+            console.log("Entered station");
+            this.enterStation(this.currentStation);
+        }
     }
 
     /*
@@ -185,10 +213,8 @@ class PlayGame extends Phaser.Scene {
         // spawn the tracks if tracks have been deleted to ensure consistent number of tracks
         if (spawn_tracks) {
             this.station_spawn_index = spawnWorldChunk(
-                this, this.train.onTrack, this.tracks, 
-                this.nodes, this.stations, this.speed, 
-                this.node_interval, this.global_scaling,
-                this.station_spawn_table, this.station_spawn_index
+                this, this.train.onTrack, this.tracks, this.nodes, this.stations, this.speed, 
+                this.node_interval, this.global_scaling, this.station_spawn_table, this.station_spawn_index
             );
         }
     }
@@ -218,6 +244,7 @@ class PlayGame extends Phaser.Scene {
         for (let i = 0; i < this.stations.length; i++) {
             this.stations[i].speed = this.speed;
             this.stations[i].update();
+            // make an indicator for the lane the station is on
             if (this.stations[i].x < -2*this.node_interval) {
                 this.stations[i].destroy();
                 delete this.stations[i];
@@ -230,7 +257,6 @@ class PlayGame extends Phaser.Scene {
         if (this.gameOver && Phaser.Input.Keyboard.JustDown(space_bar)) {
             this.scene.restart();
         }
-
         // A and D key exists for debug rn to test with variable speeds
         if (left_key.isDown && this.speed > 0){
             this.speed -= 1;
@@ -238,32 +264,7 @@ class PlayGame extends Phaser.Scene {
         if (right_key.isDown && this.speed < 50) {
             this.speed += 1;
         }
-
-        // Check if player lost
-        if (this.train.health <= 0 && !this.gameOver) {
-            this.speed = 0;
-            this.gameOver = true;
-            this.backgroundMusic.stop();
-            console.log("YOU DIED");
-            EndGameUI(this);
-        }
-
-        // Check if train is at station
-        if (this.train.atStation == 0) {
-            for (let i = 0; i < this.stations.length; i++) {
-                if (this.train.onTrack == this.stations[i].onTrack && !this.train.turning
-                && Math.abs(this.train.x - (this.stations[i].x + 500)) <= (this.speed / 2) && !this.stations[i].stoppedAt) {
-                    this.stations[i].stoppedAt = true;
-                    this.currentStation = this.stations[i];
-                    this.train.atStation = 1;
-                    break;
-                }
-            }
-        }
-        if (this.train.atStation == 1) {
-            console.log("Entered station");
-            this.enterStation(this.currentStation);
-        }
+        
     }
 
     enterStation(station) {
