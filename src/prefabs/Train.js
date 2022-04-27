@@ -53,7 +53,7 @@ class Train extends Phaser.GameObjects.Sprite {
             let turn_timer = (delta/1000)*(this.junction_wid / this.speed);
             let dy = this.track_y_interval / (turn_timer/(delta/1000)) * offsetMod;
 
-            if (this.turn_dir == "north" && this.tweening != true && false) {
+            /*if (this.turn_dir == "north" && this.tweening != true && false) {
                 this.tweening = true;
 
                 let startingDelay = 300;
@@ -73,7 +73,7 @@ class Train extends Phaser.GameObjects.Sprite {
                     delay: startingDelay + (turn_timer*1000)/2,
                     duration: (turn_timer*1000)/2
                 })
-            }
+            }*/
             
             if (this.dt < turn_timer) {
                 if (this.turn_dir == "north"){

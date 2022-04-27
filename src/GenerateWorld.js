@@ -90,7 +90,12 @@ spawn a set of tracks on a row
 */
 function spawnTracks(scene, x, y, row) {
     scene.tracks[row].push(scene.add.image(x, y, "basic_straight_track").setScale(scene.scaling).setDepth(3));
-}
+    // if previous node had an obstacle, set to basic track end
+    //if (scene.nodes[row].length && scene.nodes[row][scene.nodes[row].length-1].obstacle_type != 1)
+        //scene.tracks[row].push(scene.add.image(x, y, "basic_straight_track").setScale(scene.scaling).setDepth(3));
+    //else
+    //scene.tracks[row].push(scene.add.image(x, y, "basic_track_end").setScale(scene.scaling).setDepth(3));
+}   
 
 /*
 spawn a set of nodes and generate junctions, obstacles, and signs for them
@@ -137,6 +142,9 @@ function spawnNodes(scene, x, y, station_row, row, can_have_obstacles) {
         } else if (obstacle_chance <= 20 && (n_junc || s_junc)) {
             obstacle_type = 2;
         }
+    }
+    if (obstacle_type == 1) {
+        scene.tracks[row][scene.tracks[row].length-1].setTexture("basic_track_end");
     }
 
     // generate possible route to station
