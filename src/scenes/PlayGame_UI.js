@@ -28,9 +28,9 @@ this.instrctionConfig =  {
 function DisplayNextInstruction(scene) {
     if (this.instructionStage == 0){
         instructionStage += 1;
-        this.instructionText = scene.add.text(game.config.width/2, game.config.height/2, "USE W, S, and D to change junction direction", instrctionConfig)
+        /*this.instructionText = scene.add.text(game.config.width/2, game.config.height/2, "USE W, S, and D to change junction direction", instrctionConfig)
         .setDepth(25)
-        .setOrigin(0.5);
+        .setOrigin(0.5);*/
     }
 }
 
