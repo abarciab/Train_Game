@@ -24,6 +24,7 @@ class Train extends Phaser.GameObjects.Sprite {
         this.scaleX = scaling;
         this.scaleY = scaling;
         this.setDepth(10);
+
     }
 
     update(scene, timer, delta) {
@@ -38,25 +39,31 @@ class Train extends Phaser.GameObjects.Sprite {
             - I did it like this so that the y position change remains consistent despite frame rate, and works with variable speeds
         */
         if (this.turning) {
-            this.dt += delta/1000 * 1.5;
+            let offsetMod = 1;        //an offset that changes the steepness of the train's diagonal movement
+
+            this.dt += delta/1000 * offsetMod;
             let turn_timer = (delta/1000)*(this.junction_wid / this.speed);
-            let dy = this.track_y_interval / (turn_timer/(delta/1000)) * 1.5;
+            let dy = this.track_y_interval / (turn_timer/(delta/1000)) * offsetMod;
 
-            if (this.turn_dir == "north" && this.tweening != true){
+            if (this.turn_dir == "north" && this.tweening != true && false){
                 this.tweening = true;
-                console.log("starting tween");
 
-                scene.tweens.addCounter({
-                    from: 0, 
-                    to: 100,
-                    duration: turn_timer * 1000,
-                    startDelay: 0,
-                    ease: Phaser.Math.Easing.Sine.InOut,
-                    //ease: Phaser.Math.Easing.Linear,
-                    repeat: 0,
-                    onUpdate: tween => {
-                        this.angle -= 10;
-                    }
+                let startingDelay = 300;
+                console.log("starting tween. speed: " + scene.speed);
+
+
+                scene.tweens.add({
+                    targets: scene.train,
+                    delay: startingDelay,
+                    angle: -45,
+                    duration: (turn_timer*1000)/2
+                })
+
+                scene.tweens.add({
+                    targets: scene.train,
+                    angle: 0,
+                    delay: startingDelay + (turn_timer*1000)/2,
+                    duration: (turn_timer*1000)/2
                 })
             }
             
@@ -65,7 +72,7 @@ class Train extends Phaser.GameObjects.Sprite {
                     this.y -= dy;
                     console.log("moving up");
                     //turning
-                    this.angle = 0;
+                    //this.angle = 0;
 
                 } else if (this.turn_dir == "south") {
                     this.y += dy;

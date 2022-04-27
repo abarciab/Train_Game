@@ -5,7 +5,7 @@ class PlayGame extends Phaser.Scene {
 
     preload() {
         // load images/tile sprites
-        this.load.image('train', './assets/trains/basic locomotive.png');
+        this.load.spritesheet('train', './assets/trains/basic locomotive spritesheet.png', {frameWidth: 400, frameHeight: 446, startFrame: 0, endFrame: 2});
 
         //sound effects
         this.load.audio('junction_switch', './assets/sound effects/junction switched.mp3');
@@ -78,7 +78,6 @@ class PlayGame extends Phaser.Scene {
         }, null, this);
         this.currentStation = new Station(this, config.width/5, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'station', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
         */
-
         StartUI(this);
     }
 
@@ -158,6 +157,7 @@ class PlayGame extends Phaser.Scene {
                         this.train.health -= 4;
                     }
                 }
+
                 
                 /*if the player is:
                     - within x_distance of node
@@ -175,7 +175,7 @@ class PlayGame extends Phaser.Scene {
                 // when the train is close enough to turn on the node, turn the node's turn dir
                 else if (
                     this.train.onTrack == i && !this.train.turning
-                    && this.train.x >= this.nodes[i][j].x-this.junction_offset 
+                    && this.train.x>= this.nodes[i][j].x-this.junction_offset 
                     && this.train.x <= this.nodes[i][j].x+this.junction_offset
                 ) {
                     this.train.distanceTraveled++;
