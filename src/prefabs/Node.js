@@ -1,11 +1,11 @@
 class Node extends Phaser.GameObjects.Sprite {
     // can be straight track, node track, or junction
-    constructor(scene, x, y, texture, row, speed, scaling, exit_N=false, exit_S=false, signs, obstacle_type) {
+    constructor(scene, x, y, texture, row, exit_N=false, exit_S=false, signs, obstacle_type) {
         super(scene, x, y, texture);
         scene.add.existing(this);
 
         this.row = row;
-        this.speed = speed;
+        this.speed = scene.speed;
         this.sign_types = signs;
         this.turn_dir = "straight";
         this.at_junction = false;
@@ -15,8 +15,8 @@ class Node extends Phaser.GameObjects.Sprite {
         this.obstacleHit = false;
         this.has_arrow = false;
 
-        this.junctions = {"straight": scene.add.image(x, y, "basic_out-straight_track").setScale(scaling).setDepth(4)};
-        this.junction_arrow = scene.add.image(x, y, "junction_arrows-straight").setScale(scaling).setVisible(false).setDepth(5);
+        this.junctions = {"straight": scene.add.image(x, y, "basic_out-straight_track").setScale(scene.scaling).setDepth(4)};
+        this.junction_arrow = scene.add.image(x, y, "junction_arrows-straight").setScale(scene.scaling).setVisible(false).setDepth(5);
         this.signs = [];
 
         // 0: nothing, 1: tree, 2: braches
@@ -24,16 +24,10 @@ class Node extends Phaser.GameObjects.Sprite {
             case 0:
                 break;
             case 1:
-                this.obstacle = scene.add.image(x+(10*64*scaling), y, "field_deadly_obstacle");
-                this.obstacle.y -= this.displayHeight/2;
-                this.obstacle.setScale(scaling);
-                this.obstacle.setDepth(5);
+                this.obstacle = scene.add.image(x+(10*64*scene.scaling), y, "field_deadly_obstacle").setScale(scene.scaling).setDepth(5);
                 break;
             case 2:
-                this.obstacle = scene.add.image(x+(10*64*scaling), y, "field_debris_obstacle");
-                this.obstacle.y -= this.displayHeight/6;
-                this.obstacle.setScale(scaling);
-                this.obstacle.setDepth(5);
+                this.obstacle = scene.add.image(x+(10*64*scene.scaling), y, "field_debris_obstacle").setScale(scene.scaling).setDepth(5);
                 break;
             default:
                 console.log("unknown obstacle:", obstacle_type);
@@ -41,21 +35,21 @@ class Node extends Phaser.GameObjects.Sprite {
         
         if (exit_N) {
             this.to_tracks.add(this.row-1);
-            this.junctions["north"] = scene.add.image(x, y, "basic_out-up_track").setScale(scaling).setDepth(4);
+            this.junctions["north"] = scene.add.image(x, y, "basic_out-up_track").setScale(scene.scaling).setDepth(4);
         }
         if (exit_S) {
             this.to_tracks.add(this.row+1);
-            this.junctions["south"] = scene.add.image(x, y, "basic_out-down_track").setScale(scaling).setDepth(4);
+            this.junctions["south"] = scene.add.image(x, y, "basic_out-down_track").setScale(scene.scaling).setDepth(4);
         }
         for (const[key, value] of Object.entries(this.sign_types)) {
-            this.signs.push(scene.add.image(x, y, `track sign ${key}`).setScale(scaling).setDepth(5));
+            this.signs.push(scene.add.image(x, y, `track sign ${key}`).setScale(scene.scaling).setDepth(5));
             Array.from(value).forEach(element => {
-                this.signs.push(scene.add.image(x, y, `${element} ${key} sign`).setScale(scaling).setDepth(6));
+                this.signs.push(scene.add.image(x, y, `${element} ${key} sign`).setScale(scene.scaling).setDepth(6));
             })
         }
 
-        this.scaleX = scaling;
-        this.scaleY = scaling;
+        this.scaleX = scene.scaling;
+        this.scaleY = scene.scaling;
         this.setDepth(4);
     }
 

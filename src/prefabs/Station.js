@@ -1,13 +1,13 @@
 class Station extends Phaser.GameObjects.Sprite {
     // type: array of all the passenger types that can be dropped off at the station.
-    constructor(scene, x, y, texture, frame, initial_track, type, passengers, speed, scaling) {
-        super(scene, x, y, texture, frame);
+    constructor(scene, x, y, texture, initial_track, type, passengers) {
+        super(scene, x, y, texture);
 
         scene.add.existing(this);
         this.spawn_timer = 15;    // number of nodes it takes to spawn a station
         this.sign_distance = 15;
         this.type = type;
-        this.speed = speed;
+        this.speed = scene.speed;
         this.dir_sign = false;
         this.passengers = passengers;      // list of passengers at station
         this.onTrack = initial_track;
@@ -18,15 +18,12 @@ class Station extends Phaser.GameObjects.Sprite {
         this.stoppedAt = false;
         //this.stopX = this.x + 1300;
         
-        this.sign = scene.add.image(x, y, "red square station sign").setScale(scaling).setDepth(8);
-        this.indicator = scene.add.image(config.width-200, y, "red square station indicator").setScale(2).setDepth(9).setVisible(false);
-        // let station_type = Array.from(this.type)[0];
-        //this.sign = scene.add.image(x, y, `${station_type} station sign`).setScale(scaling).setDepth(8);
-        //this.indicator = scene.add.image(x, y, `${station_type} station indicator`).setScale(scaling).setDepth(8);
+        let station_type = Array.from(this.type)[0];    
+        this.sign = scene.add.image(x, y, `${station_type} station sign`).setScale(scene.scaling).setDepth(8);
+        this.indicator = scene.add.image(config.width*0.9, y, `${station_type} station indicator`).setScale(scene.scaling*2).setDepth(8).setVisible(false);
 
-
-        this.scaleX = scaling;
-        this.scaleY = scaling;
+        this.scaleX = scene.scaling;
+        this.scaleY = scene.scaling;
         this.setDepth(7);
     }
     update() {

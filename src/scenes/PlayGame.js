@@ -49,27 +49,21 @@ class PlayGame extends Phaser.Scene {
 
         this.margin = config.height/15; // margin; no use right now
         this.y_interval = (config.height-(2*this.margin))/(Object.keys(this.tracks).length+1); // interval that rows of tracks should be seperated
-        this.global_scaling = this.y_interval / this.base_interval; // scaling of all objects
-        this.x_unit = 64 * this.global_scaling; // unit square of measurement
+        this.scaling = this.y_interval / this.base_interval; // scaling of all objects
+        this.x_unit = 64 * this.scaling; // unit square of measurement
         this.node_interval = 20 * this.x_unit;  // interval between each node/track placement
         // this.travel_interval = this.node_interval;
         this.input_interval = this.node_interval; // interval user can input an action before a junction
         this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
         this.speed = 5;    // speed of world
+        this.dist = 0;
         // spawn the world initially
-        this.station_spawn_index = initSpawn(
-            this, Math.floor(this.num_tracks/2), this.tracks, this.nodes, this.stations,
-            this.speed, this.margin, this.node_interval, 
-            this.y_interval, this.num_chunks, this.global_scaling,
-            this.station_spawn_table, this.station_spawn_index
-        );
-        
-        this.train = new Train(this, config.width/10, this.tracks[Math.floor(this.num_tracks/2)][0].y, 'basic_locomotive', 0, Math.floor(this.num_tracks/2), this.speed, this.global_scaling);
+        this.train = new Train(this, config.width/10, 0, 'basic_locomotive', Math.floor(this.num_tracks/2));
+        initSpawn(this);
 
         // set fuel
         this.fuel = this.train.fuelCapacity;
         this.currentStation;
-
         
         /*
         // Testing station logic (REMOVE IN FUTURE)
@@ -82,6 +76,7 @@ class PlayGame extends Phaser.Scene {
     }
 
     update(timer, delta) {
+        this.updateSpeed(delta);
         this.updateTracks(delta);
         this.updateStations(delta);
         this.updateTrain(timer, delta);
@@ -123,7 +118,12 @@ class PlayGame extends Phaser.Scene {
             this.enterStation(this.currentStation);
         }
     }
+    updateSpeed(delta) {
+        this.dist += (delta/1000) * this.speed;
+        //if (this.dist % )
+    }
 
+    
     /*
         - if the player is x distance before a node, can choose which direction the node goes
     */
@@ -178,7 +178,6 @@ class PlayGame extends Phaser.Scene {
                     && this.train.x>= this.nodes[i][j].x-this.junction_offset 
                     && this.train.x <= this.nodes[i][j].x+this.junction_offset
                 ) {
-                    this.train.distanceTraveled++;
                     this.train.turn_dir = this.nodes[i][j].turn_dir;
                     switch (this.nodes[i][j].turn_dir) {
                         // simply go straight; no longer at junction
@@ -212,10 +211,7 @@ class PlayGame extends Phaser.Scene {
         }
         // spawn the tracks if tracks have been deleted to ensure consistent number of tracks
         if (spawn_tracks) {
-            this.station_spawn_index = spawnWorldChunk(
-                this, this.train.onTrack, this.tracks, this.nodes, this.stations, this.speed, 
-                this.node_interval, this.global_scaling, this.station_spawn_table, this.station_spawn_index
-            );
+            spawnWorldChunk(this, true);
         }
     }
 

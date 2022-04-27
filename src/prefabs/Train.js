@@ -1,6 +1,6 @@
 class Train extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, texture, frame, initial_track, speed, scaling) {
-        super(scene, x, y, texture, frame);
+    constructor(scene, x, y, texture, initial_track) {
+        super(scene, x, y, texture);
     
         scene.add.existing(this);             // add object to existing scene
         this.atStation = 0;               // tracks if train is at station
@@ -11,18 +11,17 @@ class Train extends Phaser.GameObjects.Sprite {
         this.capacity = 6;                    // # of passengers the train can fit
         this.fuelCapacity = 100000;           // max amount of fuel Train can hold
         this.moving = true;              // tracks if train needs to deplete fuel
-        this.distanceTraveled = 0;            // # of nodes passed
-        this.junction_wid = (1184-192)*scaling;
+        this.junction_wid = (1184-192)*scene.scaling;
         this.turning = false;
         this.turn_dest = this.y;
-        this.speed = speed;
+        this.speed = scene.speed;
         this.dt = 0;
         this.turn_dir = "straight";
-        this.track_y_interval = 64*6*scaling;
+        this.track_y_interval = 64*6*scene.scaling;
         
-        this.displayOriginX = 200;
-        this.scaleX = scaling;
-        this.scaleY = scaling;
+        this.displayOriginX = 1;
+        this.scaleX = scene.scaling;
+        this.scaleY = scene.scaling;
         this.setDepth(10);
 
     }

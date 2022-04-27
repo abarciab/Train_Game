@@ -39,11 +39,12 @@ class Menu extends Phaser.Scene {
                     this.load.image(`${sign_shapes[i]} ${sign_dirs[j]}`, `./assets/track signs/${sign_shapes[i]} ${sign_dirs[j]}.png`);
             }
         }
-        /*for (let i = 0; i < sign_shapes.length-1; i++) {
-            this.load.image(`${sign_shapes[i]} station sign`, `./assets/stations/${sign_shapes} station sign.png`);
-        }*/
-        this.load.image(`red square station sign`, `./assets/stations/red square station sign.png`);
-        this.load.image(`red square station indicator`, `./assets/stations/red_square.png`);
+        for (let i = 0; i < sign_shapes.length-1; i++) {
+            // console.log(sign_shapes[i]);
+            let sign = sign_shapes[i];
+            this.load.image(`${sign} station sign`, `./assets/stations/${sign} station sign.png`);
+            this.load.image(`${sign} station indicator`, `./assets/stations/${sign} station indicator.png`)
+        }
         
         //sounds
         this.load.audio('train_on_rails', './assets/sound effects/train on rails 2.mp3');

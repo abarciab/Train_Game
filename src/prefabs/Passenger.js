@@ -1,5 +1,5 @@
 class Passenger extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, texture, frame, initial_track, patience, speed, scaling) {
+    constructor(scene, x, y, texture, frame, initial_track, patience, speed) {
         super(scene, x, y, texture, frame);
 
         scene.add.existing(this);
@@ -11,8 +11,8 @@ class Passenger extends Phaser.GameObjects.Sprite {
         this.patience = patience; //the number of time this passenger is willing to wait on the train untill they get mad.
         this.speed = speed;
         this.onTrack = initial_track;
-        this.scaleX = scaling;
-        this.scaleY = scaling;
+        this.scaleX = scene.scaling;
+        this.scaleY = scene.scaling;
         
     }
 

@@ -90,7 +90,6 @@ function StartUI(scene){
     //distance display
     this.distDisplay = scene.add.text(game.config.width*0.85, this.topBar.y, "Dist: 20,000m", this.textConfig).setOrigin(0.5).setDepth(20);
     this.distDisplay.setColor('#FFFFFF');
-    this.dist = 0;
     //biome display
     this.biomeBar = scene.add.image(game.config.width/2 + 60, this.topBar.y, 'biome_bar_fields').setDepth(20);
     this.biomeBarCursor = scene.add.image(game.config.width/2 + 60, this.topBar.y, 'biome_cursor_fields').setDepth(20);
@@ -118,9 +117,8 @@ function UpdateUI(scene, delta){
     this.fuelNeedle.angle = ( (scene.fuel/scene.train.fuelCapacity) * 180) - 90;
 
     //update distance display and biome display
-    this.dist += (delta/1000) * scene.speed;
     biomeBarCursor.x += delta/200;
-    this.distDisplay.text = "Dist: " + Math.round(this.dist).toLocaleString(undefined) + "m";
+    this.distDisplay.text = "Dist: " + Math.round(scene.dist).toLocaleString(undefined) + "m";
 
     //update star display, if needed
     if (this.rating != scene.train.health){
@@ -251,7 +249,7 @@ function EndGameUI(scene){
 
     this.darkColorBack = scene.add.rectangle(0, 0, game.config.width, game.config.height, '#000000').setAlpha(0.1).setScale(4).setDepth(22.9);
     this.gameOverBackground = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5).setAlpha;
-    this.gameOverText = scene.add.text(game.config.width/2, game.config.height/2, "GAME OVER\nDistance travelled: " + Math.round(this.dist).toLocaleString(undefined), this.textConfig)
+    this.gameOverText = scene.add.text(game.config.width/2, game.config.height/2, "GAME OVER\nDistance traveled: " + Math.round(scene.dist).toLocaleString(undefined), this.textConfig)
         .setDepth(23.1)
         .setColor('#FFFFFF')
         .setOrigin(0.5);
