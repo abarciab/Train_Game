@@ -1,17 +1,5 @@
 /*
 the initial spawn for the world
-    - scene: scene to spawn objects
-    - train_row: the row the train is on
-    - tracks: dict of tracks
-    - nodes: dict of nodes
-    - speed: initial speed of world
-    - margin: (optional/WIP): if y margins, considers it for the spawn intervals
-    - node_interval: the intervals which to spawn tracks/nodes of a row
-    - y_interval: the distance between rows of tracks
-    - num_chunks: number of node/track objects to spawn initally
-    - scaling: world size scaling
-    - spawn_table: table of station spawn chances
-    - spawn_index: index position within the spawn table
 */
 function initSpawn(scene) {
     // spawn one column of initial tracks first
@@ -36,15 +24,6 @@ function initSpawn(scene) {
 
 /*
 spawn a chunk of the world
-    - scene to spawn chunk
-    - train_row: row the train is on
-    - tracks/nodes: dict of track/nodes
-    - stations: array of stations
-    - speed: speed of world
-    - node_interval: used to spawn tracks/nodes at right place
-    - scaling: world size scaling
-    - spawn_table: table of station spawn chances
-    - spawn_index: index position within the spawn table
 */
 function spawnWorldChunk(scene, can_have_obstacles) {
     let station_row = new Set();                // when a station spawns, what row it's on
@@ -246,6 +225,70 @@ function generateStationRoute(scene, junction_signs, row, n_junc, s_junc) {
             }
         }
     }
+    // checks to see if previous nodes had signs, and if it did remake signs
+    checkSameRoute(scene, junction_signs, row);
+}
+
+function checkSameRoute(scene, junction_signs, row) {
+    let check_num = 3;
+    if (check_num > scene.nodes[row].length) check_num = scene.nodes[row].length;
+    for (let i = 1; i <= check_num; i++) {
+        let break_check = false;
+        // check the directions and types of the junction signs
+        for (const[key, value] of Object.entries(junction_signs)) {
+            let prev_node;
+            let prev_signs;
+            let remove_sign;
+            // if sign has up junc, check if the node above has down junc
+            if (key == "up" && row > 0) {
+                prev_node = scene.nodes[row-1][scene.nodes[row-1].length-i];  
+                prev_signs = prev_node.sign_types;
+                if ("down" in prev_signs) remove_sign = "down";
+            }
+            // if sign has down junc, check if node below has up chunk
+            else if (key == "down" && row < scene.num_tracks) {
+                prev_node = scene.nodes[row+1][scene.nodes[row+1].length-i];
+                prev_signs = prev_node.sign_types;
+                if ("up" in prev_signs) remove_sign = "up";
+            }
+            // if sign has straight junc, check if node before has straight junc
+            else if (key == "straight") {
+                prev_node = scene.nodes[row][scene.nodes[row].length-i];
+                prev_signs = prev_node.sign_types;
+                remove_sign = "straight";
+            }
+            
+            // if the prev node has a sign that leads back to same route, check if they share types
+            if (remove_sign != undefined && remove_sign in prev_signs) {
+                Array.from(value).forEach(element => {
+                    // if prev sign shares type wt junction signs, remove the type from there
+                    if (prev_signs[remove_sign].has(element)) {
+                        prev_signs[remove_sign].delete(element);
+                        junction_signs[key].delete(element);
+                        if (!prev_signs[remove_sign].size) 
+                            delete prev_signs[remove_sign];
+                        if (!junction_signs[key].size)
+                            delete junction_signs[key];
+                        // replace the sign with a straight sign
+                        if (!("straight" in prev_signs)) 
+                            prev_signs["straight"] = new Set();
+                        prev_signs["straight"].add(element);
+                        prev_node.signs.splice(0, prev_node.signs.length);
+
+                        // remake the signs
+                        for (const[key, value] of Object.entries(prev_signs)) {
+                            prev_node.signs.push(scene.add.image(prev_node.x, prev_node.y, `track sign ${key}`).setScale(scene.scaling).setDepth(5));
+                            Array.from(value).forEach(element => {
+                                prev_node.signs.push(scene.add.image(prev_node.x, prev_node.y, `${element} ${key} sign`).setScale(scene.scaling).setDepth(6));
+                            })
+                        }
+                        break_check = true;
+                    }
+                });
+            } // end of if
+        } // end of signs for
+        if (break_check) break;
+    } // end of row for
 }
 
 function spawnStation(scene, x, y) {

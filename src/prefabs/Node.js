@@ -1,12 +1,12 @@
 class Node extends Phaser.GameObjects.Sprite {
     // can be straight track, node track, or junction
-    constructor(scene, x, y, texture, row, exit_N=false, exit_S=false, signs, obstacle_type) {
+    constructor(scene, x, y, texture, row, exit_N=false, exit_S=false, sign_types, obstacle_type) {
         super(scene, x, y, texture);
         scene.add.existing(this);
 
         this.row = row;
         this.speed = scene.speed;
-        this.sign_types = signs;
+        this.sign_types = sign_types;
         this.turn_dir = "straight";
         this.at_junction = false;
         this.obstacle;
@@ -17,6 +17,7 @@ class Node extends Phaser.GameObjects.Sprite {
 
         this.junctions = {"straight": scene.add.image(x, y, "basic_out-straight_track").setScale(scene.scaling).setDepth(4)};
         this.junction_arrow = scene.add.image(x, y, "junction_arrows-straight").setScale(scene.scaling).setVisible(false).setDepth(5);
+        this.sign_types = sign_types;
         this.signs = [];
 
         // 0: nothing, 1: tree, 2: braches
@@ -32,7 +33,7 @@ class Node extends Phaser.GameObjects.Sprite {
             default:
                 console.log("unknown obstacle:", obstacle_type);
         }
-        
+    
         if (exit_N) {
             this.to_tracks.add(this.row-1);
             this.junctions["north"] = scene.add.image(x, y, "basic_out-up_track").setScale(scene.scaling).setDepth(4);

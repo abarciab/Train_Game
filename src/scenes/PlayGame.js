@@ -52,7 +52,6 @@ class PlayGame extends Phaser.Scene {
         this.scaling = this.y_interval / this.base_interval; // scaling of all objects
         this.x_unit = 64 * this.scaling; // unit square of measurement
         this.node_interval = 20 * this.x_unit;  // interval between each node/track placement
-        // this.travel_interval = this.node_interval;
         this.input_interval = this.node_interval; // interval user can input an action before a junction
         this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
         this.speed = 5;    // speed of world
@@ -85,12 +84,11 @@ class PlayGame extends Phaser.Scene {
         UpdateUI(this, delta);
     }
 
-    updateBackground(){
+    updateBackground() {
         this.background.tilePositionX += this.speed;
     }
 
     updateTrain(timer, delta) {
-        this.train.speed = this.speed;
         this.fuel -= delta;
         this.train.update(this, timer, delta);
         // Check if player lost
@@ -118,9 +116,10 @@ class PlayGame extends Phaser.Scene {
             this.enterStation(this.currentStation);
         }
     }
+    
     updateSpeed(delta) {
         this.dist += (delta/1000) * this.speed;
-        //if (this.dist % )
+        this.train.speed = this.speed;
     }
 
     
