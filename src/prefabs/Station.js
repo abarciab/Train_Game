@@ -16,26 +16,18 @@ class Station extends Phaser.GameObjects.Sprite {
         this.no_junc = true;
         this.spawned = false;
         this.stoppedAt = false;
-        this.sign;
-        this.indicator;
         //this.stopX = this.x + 1300;
+        
+        this.sign = scene.add.image(x, y, "red square station sign").setScale(scaling).setDepth(8);
+        this.indicator = scene.add.image(config.width-200, y, "red square station indicator").setScale(2).setDepth(9).setVisible(false);
+        // let station_type = Array.from(this.type)[0];
+        //this.sign = scene.add.image(x, y, `${station_type} station sign`).setScale(scaling).setDepth(8);
+        //this.indicator = scene.add.image(x, y, `${station_type} station indicator`).setScale(scaling).setDepth(8);
 
-        switch (Array.from(this.type)[0]) {
-            case "red square":
-                this.sign = scene.add.image(x, y, "red square station sign").setScale(scaling).setDepth(8);
-                this.indicator = scene.add.image(config.width-200, y, "red square station indicator").setScale(2).setDepth(9).setVisible(false);
-                break;
-            case "blue circle":
-            case "green triangle":
-            default:
-                this.sign = scene.add.image(x, y, "red square station sign").setScale(scaling).setDepth(8);
-                this.indicator = scene.add.image(config.width-200, y, "red square station indicator").setScale(2).setDepth(9).setVisible(false);
-                break;
-        }
 
         this.scaleX = scaling;
         this.scaleY = scaling;
-        this.setDepth(7)
+        this.setDepth(7);
     }
     update() {
         if (this.visible) {
