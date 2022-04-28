@@ -60,7 +60,7 @@ class PlayGame extends Phaser.Scene {
         this.lock = false; // traces when speed is locked
         this.dist = 0;
         this.nodes_onscreen = Math.floor(config.width / this.node_interval);   // number of nodes on screen
-        this.num_chunks = this.nodes_onscreen * 5;        // number of chunks that are loaded; 5x screen width
+        this.num_chunks = this.nodes_onscreen * 10;        // number of chunks that are loaded; 5x screen width
 
         this.wagonCheck = false; // checks if train gets second wagon
         // spawn the world initially
