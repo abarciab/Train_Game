@@ -16,6 +16,11 @@ class Station extends Phaser.GameObjects.Sprite {
         this.no_junc = true;
         this.spawned = false;
         this.stoppedAt = false;
+        this.station_point = this.displayWidth * scene.scaling * 0.32;
+        this.arriving_status = 0;
+        this.stop_dist;
+        this.dt = 0;
+        // this.arriving = 0;
         //this.stopX = this.x + 1300;
         
         let station_type = Array.from(this.type)[0];    
@@ -37,7 +42,6 @@ class Station extends Phaser.GameObjects.Sprite {
                 this.indicator.setVisible(false);
             } 
             else if (this.x < config.width*2) {
-                //console.log("show indicator");
                 this.indicator.y = this.y;
                 this.indicator.setVisible(true);
             }

@@ -16,23 +16,21 @@ this.textConfig = {
     align: 'center',
 }
 
-
+this.instrctionConfig =  {
+    align: 'center', 
+    color: '#FFFFFF', 
+    stroke: '#000000', 
+    strokeThickness:'2',
+    fontSize: '35px'
+}
 
 
 function DisplayNextInstruction(scene) {
-    let config = {
-        align: 'center',
-        fontSize: '35px',
-        strokeThickness: 1,
-        stroke: '#000000',
-    }
-
-
     if (this.instructionStage == 0){
         instructionStage += 1;
-        this.instructionText = scene.add.text(game.config.width/2, game.config.height/2 - 150, "USE W, S, and D to change junction direction", config)
+        /*this.instructionText = scene.add.text(game.config.width/2, game.config.height/2, "USE W, S, and D to change junction direction", instrctionConfig)
         .setDepth(25)
-        .setOrigin(0.5);
+        .setOrigin(0.5);*/
     }
 }
 
@@ -190,7 +188,7 @@ function addPasengerUI(scene, passenger){
     this.newPassIcon = new PassengerIcon(scene, this.front + (iconGap*numPassengers), bottomBarYpos, shape, passenger, numPassengers).setScale(this.iconScale).setDepth(25);
     this.passengers.add(newPassIcon);
 
-    //console.log(this.newPassIcon.passengerObj.destination + " BORDED. passengers: " + this.numPassengers);
+    console.log(this.newPassIcon.passengerObj.destination + " BORDED. passengers: " + this.numPassengers);
 }
 
 function RemovePassengerIcons(scene, stationName){
@@ -198,7 +196,6 @@ function RemovePassengerIcons(scene, stationName){
     let incomingPassengers = this.passengers.countActive(true);
 
     for (i = 0; i < incomingPassengers; i++) {
-        let passengerIcon = passengers.getChildren()[i];
 
         if (passengerIcon.passengerObj.destination == stationName || !passengerIcon.passengerObj.goodReview){
 
@@ -207,6 +204,7 @@ function RemovePassengerIcons(scene, stationName){
 
             passengerIcon.patienceBar.destroy();
             this.passengers.remove(passengerIcon, true, true);
+            deletedPassengers += 1;
 
             if (i != incomingPassengers-1){ i -= 1; }
             
@@ -252,7 +250,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
         scene.tweens.addCounter({
             from: 0, 
             to: 100,
-            duration: passenger.patience,
+            duration: passenger.patience * 100000,
             ease: Phaser.Math.Easing.Sine.InOut,
             repeat: 0,
             onUpdate: tween => {
@@ -263,7 +261,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
                     passenger.goodReview = false;
                     this.setAlpha(0.4);
                     scene.cameras.main.shake(50, 0.009);
-                    //console.log(this.passengerObj.destination + " ran out of patience. passengers: " + this.numPassengers);
+                    console.log(this.passengerObj.destination + " ran out of patience. passengers: " + this.numPassengers);
                 }
             }
         })
@@ -280,7 +278,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
 }
 
 function EndGameUI(scene){
-    //console.log("endGame");
+    console.log("endGame");
 
     this.darkColorBack = scene.add.rectangle(0, 0, game.config.width, game.config.height, '#000000').setAlpha(0.1).setScale(4).setDepth(22.9);
     this.gameOverBackground = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5).setAlpha;
