@@ -238,7 +238,7 @@ function generateStationRoute(scene, junction_signs, row, n_junc, s_junc) {
 }
 
 function checkSameRoute(scene, junction_signs, row) {
-    let check_num = 3;
+    let check_num = 5;
     if (check_num > scene.nodes[row].length) check_num = scene.nodes[row].length;
     for (let i = 1; i <= check_num; i++) {
         let break_check = false;
@@ -267,20 +267,32 @@ function checkSameRoute(scene, junction_signs, row) {
             }
             
             // if the prev node has a sign that leads back to same route, check if they share types
-            if (remove_sign != undefined && remove_sign in prev_signs) {
-                Array.from(value).forEach(element => {
+            if (remove_sign != undefined && remove_sign in prev_signs) {// && prev_signs[remove_sign] != undefined) {
+                // check each type of the junction_signs
+                for (let j = 0; j < Array.from(value).length-1; j++) {
+                    let type = value[j];
+                    if (prev_signs[remove_sign] == undefined) {
+                        console.log(prev_signs[remove_sign], prev_signs, remove_sign);
+                        console.log(junction_signs[remove_sign], junction_signs, key);
+                        console.log(type);
+                    }
                     // if prev sign shares type wt junction signs, remove the type from there
-                    if (prev_signs[remove_sign].has(element)) {
-                        prev_signs[remove_sign].delete(element);
-                        junction_signs[key].delete(element);
-                        if (!prev_signs[remove_sign].size) 
-                            delete prev_signs[remove_sign];
-                        if (!junction_signs[key].size)
+                    if (prev_signs[remove_sign].has(type)) {
+                        let sign_removed = false;
+                        prev_signs[remove_sign].delete(type);
+                        junction_signs[key].delete(type);
+                        if (!junction_signs[key].size) {
                             delete junction_signs[key];
+                        }
+                        // once the previous sign is empty, no more need to check for more typess
+                        if (!prev_signs[remove_sign].size) {
+                            delete prev_signs[remove_sign];
+                            sign_removed = true;
+                        }
                         // replace the sign with a straight sign
                         if (!("straight" in prev_signs)) 
                             prev_signs["straight"] = new Set();
-                        prev_signs["straight"].add(element);
+                        prev_signs["straight"].add(type);
                         prev_node.signs.splice(0, prev_node.signs.length);
 
                         // remake the signs
@@ -291,8 +303,9 @@ function checkSameRoute(scene, junction_signs, row) {
                             })
                         }
                         break_check = true;
+                        if (sign_removed) break;
                     }
-                });
+                }
             } // end of if
         } // end of signs for
         if (break_check) break;
