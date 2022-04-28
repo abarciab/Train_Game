@@ -194,16 +194,11 @@ function addPasengerUI(scene, passenger){
 }
 
 function RemovePassengerIcons(scene, stationName){
-    //console.log("length(passengers): " + this.passengers.countActive(true));
     let emptySlots = [];
-
-    //this.passengers.getChildren().forEach(function(passengerIcon) 
     let incomingPassengers = this.passengers.countActive(true);
 
     for (i = 0; i < incomingPassengers; i++) {
         let passengerIcon = passengers.getChildren()[i];
-
-        //console.log(passengerIcon.passengerObj.destination + "PASSENGER CONSIDERED. i: " + i);
 
         if (passengerIcon.passengerObj.destination == stationName || !passengerIcon.passengerObj.goodReview){
 
@@ -213,14 +208,10 @@ function RemovePassengerIcons(scene, stationName){
             passengerIcon.patienceBar.destroy();
             this.passengers.remove(passengerIcon, true, true);
 
-            if (i != incomingPassengers-1){
-                i -= 1;
-            }
+            if (i != incomingPassengers-1){ i -= 1; }
             
             incomingPassengers -= 1;
             this.numPassengers -= 1;
-
-            //console.log(passengerIcon.passengerObj.destination + " DISEMBARKED. passengers: " + this.numPassengers);
 
         } else{
             const emptySlotCount = emptySlots.length;
@@ -232,21 +223,16 @@ function RemovePassengerIcons(scene, stationName){
 
                     passengerIcon.x -= scene.UIConfig.iconGap;
                     passengerIcon.patienceBar.x -= scene.UIConfig.iconGap;   
-
-                    //console.log("shifting " + passengerIcon.passengerObj.destination + " from slot "+ (passengerIcon.slot +1) +" to slot " + passengerIcon.slot);
                 }
             }
             for (j = 0; j < emptySlots.length; j++){
                 if (emptySlots[j] == passengerIcon.slot){
                     emptySlots.splice(j, 1);
-                    //console.log("icon was shifted into a previously empty slot ("+emptySlots[j]+") and now that slot isn't marked as empty");
                     break;
                 }
             }
         }
-    };
-
-
+    }
 }
 
 class PassengerIcon extends Phaser.GameObjects.Sprite {
