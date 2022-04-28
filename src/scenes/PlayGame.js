@@ -307,12 +307,13 @@ class PlayGame extends Phaser.Scene {
             if (this.stations[i].arriving_status == 1) {
                 let stop_time = 2;
                 // t = this.stop_dist / this.speed;
-                let dt = this.stop_dist / (this.speed / (delta/1000));
+                /*let dt = this.stop_dist / (this.speed / (delta/1000));
                 dt = dt / stop_time;
                 // find dx per second
                 let dx = this.speedLock / dt * (delta/1000);
-                this.speed -= dx;
-                console.log(this.speed, dx);//, dt);
+                this.speed -= dx;*/
+                this.speed -= 0.3;
+                //console.log(this.speed, dx);//, dt);
                 if (this.speed <= 0) {
                     console.log(this.speed);
                     this.speed = 0;
