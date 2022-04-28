@@ -237,8 +237,11 @@ function generateStationRoute(scene, junction_signs, row, n_junc, s_junc) {
     checkSameRoute(scene, junction_signs, row);
 }
 
+/*
+junction_signs: key: direction, value: set of types
+*/
 function checkSameRoute(scene, junction_signs, row) {
-    let check_num = 3;
+    let check_num = scene.nodes_onscreen*3;
     if (check_num > scene.nodes[row].length) check_num = scene.nodes[row].length;
     for (let i = 1; i <= check_num; i++) {
         let break_check = false;
@@ -249,7 +252,7 @@ function checkSameRoute(scene, junction_signs, row) {
             let remove_sign;
             // if sign has up junc, check if the node above has down junc
             if (key == "up" && row > 0) {
-                prev_node = scene.nodes[row-1][scene.nodes[row-1].length-i];  
+                prev_node = scene.nodes[row-1][scene.nodes[row-1].length-i];
                 prev_signs = prev_node.sign_types;
                 if ("down" in prev_signs) remove_sign = "down";
             }
@@ -268,31 +271,45 @@ function checkSameRoute(scene, junction_signs, row) {
             
             // if the prev node has a sign that leads back to same route, check if they share types
             if (remove_sign != undefined && remove_sign in prev_signs) {
-                Array.from(value).forEach(element => {
+                // check each type of the junction_sign for the direction they coincide with
+                // ie.) junc_nodes: (up: blue circle), prev_node: (down: blue circle)
+                for (let j = 0; j < value.size; j++) {
+                    let type = Array.from(value)[j];
                     // if prev sign shares type wt junction signs, remove the type from there
-                    if (prev_signs[remove_sign].has(element)) {
-                        prev_signs[remove_sign].delete(element);
-                        junction_signs[key].delete(element);
-                        if (!prev_signs[remove_sign].size) 
-                            delete prev_signs[remove_sign];
-                        if (!junction_signs[key].size)
+                    //ie.) down has blue circle
+                    if (prev_signs[remove_sign].has(type)) {
+                        let sign_removed = false;
+                        // delete the type from both signs
+                        prev_signs[remove_sign].delete(type);
+                        junction_signs[key].delete(type);
+                        // if either of the signs are empty, get rid of the signs all together
+                        if (!junction_signs[key].size) {
                             delete junction_signs[key];
-                        // replace the sign with a straight sign
-                        if (!("straight" in prev_signs)) 
+                        }
+                        // once the previous sign is empty, no more need to check for more types
+                        if (!prev_signs[remove_sign].size) {
+                            delete prev_signs[remove_sign];
+                            sign_removed = true;
+                        }
+                        // replace the prev sign with a straight sign
+                        if (!("straight" in prev_signs))
                             prev_signs["straight"] = new Set();
-                        prev_signs["straight"].add(element);
+                        prev_signs["straight"].add(type);
+
+                        // delete the list of signs
                         prev_node.signs.splice(0, prev_node.signs.length);
 
                         // remake the signs
-                        for (const[key, value] of Object.entries(prev_signs)) {
-                            prev_node.signs.push(scene.add.image(prev_node.x, prev_node.y, `track sign ${key}`).setScale(scene.scaling).setDepth(5));
-                            Array.from(value).forEach(element => {
-                                prev_node.signs.push(scene.add.image(prev_node.x, prev_node.y, `${element} ${key} sign`).setScale(scene.scaling).setDepth(6));
+                        for (const[key1, value1] of Object.entries(prev_signs)) {
+                            prev_node.signs.push(scene.add.image(prev_node.x, prev_node.y, `track sign ${key1}`).setScale(scene.scaling).setDepth(5));
+                            Array.from(value1).forEach(element => {
+                                prev_node.signs.push(scene.add.image(prev_node.x, prev_node.y, `${element} ${key1} sign`).setScale(scene.scaling).setDepth(6));
                             })
                         }
                         break_check = true;
-                    }
-                });
+                        if (sign_removed) break;
+                    } // end of if
+                } // end of for
             } // end of if
         } // end of signs for
         if (break_check) break;
