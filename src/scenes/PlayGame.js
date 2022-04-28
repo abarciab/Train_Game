@@ -38,7 +38,7 @@ class PlayGame extends Phaser.Scene {
         this.nodes = {};            // key: track row, value: node objects
         this.stations = [];         // list of stations.
         this.coins = {};            // dict of coins
-        this.station_spawn_table = [0, 0, 0, 5, 5, 5, 10, 10, 10, 20, 20, 20, 30];
+        this.station_spawn_table = [0, 0, 0, 10, 10, 10, 20, 20, 20, 30];
         this.station_spawn_index = 0;
         this.gameOver = false;
 

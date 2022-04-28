@@ -197,7 +197,6 @@ function spawnNodes(scene, x, y, station_row, row, can_have_obstacles) {
     // key: north or south. value: array of symbols
     let junction_signs = {};
     generateStationRoute(scene, junction_signs, row, n_junc, s_junc);
-
     // push the node
     scene.nodes[row].push(new Node(
         scene, x, y, "basic_node_track", row, n_junc, s_junc, junction_signs, obstacle_type
@@ -227,7 +226,7 @@ function generateStationRoute(scene, junction_signs, row, n_junc, s_junc) {
             - station has not moved yet per the column
             - the station is on the current track that has a junction
         */ 
-       let station = scene.stations[i];
+        let station = scene.stations[i];
         if (!station.visible && !station.moved && station.onTrack == row) {
             // 50% chance to spawn a sign if junctions exist
             let sign_chance = Math.floor(Math.random()*100)+1;
@@ -255,14 +254,12 @@ function generateStationRoute(scene, junction_signs, row, n_junc, s_junc) {
                     station.onTrack++;
                 }
                 // only make the sign if within the distance for signs to spawn; add station types to the junction sign
-                if (station.spawn_timer < station.sign_distance) {
-                    if (!(sign_dir in junction_signs))
-                        junction_signs[sign_dir] = new Set();
-                    Array.from(station.type).forEach(element => {
-                        junction_signs[sign_dir].add(element);
-                    });
-                    station.moved = true; // make it so station can't move multiple times per column
-                }
+                if (!(sign_dir in junction_signs))
+                    junction_signs[sign_dir] = new Set();
+                Array.from(station.type).forEach(element => {
+                    junction_signs[sign_dir].add(element);
+                });
+                station.moved = true; // make it so station can't move multiple times per column
                 // set the station's y to the row it's now on
                 station.y = scene.nodes[station.onTrack][0].y;
             }
