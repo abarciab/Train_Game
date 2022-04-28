@@ -1,8 +1,6 @@
 /*
     This file handles all the UI in the game - all the information that needs to be displayed to the player that's not represented by something in-world.
-
     there are three functions that need to be called to make it work correctly: LoadUI, StartUI, and UpdateUI
-
         - LoadUI should be called within the Preload() function of the game scene - that's where this file loads the images that make up the UI.
         - StartUI should be called at the end of the Create() function of the game scene. 
         - UpdateUI can be called in two ways: 1) anywhere in the update() function of the game scene, or 2) every time variables displayed by the UI are updated. 
@@ -16,21 +14,23 @@ this.textConfig = {
     align: 'center',
 }
 
-this.instrctionConfig =  {
-    align: 'center', 
-    color: '#FFFFFF', 
-    stroke: '#000000', 
-    strokeThickness:'2',
-    fontSize: '35px'
-}
+
 
 
 function DisplayNextInstruction(scene) {
+    let config = {
+        align: 'center',
+        fontSize: '35px',
+        strokeThickness: 1,
+        stroke: '#000000',
+    }
+
+
     if (this.instructionStage == 0){
         instructionStage += 1;
-        /*this.instructionText = scene.add.text(game.config.width/2, game.config.height/2, "USE W, S, and D to change junction direction", instrctionConfig)
+        this.instructionText = scene.add.text(game.config.width/2, game.config.height/2 - 150, "USE W, S, and D to change junction direction", config)
         .setDepth(25)
-        .setOrigin(0.5);*/
+        .setOrigin(0.5);
     }
 }
 
@@ -188,16 +188,20 @@ function addPasengerUI(scene, passenger){
     this.newPassIcon = new PassengerIcon(scene, this.front + (iconGap*numPassengers), bottomBarYpos, shape, passenger, numPassengers).setScale(this.iconScale).setDepth(25);
     this.passengers.add(newPassIcon);
 
-    console.log(this.newPassIcon.passengerObj.destination + " BORDED. passengers: " + this.numPassengers);
+    //console.log(this.newPassIcon.passengerObj.destination + " BORDED. passengers: " + this.numPassengers);
 }
 
 function RemovePassengerIcons(scene, stationName){
+    //console.log("length(passengers): " + this.passengers.countActive(true));
     let emptySlots = [];
+
+    //this.passengers.getChildren().forEach(function(passengerIcon) 
     let incomingPassengers = this.passengers.countActive(true);
 
     for (i = 0; i < incomingPassengers; i++) {
-
         let passengerIcon = passengers.getChildren()[i];
+
+        //console.log(passengerIcon.passengerObj.destination + "PASSENGER CONSIDERED. i: " + i);
 
         if (passengerIcon.passengerObj.destination == stationName || !passengerIcon.passengerObj.goodReview){
 
@@ -207,10 +211,14 @@ function RemovePassengerIcons(scene, stationName){
             passengerIcon.patienceBar.destroy();
             this.passengers.remove(passengerIcon, true, true);
 
-            if (i != incomingPassengers-1){ i -= 1; }
+            if (i != incomingPassengers-1){
+                i -= 1;
+            }
             
             incomingPassengers -= 1;
             this.numPassengers -= 1;
+
+            //console.log(passengerIcon.passengerObj.destination + " DISEMBARKED. passengers: " + this.numPassengers);
 
         } else{
             const emptySlotCount = emptySlots.length;
@@ -222,16 +230,21 @@ function RemovePassengerIcons(scene, stationName){
 
                     passengerIcon.x -= scene.UIConfig.iconGap;
                     passengerIcon.patienceBar.x -= scene.UIConfig.iconGap;   
+
+                    //console.log("shifting " + passengerIcon.passengerObj.destination + " from slot "+ (passengerIcon.slot +1) +" to slot " + passengerIcon.slot);
                 }
             }
             for (j = 0; j < emptySlots.length; j++){
                 if (emptySlots[j] == passengerIcon.slot){
                     emptySlots.splice(j, 1);
+                    //console.log("icon was shifted into a previously empty slot ("+emptySlots[j]+") and now that slot isn't marked as empty");
                     break;
                 }
             }
         }
-    }
+    };
+
+
 }
 
 class PassengerIcon extends Phaser.GameObjects.Sprite {
@@ -251,7 +264,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
         scene.tweens.addCounter({
             from: 0, 
             to: 100,
-            duration: passenger.patience * 100000,
+            duration: passenger.patience,
             ease: Phaser.Math.Easing.Sine.InOut,
             repeat: 0,
             onUpdate: tween => {
@@ -262,7 +275,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
                     passenger.goodReview = false;
                     this.setAlpha(0.4);
                     scene.cameras.main.shake(50, 0.009);
-                    console.log(this.passengerObj.destination + " ran out of patience. passengers: " + this.numPassengers);
+                    //console.log(this.passengerObj.destination + " ran out of patience. passengers: " + this.numPassengers);
                 }
             }
         })
@@ -279,7 +292,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
 }
 
 function EndGameUI(scene){
-    console.log("endGame");
+    //console.log("endGame");
 
     this.darkColorBack = scene.add.rectangle(0, 0, game.config.width, game.config.height, '#000000').setAlpha(0.1).setScale(4).setDepth(22.9);
     this.gameOverBackground = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5).setAlpha;
