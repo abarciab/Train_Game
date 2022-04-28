@@ -16,21 +16,23 @@ this.textConfig = {
     align: 'center',
 }
 
-this.instrctionConfig =  {
-    align: 'center', 
-    color: '#FFFFFF', 
-    stroke: '#000000', 
-    strokeThickness:'2',
-    fontSize: '35px'
-}
+
 
 
 function DisplayNextInstruction(scene) {
+    let config = {
+        align: 'center',
+        fontSize: '35px',
+        strokeThickness: 1,
+        stroke: '#000000',
+    }
+
+
     if (this.instructionStage == 0){
         instructionStage += 1;
-        /*this.instructionText = scene.add.text(game.config.width/2, game.config.height/2, "USE W, S, and D to change junction direction", instrctionConfig)
+        this.instructionText = scene.add.text(game.config.width/2, game.config.height/2 - 150, "USE W, S, and D to change junction direction", config)
         .setDepth(25)
-        .setOrigin(0.5);*/
+        .setOrigin(0.5);
     }
 }
 
@@ -188,22 +190,20 @@ function addPasengerUI(scene, passenger){
     this.newPassIcon = new PassengerIcon(scene, this.front + (iconGap*numPassengers), bottomBarYpos, shape, passenger, numPassengers).setScale(this.iconScale).setDepth(25);
     this.passengers.add(newPassIcon);
 
-    console.log(this.newPassIcon.passengerObj.destination + " BORDED. passengers: " + this.numPassengers);
+    //console.log(this.newPassIcon.passengerObj.destination + " BORDED. passengers: " + this.numPassengers);
 }
 
 function RemovePassengerIcons(scene, stationName){
-    console.log("length(passengers): " + this.passengers.countActive(true));
+    //console.log("length(passengers): " + this.passengers.countActive(true));
     let emptySlots = [];
 
     //this.passengers.getChildren().forEach(function(passengerIcon) 
-    const incomingPassengers = this.passengers.countActive(true);
-    let deletedPassengers = 0;
+    let incomingPassengers = this.passengers.countActive(true);
 
     for (i = 0; i < incomingPassengers; i++) {
+        let passengerIcon = passengers.getChildren()[i];
 
-        console.log("PASSENGER CONSIDERED");
-
-        let passengerIcon = passengers.getChildren()[i - deletedPassengers];
+        //console.log(passengerIcon.passengerObj.destination + "PASSENGER CONSIDERED. i: " + i);
 
         if (passengerIcon.passengerObj.destination == stationName || !passengerIcon.passengerObj.goodReview){
 
@@ -212,30 +212,41 @@ function RemovePassengerIcons(scene, stationName){
 
             passengerIcon.patienceBar.destroy();
             this.passengers.remove(passengerIcon, true, true);
-            deletedPassengers += 1;
 
-            this.numPassengers -= 1;
-            console.log(passengerIcon.passengerObj.destination + " DISEMBARKED. passengers: " + this.numPassengers);
+            if (i != incomingPassengers-1){
+                i -= 1;
+            }
             
+            incomingPassengers -= 1;
+            this.numPassengers -= 1;
+
+            //console.log(passengerIcon.passengerObj.destination + " DISEMBARKED. passengers: " + this.numPassengers);
+
         } else{
-            console.log("stationName: " + stationName + ". passengerDest: " + passengerIcon.passengerObj.destination);
+            const emptySlotCount = emptySlots.length;
+            for (j = 0; j < emptySlotCount; j++){
+                if (passengerIcon.slot >= emptySlots[j]){
+                    
+                    emptySlots.push(passengerIcon.slot);
+                    passengerIcon.slot -= 1;
+
+                    passengerIcon.x -= scene.UIConfig.iconGap;
+                    passengerIcon.patienceBar.x -= scene.UIConfig.iconGap;   
+
+                    //console.log("shifting " + passengerIcon.passengerObj.destination + " from slot "+ (passengerIcon.slot +1) +" to slot " + passengerIcon.slot);
+                }
+            }
+            for (j = 0; j < emptySlots.length; j++){
+                if (emptySlots[j] == passengerIcon.slot){
+                    emptySlots.splice(j, 1);
+                    //console.log("icon was shifted into a previously empty slot ("+emptySlots[j]+") and now that slot isn't marked as empty");
+                    break;
+                }
+            }
         }
     };
 
 
-    console.log("DONE REMOVING PASSENGERS. remaining: " + this.passengers.countActive(true));
-    
-    this.passengers.getChildren().forEach(function(passengerIcon) {
-        console.log("SHIFT CONSIDERED");
-        for (i = 0; i < emptySlots.length; i++){
-            if (passengerIcon.slot > emptySlots[i]){
-                console.log("shifting " + passengerIcon.passengerObj.destination + " passenger to the left. passengers: " + this.numPassengers)
-                passengerIcon.slot -= 1;
-                passengerIcon.x -= scene.UIConfig.iconGap;
-                passengerIcon.patienceBar.x -= scene.UIConfig.iconGap;
-            }
-        }
-    })
 }
 
 class PassengerIcon extends Phaser.GameObjects.Sprite {
@@ -255,7 +266,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
         scene.tweens.addCounter({
             from: 0, 
             to: 100,
-            duration: passenger.patience * 100000,
+            duration: passenger.patience,
             ease: Phaser.Math.Easing.Sine.InOut,
             repeat: 0,
             onUpdate: tween => {
@@ -266,7 +277,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
                     passenger.goodReview = false;
                     this.setAlpha(0.4);
                     scene.cameras.main.shake(50, 0.009);
-                    console.log(this.passengerObj.destination + " ran out of patience. passengers: " + this.numPassengers);
+                    //console.log(this.passengerObj.destination + " ran out of patience. passengers: " + this.numPassengers);
                 }
             }
         })
@@ -283,7 +294,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
 }
 
 function EndGameUI(scene){
-    console.log("endGame");
+    //console.log("endGame");
 
     this.darkColorBack = scene.add.rectangle(0, 0, game.config.width, game.config.height, '#000000').setAlpha(0.1).setScale(4).setDepth(22.9);
     this.gameOverBackground = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5).setAlpha;
