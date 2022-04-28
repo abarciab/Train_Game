@@ -156,7 +156,7 @@ class PlayGame extends Phaser.Scene {
         }
 
         if (this.train.atStation == 1) {
-            console.log("Entered station");
+            //console.log("Entered station");
             this.enterStation(this.currentStation);
         }
     }
@@ -305,46 +305,51 @@ class PlayGame extends Phaser.Scene {
     }
 
     enterStation(station) {
+        console.log("\n\nENTERED STATION");
+
         this.train.atStation = 2;
         let stationTime = 5000;
         let tempSpeed = this.speed;
         this.speed = 0;
         this.train.moving = false;
-        RemovePassengerIcons(this, Array.from(station.type)[0]);
         this.fuel = this.train.fuelCapacity;
-        console.log("Fuel sustained");
+        
+        RemovePassengerIcons(this, Array.from(station.type)[0]);
+
         this.train.passengers.forEach(passenger => {
             if (station.type.has(passenger.destination)) {
                 passenger.onTrain = false;
                 if (passenger.goodReview == false) {
                     this.train.health -= 2;
-                    console.log("Bad review");
+                    //console.log("Bad review");
                 } else {
                     if (this.train.health < this.train.healthCapacity) {
                         this.train.health += 1;
                     }
-                    console.log("Good review");
+                    //console.log("Good review");
                 }
                 this.train.passengers.splice(this.train.passengers.indexOf(passenger), 1);
-                console.log("Passenger got off train");
+                //console.log("Passenger got off train (happy)");
             } else if (!passenger.goodReview) {
                 passenger.onTrain = false;
                 this.train.health -= 4;
-                console.log("Terrible review!");
+                //console.log("Terrible review!");
                 this.train.passengers.splice(this.train.passengers.indexOf(passenger), 1);
-                console.log("Passenger got off train");
+                //console.log("Passenger got off train (angry)");
             }
         });
+
+        console.log("DONE UNLOADING TRAIN - now loading...")
 
         station.passengers.forEach(passenger => {
             if (this.train.passengers.length < this.train.capacity) {
                 passenger.onTrain = true;
                 passenger.boardTrain(this);
                 this.train.passengers.push(passenger);
-                console.log("Passenger got on train");
+                //console.log("Passenger got on train");
             }
             if (this.train.passengers.length == this.train.capacity) {
-                console.log("Full train!");
+                //console.log("Full train!");
             }
         });
 
@@ -363,8 +368,8 @@ class PlayGame extends Phaser.Scene {
                 this.speed = tempSpeed;
                 this.fuel = this.train.fuelCapacity;
                 this.train.moving = true;
-                console.log("Refueled");
-                console.log("Station business done");
+                //console.log("Refueled");
+                //console.log("Station business done");
                 this.train.atStation = 0;
                 // start patience timers
             }, null, this);
