@@ -189,6 +189,7 @@ function addPasengerUI(scene, passenger){
             break;
     }
 
+    console.log("FRONT1: " + this.front);
     this.newPassIcon = new PassengerIcon(scene, this.front + (iconGap*numPassengers), bottomBarYpos, shape, passenger, numPassengers).setScale(this.iconScale).setDepth(25);
     this.passengers.add(newPassIcon);
 
@@ -196,6 +197,33 @@ function addPasengerUI(scene, passenger){
 }
 
 function RemovePassengerIcons(scene, stationName){
+
+    for (i = 0; i < this.passengers.countActive(true); i++) {
+        let passengerIcon = passengers.getChildren()[i];
+
+        if (passengerIcon.passengerObj.destination == stationName || !passengerIcon.passengerObj.goodReview){
+            
+            passengerIcon.passengerObj.disembark(scene);
+
+            passengerIcon.patienceBar.destroy();
+            this.passengers.remove(passengerIcon, true, true);
+
+            if (i != this.passengers.countActive(true)-1){
+                i -= 1;
+            }
+            
+            this.numPassengers -= 1;
+        }
+    }
+
+    for (i = 0; i < this.passengers.countActive(true); i++) {
+        let passengerIcon = passengers.getChildren()[i];
+        //console.log("FRONT2: " + this.front);
+        passengerIcon.x = this.front + (scene.UIConfig.iconGap * (i+1));
+        passengerIcon.patienceBar.x = this.front + (scene.UIConfig.iconGap * (i+1));
+    }
+
+    /*
     //console.log("length(passengers): " + this.passengers.countActive(true));
     let emptySlots = [];
 
@@ -203,7 +231,7 @@ function RemovePassengerIcons(scene, stationName){
     let incomingPassengers = this.passengers.countActive(true);
 
     for (i = 0; i < incomingPassengers; i++) {
-        let passengerIcon = passengers.getChildren()[i];
+        
 
         //console.log(passengerIcon.passengerObj.destination + "PASSENGER CONSIDERED. i: " + i);
 
@@ -246,7 +274,7 @@ function RemovePassengerIcons(scene, stationName){
                 }
             }
         }
-    };
+    };*/
 
 
 }
