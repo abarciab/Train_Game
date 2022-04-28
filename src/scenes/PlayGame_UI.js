@@ -65,6 +65,10 @@ function LoadUI(scene){
     scene.load.image('star_1/4', './assets/UI/UI star quarter.png');
     scene.load.image('star_0/4', './assets/UI/UI star empty.png');
 
+    //sounds
+    scene.load.audio('bad_review', './assets/sound effects/badreview.wav');
+    scene.load.audio('board_train', './assets/sound effects/boardtrain sound.wav');
+    scene.load.audio('good_review', './assets/sound effects/disembark sound.wav');
 }
 
 function StartUI(scene){
@@ -128,7 +132,10 @@ function UpdateUI(scene, delta){
     this.fuelNeedle.angle = ( (scene.fuel/scene.train.fuelCapacity) * 180) - 90;
 
     //update distance display and biome display
-    biomeBarCursor.x += delta/200;
+    biomeBarCursor.x += (delta * scene.speed)/5000;
+    if (biomeBarCursor.x > biomeBar.x + biomeBar.displayWidth-40){
+        biomeBarCursor.x = game.config.width/2 + 60
+    }
     this.distDisplay.text = "Dist: " + Math.round(scene.dist).toLocaleString(undefined) + "m";
 
     //update star display, if needed
@@ -189,11 +196,10 @@ function addPasengerUI(scene, passenger){
             break;
     }
 
-    console.log("FRONT1: " + this.front);
     this.newPassIcon = new PassengerIcon(scene, this.front + (iconGap*numPassengers), bottomBarYpos, shape, passenger, numPassengers).setScale(this.iconScale).setDepth(25);
     this.passengers.add(newPassIcon);
 
-    //console.log(this.newPassIcon.passengerObj.destination + " BORDED. passengers: " + this.numPassengers);
+    scene.sound.play('board_train', {volume: 0.5});
 }
 
 function RemovePassengerIcons(scene, stationName){
@@ -203,79 +209,28 @@ function RemovePassengerIcons(scene, stationName){
 
         if (passengerIcon.passengerObj.destination == stationName || !passengerIcon.passengerObj.goodReview){
             
-            passengerIcon.passengerObj.disembark(scene);
+            if (passengerIcon.goodReview != false){
+                console.log("good review");
+                scene.sound.play('good_review', {volume: 0.8});
+            } 
 
+            passengerIcon.passengerObj.disembark(scene);
             passengerIcon.patienceBar.destroy();
             this.passengers.remove(passengerIcon, true, true);
 
             if (i != this.passengers.countActive(true)-1){
                 i -= 1;
             }
-            
             this.numPassengers -= 1;
         }
     }
 
     for (i = 0; i < this.passengers.countActive(true); i++) {
         let passengerIcon = passengers.getChildren()[i];
-        //console.log("FRONT2: " + this.front);
+
         passengerIcon.x = this.front + (scene.UIConfig.iconGap * (i+1));
         passengerIcon.patienceBar.x = this.front + (scene.UIConfig.iconGap * (i+1));
     }
-
-    /*
-    //console.log("length(passengers): " + this.passengers.countActive(true));
-    let emptySlots = [];
-
-    //this.passengers.getChildren().forEach(function(passengerIcon) 
-    let incomingPassengers = this.passengers.countActive(true);
-
-    for (i = 0; i < incomingPassengers; i++) {
-        
-
-        //console.log(passengerIcon.passengerObj.destination + "PASSENGER CONSIDERED. i: " + i);
-
-        if (passengerIcon.passengerObj.destination == stationName || !passengerIcon.passengerObj.goodReview){
-
-            passengerIcon.passengerObj.disembark(scene);
-            emptySlots.push(passengerIcon.slot);
-
-            passengerIcon.patienceBar.destroy();
-            this.passengers.remove(passengerIcon, true, true);
-
-            if (i != incomingPassengers-1){
-                i -= 1;
-            }
-            
-            incomingPassengers -= 1;
-            this.numPassengers -= 1;
-
-            //console.log(passengerIcon.passengerObj.destination + " DISEMBARKED. passengers: " + this.numPassengers);
-
-        } else{
-            const emptySlotCount = emptySlots.length;
-            for (j = 0; j < emptySlotCount; j++){
-                if (passengerIcon.slot >= emptySlots[j]){
-                    
-                    emptySlots.push(passengerIcon.slot);
-                    passengerIcon.slot -= 1;
-
-                    passengerIcon.x -= scene.UIConfig.iconGap;
-                    passengerIcon.patienceBar.x -= scene.UIConfig.iconGap;   
-
-                    //console.log("shifting " + passengerIcon.passengerObj.destination + " from slot "+ (passengerIcon.slot +1) +" to slot " + passengerIcon.slot);
-                }
-            }
-            for (j = 0; j < emptySlots.length; j++){
-                if (emptySlots[j] == passengerIcon.slot){
-                    emptySlots.splice(j, 1);
-                    //console.log("icon was shifted into a previously empty slot ("+emptySlots[j]+") and now that slot isn't marked as empty");
-                    break;
-                }
-            }
-        }
-    };*/
-
 
 }
 
@@ -307,7 +262,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
                     passenger.goodReview = false;
                     this.setAlpha(0.4);
                     scene.cameras.main.shake(50, 0.009);
-                    //console.log(this.passengerObj.destination + " ran out of patience. passengers: " + this.numPassengers);
+                    scene.sound.play('bad_review', {volume: 0.8});
                 }
             }
         })

@@ -340,7 +340,6 @@ class PlayGame extends Phaser.Scene {
     }
 
     enterStation(station) {
-        console.log("\n\nENTERED STATION");
         this.train.atStation = 2;
         let stationTime = 5000;
         this.train.moving = false;
@@ -370,8 +369,6 @@ class PlayGame extends Phaser.Scene {
                 //console.log("Passenger got off train (angry)");
             }
         });
-
-        console.log("DONE UNLOADING TRAIN - now loading...")
 
         station.passengers.forEach(passenger => {
             if (this.train.passengers.length < this.train.capacity) {
