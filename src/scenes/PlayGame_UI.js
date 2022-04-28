@@ -16,21 +16,23 @@ this.textConfig = {
     align: 'center',
 }
 
-this.instrctionConfig =  {
-    align: 'center', 
-    color: '#FFFFFF', 
-    stroke: '#000000', 
-    strokeThickness:'2',
-    fontSize: '35px'
-}
+
 
 
 function DisplayNextInstruction(scene) {
+    let config = {
+        align: 'center',
+        fontSize: '35px',
+        strokeThickness: 1,
+        stroke: '#000000',
+    }
+
+
     if (this.instructionStage == 0){
         instructionStage += 1;
-        /*this.instructionText = scene.add.text(game.config.width/2, game.config.height/2, "USE W, S, and D to change junction direction", instrctionConfig)
+        this.instructionText = scene.add.text(game.config.width/2, game.config.height/2 - 150, "USE W, S, and D to change junction direction", config)
         .setDepth(25)
-        .setOrigin(0.5);*/
+        .setOrigin(0.5);
     }
 }
 
@@ -65,7 +67,6 @@ function LoadUI(scene){
 }
 
 function StartUI(scene){
-
     //variables
     this.front = 60;
     this.IconGap = 80;
