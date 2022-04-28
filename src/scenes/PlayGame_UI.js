@@ -163,7 +163,7 @@ function displayRating(){
         this.star5.setTexture('star_4/4');
         return;
     }
-    
+
     if (rating > 0){
         partialStar.setTexture("star_" + rating%4 + "/4"); 
     }
