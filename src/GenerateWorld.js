@@ -238,7 +238,7 @@ function generateStationRoute(scene, junction_signs, row, n_junc, s_junc) {
 }
 
 function checkSameRoute(scene, junction_signs, row) {
-    let check_num = 5;
+    let check_num = 10;
     if (check_num > scene.nodes[row].length) check_num = scene.nodes[row].length;
     for (let i = 1; i <= check_num; i++) {
         let break_check = false;
@@ -284,13 +284,13 @@ function checkSameRoute(scene, junction_signs, row) {
                         if (!junction_signs[key].size) {
                             delete junction_signs[key];
                         }
-                        // once the previous sign is empty, no more need to check for more typess
+                        // once the previous sign is empty, no more need to check for more types
                         if (!prev_signs[remove_sign].size) {
                             delete prev_signs[remove_sign];
                             sign_removed = true;
                         }
                         // replace the sign with a straight sign
-                        if (!("straight" in prev_signs)) 
+                        if (!("straight" in prev_signs))
                             prev_signs["straight"] = new Set();
                         prev_signs["straight"].add(type);
                         prev_node.signs.splice(0, prev_node.signs.length);

@@ -33,12 +33,11 @@ class PlayGame extends Phaser.Scene {
         space_bar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.base_interval = 64*6;  // base unscaled interval between rows of tracks
         this.num_tracks = 4;        // number of rows of tracks
-        this.num_chunks = 20;        // number of chunks that are loaded
         // this.dx = 0;                // delta x; how much the player has traveled
         this.tracks = {};           // key: track row, value: track images
         this.nodes = {};            // key: track row, value: node objects
         this.stations = [];         // list of stations.
-        this.station_spawn_table = [0, 0, 0, 10, 10, 10, 20, 20, 20, 30];
+        this.station_spawn_table = [0, 0, 0, 5, 5, 5, 10, 10, 10, 20, 20, 20, 30];
         this.station_spawn_index = 0;
         this.gameOver = false;
 
@@ -55,10 +54,14 @@ class PlayGame extends Phaser.Scene {
         this.node_interval = 20 * this.x_unit;  // interval between each node/track placement
         this.input_interval = this.node_interval; // interval user can input an action before a junction
         this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
-        this.speed = 5;    // speed of world
+        this.speed = 5;     // speed of world
+        this.dx = 0;        // how much a player has moved
         this.speedLock = this.speed; // holds speed while speed changes when entering stations
         this.lock = false; // traces when speed is locked
         this.dist = 0;
+        this.nodes_onscreen = Math.floor(config.width / this.node_interval);   // number of nodes on screen
+        this.num_chunks = nodes_onscreen * 5;        // number of chunks that are loaded; 5x screen width
+
         this.wagonCheck = false; // checks if train gets second wagon
         // spawn the world initially
         this.train = new Train(this, config.width/10, 0, 'basic_locomotive', Math.floor(this.num_tracks/2));
@@ -118,52 +121,15 @@ class PlayGame extends Phaser.Scene {
             this.train.wagons.add(this.wagon);
             this.wagonCheck = false;
         }
-
-        // Check if train is at station
-        if (this.train.atStation == 0) {
-            for (let i = 0; i < this.stations.length; i++) {
-                // Slow down before entering station 
-                // station.x (node.x + 500) - 
-                if (this.stations[i].onTrack == this.train.onTrack 
-                && (this.stations[i].x+this.stations[i].station_point)-this.train.x < this.node_interval 
-                && this.stations[i].x > this.train.x) {
-                //if (this.train.onTrack == this.stations[i].onTrack && this.train.x > this.stations[i].x) {
-                    if (this.lock == false) {
-                        this.speedLock = this.speed;
-                        this.lock = true;
-                        this.stations[i].stop_dist = (this.stations[i].x + this.stations[i].station_point) - this.train.x;
-                    }
-                    let stop_interval = 3;
-                    // decel per frame
-                    let decel = ((-this.speedLock) / (stop_interval/(delta/1000))) 
-                    // math: want the speed to hit 0 in 3 seconds.
-                    this.speed -= decel;
-                    console.log(this.speed);
-                }
-                else if (this.currentStation == this.stations[i] && this.lock) {
-                    this.speed = this.speedLock;
-                    this.lock = false;
-                }
-
-                // Check if train will enter station
-                if (this.train.onTrack == this.stations[i].onTrack && !this.train.turning
-                && Math.abs(this.train.x - (this.stations[i].x + this.stations[i].station_point)) <= (this.speed / 2) && !this.stations[i].stoppedAt) {
-                    this.stations[i].stoppedAt = true;
-                    this.currentStation = this.stations[i];
-                    this.train.atStation = 1;
-                    break;
-                }
-            }
-        }
-
-        if (this.train.atStation == 1) {
-            //console.log("Entered station");
-            this.enterStation(this.currentStation);
-        }
     }
     
     updateSpeed(delta) {
         this.dist += (delta/1000) * this.speed;
+        this.dx += (delta/1000) * this.speed;
+        if (this.dx >= 200 && !this.train.atStation) {
+            this.speed++;
+            this.dx = 0;
+        }
         this.train.speed = this.speed;
     }
 
@@ -287,45 +253,39 @@ class PlayGame extends Phaser.Scene {
             this.stations[i].update();
             // check if the train is arriving at the station
             if (this.train.onTrack == this.stations[i].onTrack 
-            && this.train.x > this.stations[i].x && this.stations[i].arriving_status == 0) {
+            && this.train.x > this.stations[i].x && this.train.x < this.stations[i].station_point + this.stations[i].x
+            && this.stations[i].arriving_status == 0) {
                 this.stations[i].arriving_status = 1;
                 this.stations[i].stop_dist = (this.stations[i].x + this.stations[i].station_point) - this.train.x;
                 this.speedLock = this.speed;
+                this.train.atStation = 1;
             }
-            // if arriving, decrement speed until 0, then status = 2
-            /* 
-            goal: have train decelerate from speed -> 0 within stop_dist over t time.
-            given: 
-                - initial_velocity: this.speed
-                - delta x: stop_dist
-                - t: stop_time
-            get:
-                - velocity per frame. 
-            equation: speed = time/distance.
-            ie.) if speed = 5: will go from 5->0 in 2 seconds over stop_dist
-            */
+            // if arriving, speed lowers based on the closer you get to the station
             if (this.stations[i].arriving_status == 1) {
-                let stop_time = 2;
-                // t = this.stop_dist / this.speed;
-                /*let dt = this.stop_dist / (this.speed / (delta/1000));
-                dt = dt / stop_time;
-                // find dx per second
-                let dx = this.speedLock / dt * (delta/1000);
-                this.speed -= dx;*/
-                this.speed -= 0.3;
-                //console.log(this.speed, dx);//, dt);
-                if (this.speed <= 0) {
-                    console.log(this.speed);
+                let station_dist = this.stations[i].x + this.stations[i].station_point;
+                this.stations[i].stop_dist = station_dist - this.train.x;
+                let distance_ratio = this.stations[i].stop_dist / this.stations[i].station_point;
+                this.speed = this.speedLock * distance_ratio;
+                if (this.speed <= 0.5) {
                     this.speed = 0;
                     this.stations[i].arriving_status = 2;
                 }
             }
+            // once stopped, enter station
             else if (this.stations[i].arriving_status == 2) {
                 this.enterStation(this.stations[i]);
                 this.stations[i].arriving_status = 3;
             }
+            // when done loading passengers, leave the station
             else if (this.stations[i].arrived_status == 4) {
-                this.speed = this.speedLock;
+                let acc_dist = Math.abs((this.stations[i].station_point + this.stations[i].x) - this.train.x);
+                this.train.atStation = 0;
+                this.speed = this.speedLock * (acc_dist / this.stations[i].station_point);
+                if (this.speed < 1) this.speed = 1;
+                if (this.speed >= this.speedLock) {
+                    this.stations[i].arrived_status = 5;
+                    this.speed = this.speedLock;
+                }
             }
 
             // delete the station once off screen
@@ -350,11 +310,8 @@ class PlayGame extends Phaser.Scene {
 
     enterStation(station) {
         console.log("\n\nENTERED STATION");
-
         this.train.atStation = 2;
         let stationTime = 5000;
-        let tempSpeed = this.speed;
-        this.speed = 0;
         this.train.moving = false;
         this.fuel = this.train.fuelCapacity;
         
@@ -409,12 +366,8 @@ class PlayGame extends Phaser.Scene {
             let gettingOn = this.time.delayedCall(stationTime/2, () => {
                 // Getting on animations
                 // Same as getting off
-                this.speed = tempSpeed;
                 this.fuel = this.train.fuelCapacity;
                 this.train.moving = true;
-                //console.log("Refueled");
-                //console.log("Station business done");
-                this.train.atStation = 0;
                 station.arrived_status = 4;
                 // start patience timers
             }, null, this);
