@@ -133,7 +133,6 @@ class PlayGame extends Phaser.Scene {
         this.train.speed = this.speed;
     }
 
-    
     /*
         - if the player is x distance before a node, can choose which direction the node goes
     */
