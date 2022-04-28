@@ -27,10 +27,13 @@ function DisplayNextInstruction(scene) {
 
 
     if (this.instructionStage == 0){
-        instructionStage += 1;
+        //instructionStage += 1;
         this.instructionText = scene.add.text(game.config.width/2, game.config.height/2 - 150, "USE W, S, and D to change junction direction", config)
         .setDepth(25)
         .setOrigin(0.5);
+    } 
+    else if (this.instructionStage >= 1){
+        this.instructionText.setVisible(false);
     }
 }
 
@@ -115,10 +118,11 @@ function StartUI(scene){
 }
 
 function UpdateUI(scene, delta){
-    //display instructions
-    if (this.instructionStage == 0){
-        DisplayNextInstruction(scene);
-    } 
+    //instructions
+    
+    DisplayNextInstruction(scene);
+
+    this.instructionStage += (delta/1000)/5
 
     //update fuel display
     this.fuelNeedle.angle = ( (scene.fuel/scene.train.fuelCapacity) * 180) - 90;

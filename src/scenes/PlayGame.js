@@ -18,8 +18,8 @@ class PlayGame extends Phaser.Scene {
     create() {
         //sound effects
         this.junctionSwitchSfx = this.sound.add('junction_switch', {volume: 0.5, rate: 1.5});
-        this.backgroundMusic = this.sound.add('backgroundMusic', {volume: 1});
-        this.crashSound = this.sound.add('crash_sound');
+        this.backgroundMusic = this.sound.add('backgroundMusic', {volume: 0.8, loop: true});
+        this.crashSound = this.sound.add('crash_sound', {volume: 0.1});
         this.backgroundMusic.play();
 
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0);
