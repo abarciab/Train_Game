@@ -37,7 +37,7 @@ class Station extends Phaser.GameObjects.Sprite {
                 this.indicator.setVisible(false);
             } 
             else if (this.x < config.width*2) {
-                console.log("show indicator");
+                //console.log("show indicator");
                 this.indicator.y = this.y;
                 this.indicator.setVisible(true);
             }

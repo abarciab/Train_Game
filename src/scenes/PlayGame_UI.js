@@ -67,9 +67,15 @@ function LoadUI(scene){
 }
 
 function StartUI(scene){
+
+    scene.UIConfig = {
+        iconGap: null,
+        numPassengers: 0
+    };
+
     //variables
     this.front = 60;
-    this.IconGap = 80;
+    this.iconGap = 80;
     this.iconScale = 0.5;
     this.bottomBarYpos = game.config.height - 60;
 
@@ -106,13 +112,15 @@ function StartUI(scene){
     displayRating();
 
     this.instructionStage = 0;
+
+    scene.UIConfig.iconGap = this.iconGap;
 }
 
 function UpdateUI(scene, delta){
     //display instructions
     if (this.instructionStage == 0){
         DisplayNextInstruction(scene);
-    }
+    } 
 
     //update fuel display
     this.fuelNeedle.angle = ( (scene.fuel/scene.train.fuelCapacity) * 180) - 90;
@@ -158,7 +166,9 @@ function displayRating(){
         return;
     }
     
-    partialStar.setTexture("star_" + rating%4 + "/4"); 
+    if (rating > 0){
+        partialStar.setTexture("star_" + rating%4 + "/4"); 
+    }
 }
 
 function addPasengerUI(scene, passenger){
@@ -167,45 +177,76 @@ function addPasengerUI(scene, passenger){
 
     switch (passenger.destination){
         case "red square":
-            //console.log("Is A Square.");
             shape = 'pass_square';
             break;
         case "blue circle":
-            //console.log("Is A Circle.");
             shape = 'pass_circle';
             break;
         default:
-            //console.log("Is A Triangle.");
             shape = 'pass_tri';
             break;
     }
 
-    this.newPassIcon = new PassengerIcon(scene, this.front + (IconGap*numPassengers), bottomBarYpos, shape, passenger, numPassengers).setScale(this.iconScale).setDepth(25);
+    this.newPassIcon = new PassengerIcon(scene, this.front + (iconGap*numPassengers), bottomBarYpos, shape, passenger, numPassengers).setScale(this.iconScale).setDepth(25);
     this.passengers.add(newPassIcon);
+
+    //console.log(this.newPassIcon.passengerObj.destination + " BORDED. passengers: " + this.numPassengers);
 }
 
-let emptySlots = [];
-
 function RemovePassengerIcons(scene, stationName){
-    console.log("stopping at station: " + stationName);
+    //console.log("length(passengers): " + this.passengers.countActive(true));
+    let emptySlots = [];
 
-    this.passengers.getChildren().forEach(function(passengerIcon) {
-        if (passengerIcon.passengerObj.destination == stationName){
-            console.log("removed passengerUI");
+    //this.passengers.getChildren().forEach(function(passengerIcon) 
+    let incomingPassengers = this.passengers.countActive(true);
+
+    for (i = 0; i < incomingPassengers; i++) {
+        let passengerIcon = passengers.getChildren()[i];
+
+        //console.log(passengerIcon.passengerObj.destination + "PASSENGER CONSIDERED. i: " + i);
+
+        if (passengerIcon.passengerObj.destination == stationName || !passengerIcon.passengerObj.goodReview){
+
             passengerIcon.passengerObj.disembark(scene);
             emptySlots.push(passengerIcon.slot);
-            passengerIcon.destroy();
-        }
-    });
-    
-    this.passengers.getChildren().forEach(function(passengerIcon) {
-        for (i = 0; i < emptySlots.length; i++){
-            if (passengerIcon.slot > emptySlots[i]){
-                passengerIcon.slot -= 1;
-                passengerIcon.x -= IconGap;
+
+            passengerIcon.patienceBar.destroy();
+            this.passengers.remove(passengerIcon, true, true);
+
+            if (i != incomingPassengers-1){
+                i -= 1;
+            }
+            
+            incomingPassengers -= 1;
+            this.numPassengers -= 1;
+
+            //console.log(passengerIcon.passengerObj.destination + " DISEMBARKED. passengers: " + this.numPassengers);
+
+        } else{
+            const emptySlotCount = emptySlots.length;
+            for (j = 0; j < emptySlotCount; j++){
+                if (passengerIcon.slot >= emptySlots[j]){
+                    
+                    emptySlots.push(passengerIcon.slot);
+                    passengerIcon.slot -= 1;
+
+                    passengerIcon.x -= scene.UIConfig.iconGap;
+                    passengerIcon.patienceBar.x -= scene.UIConfig.iconGap;   
+
+                    //console.log("shifting " + passengerIcon.passengerObj.destination + " from slot "+ (passengerIcon.slot +1) +" to slot " + passengerIcon.slot);
+                }
+            }
+            for (j = 0; j < emptySlots.length; j++){
+                if (emptySlots[j] == passengerIcon.slot){
+                    emptySlots.splice(j, 1);
+                    //console.log("icon was shifted into a previously empty slot ("+emptySlots[j]+") and now that slot isn't marked as empty");
+                    break;
+                }
             }
         }
-    })
+    };
+
+
 }
 
 class PassengerIcon extends Phaser.GameObjects.Sprite {
@@ -235,18 +276,25 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
                 if (tween.getValue() == 100){       //this passenger is out of patience
                     passenger.goodReview = false;
                     this.setAlpha(0.4);
-                    scene.cameras.main.shake(50, 0.003);
+                    scene.cameras.main.shake(50, 0.009);
+                    //console.log(this.passengerObj.destination + " ran out of patience. passengers: " + this.numPassengers);
                 }
             }
         })
 
+        this.ID = Phaser.Math.Between(0, 999);
+
         this.slot = slot;
+    }
+
+    printPassengerIcon(){
+        console.log("passengerIcon - station: " + this.passengerObj.destination + ", ID: " + this.ID);
     }
 
 }
 
 function EndGameUI(scene){
-    console.log("endGame");
+    //console.log("endGame");
 
     this.darkColorBack = scene.add.rectangle(0, 0, game.config.width, game.config.height, '#000000').setAlpha(0.1).setScale(4).setDepth(22.9);
     this.gameOverBackground = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5).setAlpha;

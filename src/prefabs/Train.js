@@ -78,7 +78,7 @@ class Train extends Phaser.GameObjects.Sprite {
             if (this.dt < turn_timer) {
                 if (this.turn_dir == "north"){
                     this.y -= dy;
-                    console.log("moving up");
+                    //console.log("moving up");
                     //turning
                     //this.angle = 0;
 
@@ -87,7 +87,7 @@ class Train extends Phaser.GameObjects.Sprite {
                 }
             }
             else {
-                console.log("done turning");
+                //console.log("done turning");
                 this.turning = false;
                 this.dt = 0;
                 this.y = this.turn_dest;
