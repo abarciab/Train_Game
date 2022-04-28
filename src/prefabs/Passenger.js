@@ -21,6 +21,6 @@ class Passenger extends Phaser.GameObjects.Sprite {
     }
 
     disembark(scene){
-        console.log("I got off the train!");
+        //console.log("I got off the train!");
     }
 }

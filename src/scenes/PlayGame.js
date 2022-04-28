@@ -6,6 +6,7 @@ class PlayGame extends Phaser.Scene {
     preload() {
         // load images/tile sprites
         this.load.spritesheet('train', './assets/trains/basic locomotive spritesheet.png', {frameWidth: 400, frameHeight: 446, startFrame: 0, endFrame: 2});
+        this.load.image('basic_passenger_wagon', './assets/trains/basic passenger wagon.png');
 
         //sound effects
         this.load.audio('junction_switch', './assets/sound effects/junction switched.mp3');
@@ -58,8 +59,14 @@ class PlayGame extends Phaser.Scene {
         this.speedLock = this.speed; // holds speed while speed changes when entering stations
         this.lock = false; // traces when speed is locked
         this.dist = 0;
+        this.wagonCheck = false; // checks if train gets second wagon
         // spawn the world initially
         this.train = new Train(this, config.width/10, 0, 'basic_locomotive', Math.floor(this.num_tracks/2));
+        this.wagonPos = -150;
+        this.wagon = this.add.sprite(this.wagonPos, 0, 'basic_passenger_wagon');
+        this.train.wagons.add(this.wagon);
+        this.wagonPos -= 350;
+
         initSpawn(this);
 
         // set fuel
@@ -69,6 +76,10 @@ class PlayGame extends Phaser.Scene {
     }
 
     update(timer, delta) {
+        this.updateGameOver();
+        if (this.gameOver) {
+            return;
+        }
         this.updateSpeed(delta);
         this.updateTracks(delta);
         this.updateStations(delta);
@@ -78,6 +89,21 @@ class PlayGame extends Phaser.Scene {
         UpdateUI(this, delta);
     }
 
+    updateGameOver() {
+        // Check if player lost
+        if (!this.gameOver && this.train.health <= 0) {
+            this.speed = 0;
+            this.gameOver = true;
+            this.backgroundMusic.stop();
+            console.log("YOU DIED");
+            EndGameUI(this);
+        }
+
+        if (this.gameOver && Phaser.Input.Keyboard.JustDown(space_bar)) {
+            this.scene.restart();
+        }
+    }
+
     updateBackground() {
         this.background.tilePositionX += this.speed;
     }
@@ -85,13 +111,12 @@ class PlayGame extends Phaser.Scene {
     updateTrain(timer, delta) {
         this.fuel -= delta;
         this.train.update(timer, delta);
-        // Check if player lost
-        if (this.train.health <= 0 && !this.gameOver) {
-            this.speed = 0;
-            this.gameOver = true;
-            this.backgroundMusic.stop();
-            console.log("YOU DIED");
-            EndGameUI(this);
+
+        // Adds second wagon if needed
+        if (this.wagonCheck) {
+            this.wagon = this.add.sprite(this.wagonPos, 0, 'basic_passenger_wagon');
+            this.train.wagons.add(this.wagon);
+            this.wagonCheck = false;
         }
 
         // Check if train is at station
@@ -120,7 +145,7 @@ class PlayGame extends Phaser.Scene {
                     this.lock = false;
                 }
 
-                // Enter station
+                // Check if train will enter station
                 if (this.train.onTrack == this.stations[i].onTrack && !this.train.turning
                 && Math.abs(this.train.x - (this.stations[i].x + this.stations[i].station_point)) <= (this.speed / 2) && !this.stations[i].stoppedAt) {
                     this.stations[i].stoppedAt = true;
@@ -132,7 +157,7 @@ class PlayGame extends Phaser.Scene {
         }
 
         if (this.train.atStation == 1) {
-            console.log("Entered station");
+            //console.log("Entered station");
             this.enterStation(this.currentStation);
         }
     }
@@ -312,9 +337,6 @@ class PlayGame extends Phaser.Scene {
     }
 
     updateEvents(delta) {
-        if (this.gameOver && Phaser.Input.Keyboard.JustDown(space_bar)) {
-            this.scene.restart();
-        }
         // A and D key exists for debug rn to test with variable speeds
         if (left_key.isDown && this.speed > 0){
             this.speed -= 1;
@@ -326,46 +348,51 @@ class PlayGame extends Phaser.Scene {
     }
 
     enterStation(station) {
+        console.log("\n\nENTERED STATION");
+
         this.train.atStation = 2;
         let stationTime = 5000;
         let tempSpeed = this.speed;
         this.speed = 0;
         this.train.moving = false;
-        RemovePassengerIcons(this, Array.from(station.type)[0]);
         this.fuel = this.train.fuelCapacity;
-        console.log("Fuel sustained");
+        
+        RemovePassengerIcons(this, Array.from(station.type)[0]);
+
         this.train.passengers.forEach(passenger => {
             if (station.type.has(passenger.destination)) {
                 passenger.onTrain = false;
                 if (passenger.goodReview == false) {
                     this.train.health -= 2;
-                    console.log("Bad review");
+                    //console.log("Bad review");
                 } else {
                     if (this.train.health < this.train.healthCapacity) {
                         this.train.health += 1;
                     }
-                    console.log("Good review");
+                    //console.log("Good review");
                 }
                 this.train.passengers.splice(this.train.passengers.indexOf(passenger), 1);
-                console.log("Passenger got off train");
+                //console.log("Passenger got off train (happy)");
             } else if (!passenger.goodReview) {
                 passenger.onTrain = false;
                 this.train.health -= 4;
-                console.log("Terrible review!");
+                //console.log("Terrible review!");
                 this.train.passengers.splice(this.train.passengers.indexOf(passenger), 1);
-                console.log("Passenger got off train");
+                //console.log("Passenger got off train (angry)");
             }
         });
+
+        console.log("DONE UNLOADING TRAIN - now loading...")
 
         station.passengers.forEach(passenger => {
             if (this.train.passengers.length < this.train.capacity) {
                 passenger.onTrain = true;
                 passenger.boardTrain(this);
                 this.train.passengers.push(passenger);
-                console.log("Passenger got on train");
+                //console.log("Passenger got on train");
             }
             if (this.train.passengers.length == this.train.capacity) {
-                console.log("Full train!");
+                //console.log("Full train!");
             }
         });
 
@@ -384,8 +411,8 @@ class PlayGame extends Phaser.Scene {
                 this.speed = tempSpeed;
                 this.fuel = this.train.fuelCapacity;
                 this.train.moving = true;
-                console.log("Refueled");
-                console.log("Station business done");
+                //console.log("Refueled");
+                //console.log("Station business done");
                 this.train.atStation = 0;
                 station.arrived_status = 4;
                 // start patience timers
