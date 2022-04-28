@@ -374,8 +374,10 @@ function spawnStation(scene, x, y) {
     let stationCount = Math.ceil(Math.random() * 6); // Possible 1-6 Passengers
     let passengers = [];
     for (let j = 0; j < stationCount; j++) {
+        let patienceTime = Math.ceil(Math.random()*240000) + 120000;
+        console.log(patienceTime);
         passengers.push(new Passenger(
-            scene, x, y, "passenger 1", 0, scene.train.onTrack, 30000, 0
+            scene, x, y, "passenger 1", 0, scene.train.onTrack, patienceTime, 0
         ));
     }
     // determine station types
