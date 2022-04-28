@@ -13,7 +13,7 @@ class Passenger extends Phaser.GameObjects.Sprite {
         this.onTrack = initial_track;
         this.scaleX = scene.scaling;
         this.scaleY = scene.scaling;
-        
+        this.visible = false;
     }
 
     boardTrain(scene){

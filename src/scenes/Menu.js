@@ -18,7 +18,8 @@ class Menu extends Phaser.Scene {
         this.load.image('junction_arrows-straight', './assets/tracks/junction arrows straight.png');
         this.load.image('basic_passenger_wagon', './assets/trains/basic passenger wagon.png');
         this.load.image('station', './assets/stations/field top station.png');
-
+        this.load.image('coin', './assets/stations/red_square.png');
+        
         this.load.spritesheet('basic_locomotive', './assets/trains/basic locomotive spritesheet.png', {frameWidth: 400, frameHeight: 446, startFrame: 0, endFrame: 2});
 
         //trees
@@ -40,7 +41,6 @@ class Menu extends Phaser.Scene {
             }
         }
         for (let i = 0; i < sign_shapes.length-1; i++) {
-            // console.log(sign_shapes[i]);
             let sign = sign_shapes[i];
             this.load.image(`${sign} station sign`, `./assets/stations/${sign} station sign.png`);
             this.load.image(`${sign} station indicator`, `./assets/stations/${sign} station indicator.png`)

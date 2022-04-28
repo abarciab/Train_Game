@@ -33,10 +33,11 @@ class PlayGame extends Phaser.Scene {
         space_bar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.base_interval = 64*6;  // base unscaled interval between rows of tracks
         this.num_tracks = 4;        // number of rows of tracks
-        // this.dx = 0;                // delta x; how much the player has traveled
+        // this.dx = 0;             // delta x; how much the player has traveled
         this.tracks = {};           // key: track row, value: track images
         this.nodes = {};            // key: track row, value: node objects
         this.stations = [];         // list of stations.
+        this.coins = {};            // dict of coins
         this.station_spawn_table = [0, 0, 0, 5, 5, 5, 10, 10, 10, 20, 20, 20, 30];
         this.station_spawn_index = 0;
         this.gameOver = false;
@@ -45,6 +46,7 @@ class PlayGame extends Phaser.Scene {
         for (let i = 0; i < this.num_tracks; i++) {
             this.tracks[i] = [];
             this.nodes[i] = [];
+            this.coins[i] = [];
         }
 
         this.margin = config.height/15; // margin; no use right now
@@ -54,7 +56,7 @@ class PlayGame extends Phaser.Scene {
         this.node_interval = 20 * this.x_unit;  // interval between each node/track placement
         this.input_interval = this.node_interval; // interval user can input an action before a junction
         this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
-        this.speed = 5;     // speed of world
+        this.speed = 10;     // speed of world
         this.dx = 0;        // how much a player has moved
         this.speedLock = this.speed; // holds speed while speed changes when entering stations
         this.lock = false; // traces when speed is locked
@@ -62,15 +64,13 @@ class PlayGame extends Phaser.Scene {
         this.nodes_onscreen = Math.floor(config.width / this.node_interval);   // number of nodes on screen
         this.num_chunks = this.nodes_onscreen * 10;        // number of chunks that are loaded; 5x screen width
 
-        this.wagonCheck = false; // checks if train gets second wagon
         // spawn the world initially
         this.train = new Train(this, config.width/10, 0, 'basic_locomotive', Math.floor(this.num_tracks/2));
-        this.wagonPos = -150;
-        this.wagon = this.add.sprite(this.wagonPos, 0, 'basic_passenger_wagon');
-        this.train.wagons.add(this.wagon);
-        this.wagonPos -= 350;
 
         initSpawn(this);
+        this.train.wagons.push(new Wagon(this, this.train.wagon_point, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
+        // if you want to add another wagon
+        // this.train.wagons.push(new Wagon(this, this.train.wagons[this.train.wagons.length-1].wagon_point, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
 
         // set fuel
         this.fuel = this.train.fuelCapacity;
@@ -85,6 +85,7 @@ class PlayGame extends Phaser.Scene {
         }
         this.updateSpeed(delta);
         this.updateTracks(delta);
+        this.updateCoins(delta);
         this.updateStations(delta);
         this.updateTrain(timer, delta);
         this.updateEvents(delta);
@@ -114,13 +115,17 @@ class PlayGame extends Phaser.Scene {
     updateTrain(timer, delta) {
         this.fuel -= delta;
         this.train.update(timer, delta);
+        for (let i = 0; i < this.train.wagons.length; i++) {
+            this.train.wagons[i].speed = this.speed;
+            this.train.wagons[i].update(timer, delta);
+        }
 
         // Adds second wagon if needed
-        if (this.wagonCheck) {
+        /*if (this.wagonCheck) {
             this.wagon = this.add.sprite(this.wagonPos, 0, 'basic_passenger_wagon');
             this.train.wagons.add(this.wagon);
             this.wagonCheck = false;
-        }
+        }*/
     }
     
     updateSpeed(delta) {
@@ -131,6 +136,33 @@ class PlayGame extends Phaser.Scene {
             this.dx = 0;
         }
         this.train.speed = this.speed;
+    }
+
+    updateCoins(delta) {
+        for (const[key, value] of Object.entries(this.coins)) {
+            for (let i = 0; i < value.length; i++) {
+                value[i].x -= this.speed;
+                // check for collision
+                if (this.coinCollision(this.train, value[i])) {
+                    console.log("coin picked up");
+                    value[i].destroy();
+                    value.splice(i, 1);
+                    continue;
+                }
+
+                if (value[i].x < -2*this.node_interval) {
+                    value[i].destroy();
+                    value.splice(i, 1);
+                }
+            }
+        }
+    }
+
+    coinCollision(train, coin) {
+        return (train.x < coin.x+coin.width &&
+            train.x > coin.x-coin.width &&
+            train.y < coin.y+coin.height &&
+            train.y > coin.y-coin.height);
     }
 
     /*
@@ -185,7 +217,7 @@ class PlayGame extends Phaser.Scene {
                 // when the train is close enough to turn on the node, turn the node's turn dir
                 else if (
                     this.train.onTrack == i && !this.train.turning
-                    && this.train.x>= this.nodes[i][j].x-this.junction_offset 
+                    && this.train.x >= this.nodes[i][j].x-this.junction_offset 
                     && this.train.x <= this.nodes[i][j].x+this.junction_offset
                 ) {
                     this.train.turn_dir = this.nodes[i][j].turn_dir;

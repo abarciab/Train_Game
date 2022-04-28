@@ -8,11 +8,26 @@ function initSpawn(scene) {
     let obstacle_timer = 0;
     for (let i = 0; i < scene.num_tracks; i++) {
         spawnTracks(scene, 0, scene.margin+(scene.y_interval*(i+1)), i);
-        spawnNodes(scene, scene.node_interval/2, scene.margin+(scene.y_interval*(i+1)), new Set(), i, can_have_obstacles);
+        // on train row, no junctions to ensure you get to the station
+        if (i == scene.train.onTrack) {
+            scene.nodes[i].push(new Node(
+                scene, scene.node_interval/2, scene.margin+(scene.y_interval*(i+1)), "basic_node_track", i, false, false, {}, 0
+            ));
+        }
+        else
+            spawnNodes(scene, scene.node_interval/2, scene.margin+(scene.y_interval*(i+1)), new Set(), i, can_have_obstacles);
         obstacle_timer++;
     }
+    
     // set initial train y position
     scene.train.y = scene.tracks[Math.floor(scene.num_tracks/2)][0].y
+
+    // gurantee spawn a station in front of the initial track
+    spawnStation(scene, scene.nodes[scene.train.onTrack][0].x, scene.nodes[scene.train.onTrack][0].y);
+    scene.stations[scene.stations.length-1].spawn_timer = 0;
+    scene.stations[scene.stations.length-1].spawned = true;
+    scene.stations[scene.stations.length-1].setVisible(true);
+
     // spawn the rest of tracks using the positions of the prespawned tracks
     for (let i = 0; i < scene.num_chunks-1; i++) {
         obstacle_timer++;
@@ -49,9 +64,16 @@ function spawnWorldChunk(scene, can_have_obstacles) {
         }
     });
 
-    // try to spawn a station, return the spawn index depending on success of failure.
+    // try to spawn a station
     let station_node = scene.nodes[scene.train.onTrack][scene.nodes[scene.train.onTrack].length-1];
-    spawnStation(scene, station_node.x, station_node.y);
+    let random_station = Math.floor(Math.random() * 100)+1;
+    if (random_station <= scene.station_spawn_table[scene.station_spawn_index]) {
+        scene.station_spawn_index = 0;
+        spawnStation(scene, station_node.x, station_node.y);
+    }
+    else if (scene.station_spawn_index < scene.station_spawn_table.length-1){
+        scene.station_spawn_index++;
+    }
 }
 
 /*
@@ -90,12 +112,36 @@ spawn a set of tracks on a row
 */
 function spawnTracks(scene, x, y, row) {
     scene.tracks[row].push(scene.add.image(x, y, "basic_straight_track").setScale(scene.scaling).setDepth(3));
-    // if previous node had an obstacle, set to basic track end
-    //if (scene.nodes[row].length && scene.nodes[row][scene.nodes[row].length-1].obstacle_type != 1)
-        //scene.tracks[row].push(scene.add.image(x, y, "basic_straight_track").setScale(scene.scaling).setDepth(3));
-    //else
-    //scene.tracks[row].push(scene.add.image(x, y, "basic_track_end").setScale(scene.scaling).setDepth(3));
-}   
+    // spawnCoinRow(scene, x - (scene.node_interval*(1/6)), y, row, "straight");
+    if (Math.floor(Math.random() * 100) + 1 < 10) {
+        spawnCoinRow(scene, x-(scene.node_interval/2), y, row, "straight");
+    }
+}
+
+/*
+    spawn a series of coins
+*/
+function spawnCoinRow(scene, x, y, row, track_type) {
+    console.log("spawn coins");
+    let num_coins = 6;
+    let x_interval = Math.floor(scene.node_interval / num_coins);
+    let y_interval = 0;
+    if (track_type == "straight") {
+        x_interval = Math.floor(scene.node_interval / num_coins);
+        y_interval = 0;
+    }
+    else if (track_type == "up") {
+        x_interval = Math.floor((scene.node_interval/2) / num_coins);
+        y_interval = -Math.floor(scene.y_interval / num_coins);
+    }
+    else if (track_type == "down") {
+        x_interval = Math.floor((scene.node_interval/2) / num_coins);
+        y_interval = Math.floor(scene.y_interval / num_coins);
+    }
+    for (let i = 1; i <= num_coins; i++) {
+        scene.coins[row].push(scene.add.sprite(x+(i*x_interval), y+(i*y_interval), "coin").setScale(scene.scaling).setDepth(5));
+    }
+}
 
 /*
 spawn a set of nodes and generate junctions, obstacles, and signs for them
@@ -156,6 +202,13 @@ function spawnNodes(scene, x, y, station_row, row, can_have_obstacles) {
     scene.nodes[row].push(new Node(
         scene, x, y, "basic_node_track", row, n_junc, s_junc, junction_signs, obstacle_type
     ));
+    let coin_chance = Math.floor(Math.random() * 100) + 1;
+    if (coin_chance <= 10 && n_junc) {
+        spawnCoinRow(scene, x+(scene.x_unit*4), y, row, "up")
+    }
+    if (coin_chance > 5 && coin_chance <= 15 && s_junc) {
+        spawnCoinRow(scene, x+(scene.x_unit*4), y, row, "down")
+    }
 }
 
 /*
@@ -318,27 +371,20 @@ function checkSameRoute(scene, junction_signs, row) {
 
 function spawnStation(scene, x, y) {
     // chance to spawn a station on player's row per spawn
-    let random_station = Math.floor(Math.random() * 100)+1;
-    if (random_station <= scene.station_spawn_table[scene.station_spawn_index]) {
-        scene.station_spawn_index = 0;
-        let stationCount = Math.ceil(Math.random() * 6); // Possible 1-6 Passengers
-        let passengers = [];
-        for (let j = 0; j < stationCount; j++) {
-            passengers.push(new Passenger(
-                scene, x, y, "passenger 1", 0, scene.train.onTrack, 30000, 0
-            ));
-        }
-        // determine station types
-        let types = ["red square", "blue circle", "green triangle"];
-        let station_types = new Set();
-        let max_num_types = 1;
-        for (let i = 0; i < max_num_types; i++) {
-            let type = Math.floor(Math.random()*3)%3;
-            station_types.add(types[type]);
-        }
-        scene.stations.push(new Station(scene, x, y, "station", scene.train.onTrack, station_types, passengers));
+    let stationCount = Math.ceil(Math.random() * 6); // Possible 1-6 Passengers
+    let passengers = [];
+    for (let j = 0; j < stationCount; j++) {
+        passengers.push(new Passenger(
+            scene, x, y, "passenger 1", 0, scene.train.onTrack, 30000, 0
+        ));
     }
-    else if (scene.station_spawn_index < scene.station_spawn_table.length-1){
-        scene.station_spawn_index++;
+    // determine station types
+    let types = ["red square", "blue circle", "green triangle"];
+    let station_types = new Set();
+    let max_num_types = 1;
+    for (let i = 0; i < max_num_types; i++) {
+        let type = Math.floor(Math.random()*3)%3;
+        station_types.add(types[type]);
     }
+    scene.stations.push(new Station(scene, x, y, "station", scene.train.onTrack, station_types, passengers));
 }

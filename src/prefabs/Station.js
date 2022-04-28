@@ -5,7 +5,6 @@ class Station extends Phaser.GameObjects.Sprite {
 
         scene.add.existing(this);
         this.spawn_timer = 15;    // number of nodes it takes to spawn a station
-        this.sign_distance = 15;
         this.type = type;
         this.speed = scene.speed;
         this.dir_sign = false;
