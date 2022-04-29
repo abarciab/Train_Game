@@ -133,7 +133,8 @@ spawn a set of tracks on a row
 function spawnTracks(scene, x, y, row) {
     scene.tracks[row].push(scene.add.image(x, y, "basic_straight_track").setScale(scene.scaling).setDepth(3));
     // spawnCoinRow(scene, x - (scene.node_interval*(1/6)), y, row, "straight");
-    if (Math.floor(Math.random() * 100) + 1 < 10) {
+    let coin_chance = 10;
+    if (Math.floor(Math.random() * 100) + 1 < coin_chance) {
         spawnCoinRow(scene, x-(scene.node_interval/2), y, row, "straight");
     }
 }
@@ -142,20 +143,20 @@ function spawnTracks(scene, x, y, row) {
     spawn a series of coins
 */
 function spawnCoinRow(scene, x, y, row, track_type) {
-    let num_coins = 6;
-    let x_interval = Math.floor(scene.node_interval / num_coins);
+    let num_coins = 5;
+    let x_interval = scene.node_interval / num_coins;
     let y_interval = 0;
     if (track_type == "straight") {
-        x_interval = Math.floor(scene.node_interval / num_coins);
+        x_interval = scene.node_interval / num_coins;
         y_interval = 0;
     }
     else if (track_type == "up") {
-        x_interval = Math.floor((scene.node_interval/2) / num_coins);
-        y_interval = -Math.floor(scene.y_interval / num_coins);
+        x_interval = (scene.node_interval/2) / num_coins;
+        y_interval = -scene.y_interval / num_coins;
     }
     else if (track_type == "down") {
-        x_interval = Math.floor((scene.node_interval/2) / num_coins);
-        y_interval = Math.floor(scene.y_interval / num_coins);
+        x_interval = (scene.node_interval/2) / num_coins;
+        y_interval = scene.y_interval / num_coins;
     }
     for (let i = 1; i <= num_coins; i++) {
         scene.coins[row].push(scene.add.sprite(x+(i*x_interval), y+(i*y_interval), "coin").setScale(scene.scaling).setDepth(5));

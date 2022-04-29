@@ -178,7 +178,10 @@ class PlayGame extends Phaser.Scene {
                 value[i].x -= this.speed;
                 // check for collision
                 if (this.coinCollision(this.train, value[i])) {
-                    console.log("coin picked up");
+                    this.fuel += 500;
+                    if(this.fuel > this.train.fuelCapacity) {
+                        this.fuel = this.train.fuelCapacity;
+                    }
                     value[i].destroy();
                     value.splice(i, 1);
                     continue;
