@@ -26,6 +26,10 @@ class Train extends Phaser.GameObjects.Sprite {
         //this.wagons = [scene.add.container(x, y);]
         this.wagons = [];
         this.train_type = train_type;
+        this.enemy_indicator;
+        if (this.train_type == "enemy") {
+            this.enemy_indicator = scene.add.image(config.width*0.85, y, "enemy train indicator").setScale(scene.scaling*3).setDepth(8).setVisible(false);
+        }
 
         this.scaleX = scene.scaling;
         this.scaleY = scene.scaling;
@@ -33,59 +37,78 @@ class Train extends Phaser.GameObjects.Sprite {
     }
 
     update(timer, delta) {
-        // if turning, update dy depending on speed
-        if (this.turning) {
-            this.turn_wagons = true;
-            this.dt += delta/1000;
-            // amt of time it takes to change tracks
-            let turn_timer = (delta/1000)*(this.junction_wid / this.speed);
-            // how much the train has moved
-            let dy = this.track_y_interval / (turn_timer/(delta/1000));
-            if (this.dt < turn_timer) {
-                if (this.turn_dir == "north"){
-                    this.y -= dy;
-                } 
-                else if (this.turn_dir == "south") {
-                    this.y += dy;
-                }
+        if (this.train_type == "enemy" && this.enemy_indicator != undefined) {
+            this.x -= this.speed;
+            if (this.x < config.width) {
+                this.enemy_indicator.setVisible(false);
             }
-            else {
-                this.turning = false;
-                this.dt = 0;
-                this.y = this.turn_dest;
-                this.turn_dir = "straight";
-                this.wagons.forEach(element => {
-                    this.wagons.turning = false;
-                })
+            else if (this.x < config.width*2) {
+                console.log("show indc");
+                this.enemy_indicator.y = this.y;
+                this.enemy_indicator.setVisible(true);
             }
         }
+        // if turning, update dy depending on speed
+        if (this.turning) {
+            this.updateTurn(delta);
+        }
         if (this.turn_wagons) {
-            this.dx += this.speed;
-            if (this.dx >= this.wagon_point) {
-                this.dx = 0;
-                for (let i = 0; i < this.wagons.length; i++) {
-                    if (!this.wagons[i].turning && this.wagons[i].y != this.turn_dest) {
-                        if (this.turn_dir == "north") {
-                            this.wagons[i].onTrack--;
-                        }
-                        else if (this.turn_dir == "south") {
-                            this.wagons[i].onTrack++;
-                        }
-                        this.wagons[i].turning = true;
-                        this.wagons[i].done_turning = false;
-                        this.wagons[i].turn_dir = this.turn_dir;
-                        this.wagons[i].turn_dest = this.turn_dest;
-                        break;
+            this.updateWagonTurn(delta);
+        }
+    }
+
+    updateTurn(delta) {
+        this.turn_wagons = true;
+        this.dt += delta/1000;
+        // amt of time it takes to change tracks
+        let turn_timer = (delta/1000)*(this.junction_wid / this.speed);
+        // how much the train has moved
+        let dy = this.track_y_interval / (turn_timer/(delta/1000));
+        if (this.dt < turn_timer) {
+            if (this.turn_dir == "north"){
+                this.y -= dy;
+            } 
+            else if (this.turn_dir == "south") {
+                this.y += dy;
+            }
+        }
+        else {
+            this.turning = false;
+            this.dt = 0;
+            this.y = this.turn_dest;
+            this.turn_dir = "straight";
+            /*this.wagons.forEach(element => {
+                element.turning = false;
+            })*/
+        }
+    }
+    updateWagonTurn(delta) {
+        this.dx += this.speed;
+        if (this.dx >= this.wagon_point) {
+            this.dx = 0;
+            for (let i = 0; i < this.wagons.length; i++) {
+                if (!this.wagons[i].turning && this.wagons[i].y != this.turn_dest) {
+                    if (this.turn_dir == "north") {
+                        this.wagons[i].onTrack--;
                     }
-                    else if (this.wagons[i].done_turning) {
-                        this.wagons_turned++;
-                        this.wagons[i].done_turning = false;
+                    else if (this.turn_dir == "south") {
+                        this.wagons[i].onTrack++;
                     }
+                    this.wagons[i].turning = true;
+                    this.wagons[i].done_turning = false;
+                    this.wagons[i].turn_dir = this.turn_dir;
+                    this.wagons[i].turn_dest = this.turn_dest;
+                    break;
+                }
+                else if (this.wagons[i].done_turning) {
+                    this.wagons_turned++;
+                    this.wagons[i].turning = false;
+                    this.wagons[i].done_turning = false;
                 }
             }
-            if (this.wagons_turned >= this.wagons.length) {
-                this.turn_wagons = false;
-            }
+        }
+        if (this.wagons_turned >= this.wagons.length) {
+            this.turn_wagons = false;
         }
     }
 }

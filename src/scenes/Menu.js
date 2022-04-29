@@ -45,6 +45,7 @@ class Menu extends Phaser.Scene {
             this.load.image(`${sign} station sign`, `./assets/stations/${sign} station sign.png`);
             this.load.image(`${sign} station indicator`, `./assets/stations/${sign} station indicator.png`)
         }
+        this.load.image("enemy train indicator", "./assets/stations/red_square.png");
         
         //sounds
         this.load.audio('train_on_rails', './assets/sound effects/train on rails 2.mp3');

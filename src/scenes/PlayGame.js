@@ -129,11 +129,13 @@ class PlayGame extends Phaser.Scene {
     updateEnemyTrains(timer, delta) {
         for (let i = 0; i < this.enemy_trains.length; i++) {
             let train_destroyed = false;
-            this.enemy_trains[i].x -= (this.speed + 5);
+            this.enemy_trains[i].speed = this.speed + 5;
+            this.enemy_trains[i].update();
             // if they would crash into an obstacle, have them jump ;)
             for (let j = 0; j < this.nodes[this.enemy_trains[i].onTrack].length; j++) {
                 if (this.checkObstacleCollision(this.enemy_trains[i], this.nodes[this.enemy_trains[i].onTrack][j])) {
                     console.log("enemy train crashed");
+                    this.enemy_trains[i].enemy_indicator.setVisible(false);
                     this.enemy_trains[i].destroy();
                     this.enemy_trains.splice(i, 1);
                     train_destroyed = true;

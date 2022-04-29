@@ -112,7 +112,7 @@ function checkStationSpawn(scene, station_row, x) {
             station_row.add(station.onTrack);
             // move enemy trains off track the station is on
             scene.enemy_trains.forEach(train => {
-                if (train.x > config.width && train.onTrack == station.onTrack) {
+                if (train.x > config.width*1.5 && train.onTrack == station.onTrack) {
                     if (train.onTrack > 0) {
                         train.onTrack--;
                         train.y = scene.nodes[train.onTrack][0].y;
@@ -238,7 +238,7 @@ function spawnEnemyTrain(scene, x, y, row) {
         train.flipX = true;
         // move enemy trains off track the station is on
         scene.stations.forEach(station => {
-            if (train.onTrack == station.onTrack) {
+            if (train.onTrack == station.onTrack && station.visible) {
                 if (train.onTrack > 0) {
                     train.onTrack--;
                     train.y = scene.nodes[train.onTrack][0].y;
