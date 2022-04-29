@@ -41,6 +41,7 @@ class PlayGame extends Phaser.Scene {
         this.stations = [];         // list of stations.
         this.enemy_trains = []      // list of enemy trains
         this.coins = [];            // dict of coins
+        this.currency = 0;
         this.station_spawn_table = [0, 0, 0, 10, 10, 10, 20, 20, 20, 30];
         this.station_spawn_index = 0;
         this.trainyard_spawn_table = [];
@@ -207,10 +208,7 @@ class PlayGame extends Phaser.Scene {
             this.coins[i].x -= this.speed;
             // check for collision
             if (this.coinCollision(this.train, this.coins[i])) {
-                this.fuel += 500;
-                if(this.fuel > this.train.fuelCapacity) {
-                    this.fuel = this.train.fuelCapacity;
-                }
+                this.currency += 100;
                 this.coins[i].destroy();
                 this.coins.splice(i, 1);
                 continue;
@@ -424,7 +422,7 @@ class PlayGame extends Phaser.Scene {
         this.train.moving = false;
         this.fuel = this.train.fuelCapacity;
         
-        RemovePassengerIcons(this, station.station_type);
+        // RemovePassengerIcons(this, station.station_type);
 
         this.train.passengers.forEach(passenger => {
             if (station.station_type == passenger.destination) {

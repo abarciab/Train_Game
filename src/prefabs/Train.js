@@ -29,7 +29,7 @@ class Train extends Phaser.GameObjects.Sprite {
         this.train_type = train_type;
         this.enemy_indicator;
         if (this.train_type == "enemy") {
-            this.enemy_indicator = scene.add.image(config.width*0.85, y, "enemy train indicator").setScale(scene.scaling*3).setDepth(8).setVisible(false);
+            this.enemy_indicator = scene.add.image(config.width*0.85, y, "enemy train indicator").setScale(scene.scaling*2).setDepth(8).setVisible(false);
             this.flipX = true;
         }
 

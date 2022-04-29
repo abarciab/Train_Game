@@ -145,7 +145,7 @@ function spawnCoinRow(scene, x, y, track_type) {
         y_interval = scene.y_interval / num_coins;
     }
     for (let i = 1; i <= num_coins; i++) {
-        scene.coins.push(scene.add.sprite(x+(i*x_interval), y+(i*y_interval), "coin").setScale(scene.scaling).setDepth(5));
+        scene.coins.push(scene.add.sprite(x+(i*x_interval), y+(i*y_interval), "coin").setScale(scene.scaling/2).setDepth(5));
     }
 }
 
