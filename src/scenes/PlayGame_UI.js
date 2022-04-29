@@ -54,6 +54,7 @@ function LoadUI(scene){
     scene.load.image('UI_bar_backgrounds', './assets/UI/bottom bar.png');
     scene.load.image('GO_background', './assets/UI/game over background.png');
     scene.load.image('wagon_background', './assets/UI/wagon cutout background.png');
+    scene.load.image('locomotive_background', './assets/UI/locomotive cutout background.png');
 
     //fuel display
     scene.load.image('fuel_meter', './assets/UI/fuel meter.png');
@@ -66,10 +67,18 @@ function LoadUI(scene){
     scene.load.image('star_1/4', './assets/UI/UI star quarter.png');
     scene.load.image('star_0/4', './assets/UI/UI star empty.png');
 
+    //upgrade icons
+    scene.load.image('jump_icon', './assets/UI/jump upgrade icon.png');
+    scene.load.image('boost_icon', './assets/UI/speed boost upgrade icon.png');
+    scene.load.image('shield_icon', './assets/UI/protection upgrade icon.png');
+
     //sounds
     scene.load.audio('bad_review', './assets/sound effects/badreview.wav');
     scene.load.audio('board_train', './assets/sound effects/boardtrain sound.wav');
     scene.load.audio('good_review', './assets/sound effects/disembark sound.wav');
+
+   
+
 }
 
 function StartUI(scene){
@@ -80,10 +89,13 @@ function StartUI(scene){
     };
 
     //variables
-    this.front = 60;
-    this.iconGap = 80;
+    this.front = 490;
+    this.iconGap = 70;
     this.iconScale = 0.5;
     this.bottomBarYpos = game.config.height - 30;
+    this.abilityFront = 90;
+    this.abilityGap = 80;
+    this.abilityScale = 0.7;
 
     //passenger group
     this.numPassengers = 0;
@@ -92,10 +104,23 @@ function StartUI(scene){
     }
     this.passengers = scene.add.group(groupConfig);
 
-    //UI background
+    //normal UI background
     this.topBar = scene.add.image(game.config.width/2 + 230, 60, 'UI_bar_backgrounds').setOrigin(0.5).setScale(0.95, 1.4).setDepth(20);
-    //this.bottomBar= scene.add.image(game.config.width/2, this.bottomBarYpos, 'UI_bar_backgrounds').setOrigin(0.5).setScale(1.35, 1.5).setDepth(20);
-    this.bottomBar= scene.add.image(this.front + 190, this.bottomBarYpos, 'wagon_background').setOrigin(0.5).setScale(1.1, 1).setDepth(20);
+    this.locomotive = scene.add.image(250, this.bottomBarYpos, 'locomotive_background').setOrigin(0.5).setScale(1.3, 1).setDepth(20);
+        this.jumpAbility = scene.add.image(this.abilityFront, this.bottomBarYpos-30, 'jump_icon').setDepth(23).setScale(this.abilityScale).setOrigin(0.45);
+        this.boostAbility = scene.add.image(this.abilityFront + this.abilityGap*1, this.bottomBarYpos-30, 'boost_icon').setDepth(23).setScale(this.abilityScale).setOrigin(0.45);
+        this.protAbility = scene.add.image(this.abilityFront + this.abilityGap*2, this.bottomBarYpos-30, 'shield_icon').setDepth(23).setScale(this.abilityScale).setOrigin(0.45);
+        //this.jumpAbility = scene.add.image(80, this.bottomBarYpos-30, 'jump_icon').setDepth(23).setScale(0.8).setOrigin(0.45);
+        //this.jumpAbility = scene.add.image(80, this.bottomBarYpos-30, 'jump_icon').setDepth(23).setScale(0.8).setOrigin(0.45);
+    this.wagon1 = scene.add.image(this.front + 250, this.bottomBarYpos, 'wagon_background').setOrigin(0.5).setScale(1.3, 1).setDepth(20);
+    this.wagon2 = scene.add.image(this.front + 250 + this.wagon1.displayWidth, this.bottomBarYpos, 'wagon_background').setOrigin(0.5).setScale(1.3, 1).setDepth(20);
+
+    //trainyard UI
+    this.trainyardMenu = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5).setVisible(false);
+    this.jumpUpgradeShopIcon = scene.add.image(game.config.width/2, game.config.height/2, 'jump_icon').setDepth(23.1).setVisible(false);
+    this.boostUpgradeShopIcon = scene.add.image(game.config.width/2, game.config.height/2, 'boost_icon').setDepth(23.1).setVisible(false);
+    this.protUpgradeShopIcon = scene.add.image(game.config.width/2, game.config.height/2, 'shield_icon').setDepth(23.1).setVisible(false);
+
 
     //fuel display
     this.fuelMeter = scene.add.image(game.config.width - 200, this.bottomBarYpos-10, 'fuel_meter').setOrigin(0.5).setScale(0.55).setDepth(20);
@@ -118,9 +143,26 @@ function StartUI(scene){
     this.rating  = 20;
     displayRating();
 
-    this.instructionStage = 0;
+    //game over UI
+    this.darkColorBack = scene.add.rectangle(0, 0, game.config.width, game.config.height, '#000000').setAlpha(0.6).setScale(4).setDepth(22.9).setVisible(false);
+    this.gameOverBackground = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5).setVisible(false);
+    this.gameOverText = scene.add.text(game.config.width/2, game.config.height/2, "GAME OVER\nDistance traveled: " + Math.round(scene.dist).toLocaleString(undefined), this.textConfig)
+        .setDepth(23.1)
+        .setColor('#FFFFFF')
+        .setOrigin(0.5)
+        .setVisible(false);
+    this.restartText = scene.add.text(game.config.width/2, game.config.height/2 + this.gameOverText.displayHeight, "Press SPACE to restart", this.textConfig)
+        .setDepth(23.1)
+        .setColor('#FFFFFF')
+        .setOrigin(0.5)
+        .setVisible(false);
 
+    this.instructionStage = 0;
     scene.UIConfig.iconGap = this.iconGap;
+}
+
+function DisplayTrainyardUI(scene){
+
 }
 
 function UpdateUI(scene, delta){
@@ -145,6 +187,10 @@ function UpdateUI(scene, delta){
         this.rating = scene.train.health;
         displayRating();
     }
+}
+
+function updateAbilities(scene){
+
 }
 
 function displayRating(){
@@ -199,13 +245,14 @@ function addPasengerUI(scene, passenger){
             break;
     }
 
-    this.newPassIcon = new PassengerIcon(scene, this.front + (iconGap*numPassengers), bottomBarYpos, shape, passenger, numPassengers).setScale(this.iconScale).setDepth(25);
+    this.newPassIcon = new PassengerIcon(scene, this.front + (iconGap*numPassengers), bottomBarYpos-40, shape, passenger, numPassengers).setScale(this.iconScale).setDepth(22.8);
     this.passengers.add(newPassIcon);
 
     scene.sound.play('board_train', {volume: 0.5});
 }
 
-/*function RemovePassengerIcons(scene, stationName){
+//deprecated, don't use
+function RemovePassengerIcons(scene, stationName){
 
     for (i = 0; i < this.passengers.countActive(true); i++) {
         let passengerIcon = passengers.getChildren()[i];
@@ -235,7 +282,7 @@ function addPasengerUI(scene, passenger){
         passengerIcon.patienceBar.x = this.front + (scene.UIConfig.iconGap * (i+1));
     }
 
-}*/
+}
 
 function removePassengerIcon(scene, passenger){
 
@@ -306,15 +353,9 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
 function EndGameUI(scene){
     //console.log("endGame");
 
-    this.darkColorBack = scene.add.rectangle(0, 0, game.config.width, game.config.height, '#000000').setAlpha(0.1).setScale(4).setDepth(22.9);
-    this.gameOverBackground = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5).setAlpha;
-    this.gameOverText = scene.add.text(game.config.width/2, game.config.height/2, "GAME OVER\nDistance traveled: " + Math.round(scene.dist).toLocaleString(undefined), this.textConfig)
-        .setDepth(23.1)
-        .setColor('#FFFFFF')
-        .setOrigin(0.5);
-
-    this.restartText = scene.add.text(game.config.width/2, game.config.height/2 + this.gameOverText.displayHeight, "Press SPACE to restart", this.textConfig)
-        .setDepth(23.1)
-        .setColor('#FFFFFF')
-        .setOrigin(0.5);
+    this.darkColorBack.setVisible(true);
+    this.gameOverBackground.setVisible(true);
+    this.gameOverText.text = "GAME OVER\nDistance traveled: " + Math.round(scene.dist).toLocaleString(undefined);
+    gameOverText.setVisible(true);
+    this.restartText.setVisible(true);
 }
