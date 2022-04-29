@@ -4,6 +4,7 @@ the initial spawn for the world
 function initSpawn(scene) {
     // spawn one column of initial tracks first
     let can_have_obstacles = false;
+    let can_have_enemies = false;
     let obstacle_start = Math.floor(scene.num_chunks / 2);
     let obstacle_timer = 0;
     for (let i = 0; i < scene.num_tracks; i++) {
@@ -31,16 +32,18 @@ function initSpawn(scene) {
     // spawn the rest of tracks using the positions of the prespawned tracks
     for (let i = 0; i < scene.num_chunks-1; i++) {
         obstacle_timer++;
-        if (obstacle_timer >= obstacle_start)
+        if (obstacle_timer >= obstacle_start) {
             can_have_obstacles = true;
-        spawnWorldChunk(scene, can_have_obstacles);
+            can_have_enemies = true;
+        }
+        spawnWorldChunk(scene, can_have_obstacles, can_have_enemies);
     }
 }
 
 /*
 spawn a chunk of the world
 */
-function spawnWorldChunk(scene, can_have_obstacles) {
+function spawnWorldChunk(scene, can_have_obstacles, can_have_enemies) {
     let station_row = new Set();                // when a station spawns, what row it's on
     let prev_x = scene.tracks[0][scene.tracks[0].length-1].x; // x of previous track
 
@@ -53,6 +56,10 @@ function spawnWorldChunk(scene, can_have_obstacles) {
         spawnTracks(scene, prev_x+scene.node_interval, scene.tracks[i][0].y, i);
         // spawn the nodes
         spawnNodes(scene, prev_x+(scene.node_interval/2), scene.nodes[i][0].y, station_row, i, can_have_obstacles);
+
+        // chance to spawn enemy train
+        if (can_have_enemies)
+            spawnEnemyTrain(scene, prev_x+(scene.node_interval/2), scene.nodes[i][0].y, i);
     }
 
     // reset the stations
@@ -103,6 +110,19 @@ function checkStationSpawn(scene, station_row, x) {
             station.setVisible(true);
             station.x = x;
             station_row.add(station.onTrack);
+            // move enemy trains off track the station is on
+            scene.enemy_trains.forEach(train => {
+                if (train.x > config.width && train.onTrack == station.onTrack) {
+                    if (train.onTrack > 0) {
+                        train.onTrack--;
+                        train.y = scene.nodes[train.onTrack][0].y;
+                    }
+                    else {
+                        train.onTrack++;
+                        train.y = scene.nodes[train.onTrack][0].y;
+                    }
+                }
+            })
         }
     }
 }
@@ -122,7 +142,6 @@ function spawnTracks(scene, x, y, row) {
     spawn a series of coins
 */
 function spawnCoinRow(scene, x, y, row, track_type) {
-    console.log("spawn coins");
     let num_coins = 6;
     let x_interval = Math.floor(scene.node_interval / num_coins);
     let y_interval = 0;
@@ -181,11 +200,12 @@ function spawnNodes(scene, x, y, station_row, row, can_have_obstacles) {
     });
 
     if (can_have_obstacles) {
-        // 10% chance to spawn an obstacle if there is a junction to avoid it
+        // 10% chance to spawn rock if junction to avoid it
         let obstacle_chance = Math.floor(Math.random()*100)+1;
         if (obstacle_chance <= 10 && (n_junc || s_junc)) {
             obstacle_type = 1;
-        } else if (obstacle_chance <= 20 && (n_junc || s_junc)) {
+        } 
+        else if (obstacle_chance <= 30 && (n_junc || s_junc)) {
             obstacle_type = 2;
         }
     }
@@ -207,6 +227,28 @@ function spawnNodes(scene, x, y, station_row, row, can_have_obstacles) {
     }
     if (coin_chance > 5 && coin_chance <= 15 && s_junc) {
         spawnCoinRow(scene, x+(scene.x_unit*4), y, row, "down")
+    }
+}
+
+function spawnEnemyTrain(scene, x, y, row) {
+    if (Math.floor(Math.random()*100)+1 <= 5) {
+        scene.enemy_trains.push(new Train(scene, x, y, "basic_locomotive", row, "enemy").setOrigin(0, 0.5));
+        let train = scene.enemy_trains[scene.enemy_trains.length-1]
+        //scene.enemy_trains[scene.enemy_trains.length-1].displayOriginX = 0;
+        train.flipX = true;
+        // move enemy trains off track the station is on
+        scene.stations.forEach(station => {
+            if (train.onTrack == station.onTrack) {
+                if (train.onTrack > 0) {
+                    train.onTrack--;
+                    train.y = scene.nodes[train.onTrack][0].y;
+                }
+                else {
+                    train.onTrack++;
+                    train.y = scene.nodes[train.onTrack][0].y;
+                }
+            }
+        })
     }
 }
 
@@ -372,7 +414,7 @@ function spawnStation(scene, x, y) {
     let passengers = [];
     for (let j = 0; j < stationCount; j++) {
         let patienceTime = Math.ceil(Math.random()*240000) + 120000;
-        console.log(patienceTime);
+        // console.log(patienceTime);
         passengers.push(new Passenger(
             scene, x, y, "passenger 1", 0, scene.train.onTrack, patienceTime, 0
         ));

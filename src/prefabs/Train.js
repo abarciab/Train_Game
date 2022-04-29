@@ -1,5 +1,5 @@
 class Train extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, texture, initial_track) {
+    constructor(scene, x, y, texture, initial_track, train_type) {
         super(scene, x, y, texture);
     
         scene.add.existing(this);             // add object to existing scene
@@ -25,16 +25,11 @@ class Train extends Phaser.GameObjects.Sprite {
 
         //this.wagons = [scene.add.container(x, y);]
         this.wagons = [];
-        /*scene.add.existing(this.wagons);
-        this.wagons.setDepth(10);
-        this.wagons.scaleX = scene.scaling;
-        this.wagons.scaleY = scene.scaling;*/
-        
-        this.displayOriginX = 1;
+        this.train_type = train_type;
+
         this.scaleX = scene.scaling;
         this.scaleY = scene.scaling;
         this.setDepth(10);
-
     }
 
     update(timer, delta) {
