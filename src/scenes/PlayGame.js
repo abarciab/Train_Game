@@ -45,12 +45,20 @@ class PlayGame extends Phaser.Scene {
         this.station_spawn_index = 0;
         this.trainyard_spawn_table = [];
         this.trainyard_spawn_index = 0;
-        this.upgrades = {
-            "jump": 0,
-            "extra wagon": 0,
-            "protection": 0,
-            "speed boost": 0
+        this.station_types = ["red square", "blue circle", "green triangle"];
+        this.station_type_index = 0;
+        function Upgrade(name, price) {
+            this.name = name;
+            this.price = price;
+            this.num_bought = 0;
+            this.chosen = false;
         }
+        this.upgrades = [
+            new Upgrade("jump", 500),
+            new Upgrade("extra wagon", 1000),
+            new Upgrade("protection", 250),
+            new Upgrade("speed boost", 100)
+        ];
         for (let i = 0; i < 11; i++) {
             if (i < 5)
                 this.trainyard_spawn_table.push(0);
@@ -87,12 +95,13 @@ class PlayGame extends Phaser.Scene {
 
         // spawn the world initially
         this.train = new Train(this, config.width/10, 0, 'basic_locomotive', Math.floor(this.num_tracks/2), "player").setOrigin(1, 0.5);
-        this.train.x += this.train.displayWidth;
+        this.train.x += this.train.displayWidth*2;
 
         initSpawn(this);
         this.train.wagons.push(new Wagon(this, this.train.x-this.train.wagon_offset, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
         // if you want to add another wagon
-        // this.train.wagons.push(new Wagon(this, this.train.wagons[this.train.wagons.length-1].wagon_point, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
+        let recent_wagon = this.train.wagons[this.train.wagons.length-1];
+        this.train.wagons.push(new Wagon(this, recent_wagon.x-recent_wagon.wagon_offset, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
 
         // set fuel
         this.fuel = this.train.fuelCapacity;
@@ -370,10 +379,14 @@ class PlayGame extends Phaser.Scene {
             }
             // once stopped, enter station
             else if (this.stations[i].arriving_status == 2) {
-                this.enterStation(this.stations[i]);
+                if (this.stations[i].station_type != "trainyard")
+                    this.enterStation(this.stations[i]);
+                else {
+                    this.enterTrainyard(this.stations[i]);
+                }
                 this.stations[i].arriving_status = 3;
             }
-            // when done loading passengers, leave the station
+            // when done with station, leave station
             else if (this.stations[i].arrived_status == 4) {
                 let acc_dist = Math.abs((this.stations[i].station_point + this.stations[i].x)-this.train.x);
                 this.train.atStation = 0;
@@ -407,15 +420,14 @@ class PlayGame extends Phaser.Scene {
 
     enterStation(station) {
         this.train.atStation = 2;
-
         let stationTime = 2000;
         this.train.moving = false;
         this.fuel = this.train.fuelCapacity;
         
-        RemovePassengerIcons(this, Array.from(station.type)[0]);
+        RemovePassengerIcons(this, station.station_type);
 
         this.train.passengers.forEach(passenger => {
-            if (station.type.has(passenger.destination)) {
+            if (station.station_type == passenger.destination) {
                 passenger.onTrain = false;
                 if (passenger.goodReview == false) {
                     this.train.health -= 2;
@@ -467,5 +479,19 @@ class PlayGame extends Phaser.Scene {
                 // start patience timers
             }, null, this);
         }, null, this);
+    }
+
+    enterTrainyard(trainyard) {
+        this.train.atStation = 2;
+        this.train.moving = false;
+        console.log("enter trainyard");
+        for (let i = 0; i < trainyard.upgrades; i++) {
+            let upgrade = trainyard.upgrades[i];
+            console.log(upgrade, "available at yard");
+        }
+        let leave = this.time.delayedCall(2000, () => {
+            this.train.moving = true;
+            trainyard.arrived_status = 4;
+        });
     }
 }

@@ -19,7 +19,7 @@ class Train extends Phaser.GameObjects.Sprite {
         this.turn_dest = this.y;
         this.speed = scene.speed;
         this.dx = 0;
-        this.dt = 0;
+        this.dy = 0;
         this.turn_dir = "straight";
         this.wagon_turn_dir = this.turn_dir;
         this.track_y_interval = 64*6*scene.scaling;
@@ -53,7 +53,7 @@ class Train extends Phaser.GameObjects.Sprite {
             if (this.x < config.width) {
                 this.enemy_indicator.setVisible(false);
             }
-            else if (this.x < config.width*2) {
+            else if (this.x < config.width*3) {
                 this.enemy_indicator.y = this.y;
                 this.enemy_indicator.setVisible(true);
             }
@@ -69,23 +69,24 @@ class Train extends Phaser.GameObjects.Sprite {
 
     updateTurn(delta) {
         this.turn_wagons = true;
-        this.dt += delta/1000;
+        //this.dt += delta/1000;
         // amt of time it takes to change tracks
         let turn_timer = (delta/1000)*(this.junction_wid / this.speed);
         // how much the train has moved
-        let dy = this.track_y_interval / (turn_timer/(delta/1000));
-        if (this.dt < turn_timer) {
+        let y_per_frame = this.track_y_interval / (turn_timer/(delta/1000));
+        this.dy += y_per_frame;
+        if (this.dy < this.track_y_interval) {
             this.wagon_turn_dir = this.turn_dir;
             if (this.wagon_turn_dir == "north") {
-                this.y -= dy;
+                this.y -= y_per_frame;
             } 
             else if (this.wagon_turn_dir == "south") {
-                this.y += dy;
+                this.y += y_per_frame;
             }
         }
         else {
             this.turning = false;
-            this.dt = 0;
+            this.dy = 0;
             this.y = this.turn_dest;
             this.turn_dir = "straight";
             /*this.wagons.forEach(element => {
@@ -107,14 +108,12 @@ class Train extends Phaser.GameObjects.Sprite {
                     break;
                 }
                 else if (this.wagons[i].done_turning) {
-                    console.log("one wagon done turning");
                     this.wagons_turned++;
                     this.wagons[i].done_turning = false;
                 }
             }
         }
         if (this.wagons_turned >= this.wagons.length) {
-            console.log("done turning wagons");
             this.wagons_turned = 0;
             this.turn_wagons = false;
             this.dx = 0;
@@ -136,33 +135,37 @@ class Wagon extends Phaser.GameObjects.Sprite {
         this.junction_wid = (1184-192)*scene.scaling;
         this.track_y_interval = 64*6*scene.scaling;
         this.dx = 0;
-        this.dt = 0;
+        this.dy = 0;
+        //this.dt = 0;
         this.turn_dir = "straight";
         this.turn_dest = y;
 
         this.scaleX = scene.scaling;
         this.scaleY = scene.scaling;
         this.setDepth(10);
+
+        this.wagon_offset = this.displayWidth*0.95;
     }
     update(timer, delta) {
         if (this.turning) {
-            this.dt += delta/1000;
+            // this.dt += delta/1000;
             // amt of time it takes to change tracks
             let turn_timer = (delta/1000)*(this.junction_wid / this.speed);
             // how much the train has moved
-            let dy = this.track_y_interval / (turn_timer/(delta/1000));
-            if (this.dt < turn_timer) {
+            let y_per_frame = this.track_y_interval / (turn_timer/(delta/1000));
+            this.dy += y_per_frame;
+            if (this.dy < this.track_y_interval) {
                 if (this.turn_dir == "north") {
-                    this.y -= dy;
+                    this.y -= y_per_frame;
                 }
                 else if (this.turn_dir == "south") {
-                    this.y += dy;
+                    this.y += y_per_frame;
                 }
             }
             else {
                 this.done_turning = true;
                 this.turning = false;
-                this.dt = 0;
+                this.dy = 0;
                 this.y = this.turn_dest;
                 this.turn_dir = "straight";
             }
