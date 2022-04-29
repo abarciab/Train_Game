@@ -181,6 +181,8 @@ function displayRating(){
 }
 
 function addPasengerUI(scene, passenger){
+    //console.log("adding passenger with " + passenger.patience + " patience");
+
     this.numPassengers += 1;
     let shape;
 
@@ -258,11 +260,12 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
                 const colorObj = Phaser.Display.Color.Interpolate.ColorWithColor(this.green, this.red, 100, tween.getValue());
                 this.patienceBar.setTint(Phaser.Display.Color.GetColor(colorObj.r, colorObj.g, colorObj.b));
                 this.patienceBar.setScale(1-tween.getValue()/100, 1);
-                if (tween.getValue() == 100){       //this passenger is out of patience
+                if (tween.getValue() == 100){       
                     passenger.goodReview = false;
                     this.setAlpha(0.4);
                     scene.cameras.main.shake(50, 0.009);
                     scene.sound.play('bad_review', {volume: 0.8});
+                    //console.log("PATIENCE RUN OUT");
                 }
             }
         })
