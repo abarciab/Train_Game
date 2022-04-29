@@ -40,9 +40,27 @@ class PlayGame extends Phaser.Scene {
         this.nodes = {};            // key: track row, value: node objects
         this.stations = [];         // list of stations.
         this.enemy_trains = []      // list of enemy trains
-        this.coins = {};            // dict of coins
+        this.coins = [];            // dict of coins
         this.station_spawn_table = [0, 0, 0, 10, 10, 10, 20, 20, 20, 30];
         this.station_spawn_index = 0;
+        this.trainyard_spawn_table = [];
+        this.trainyard_spawn_index = 0;
+        this.upgrades = {
+            "jump": 0,
+            "extra wagon": 0,
+            "protection": 0,
+            "speed boost": 0
+        }
+        for (let i = 0; i < 11; i++) {
+            if (i < 5)
+                this.trainyard_spawn_table.push(0);
+            else if (i < 8)
+                this.trainyard_spawn_table.push(25);
+            else if (i < 10)
+                this.trainyard_spawn_table.push(50);
+            else
+                this.trainyard_spawn_table.push(100);
+        }
         this.gameOver = false;
 
         // initialize tracks and nodes to keys and empty lists
@@ -72,7 +90,7 @@ class PlayGame extends Phaser.Scene {
         this.train.x += this.train.displayWidth;
 
         initSpawn(this);
-        this.train.wagons.push(new Wagon(this, this.train.wagon_point, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
+        this.train.wagons.push(new Wagon(this, this.train.x-this.train.wagon_offset, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
         // if you want to add another wagon
         // this.train.wagons.push(new Wagon(this, this.train.wagons[this.train.wagons.length-1].wagon_point, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
 
@@ -129,11 +147,16 @@ class PlayGame extends Phaser.Scene {
     updateEnemyTrains(timer, delta) {
         for (let i = 0; i < this.enemy_trains.length; i++) {
             let train_destroyed = false;
-            this.enemy_trains[i].x -= (this.speed + 5);
+            this.enemy_trains[i].speed = this.speed + 5;
+            this.enemy_trains[i].update();
             // if they would crash into an obstacle, have them jump ;)
             for (let j = 0; j < this.nodes[this.enemy_trains[i].onTrack].length; j++) {
                 if (this.checkObstacleCollision(this.enemy_trains[i], this.nodes[this.enemy_trains[i].onTrack][j])) {
                     console.log("enemy train crashed");
+                    this.enemy_trains[i].enemy_indicator.setVisible(false);
+                    this.enemy_trains[i].wagons.forEach(wagon => {
+                        wagon.setVisible(false);
+                    })
                     this.enemy_trains[i].destroy();
                     this.enemy_trains.splice(i, 1);
                     train_destroyed = true;
@@ -171,21 +194,22 @@ class PlayGame extends Phaser.Scene {
     }
 
     updateCoins(delta) {
-        for (const[key, value] of Object.entries(this.coins)) {
-            for (let i = 0; i < value.length; i++) {
-                value[i].x -= this.speed;
-                // check for collision
-                if (this.coinCollision(this.train, value[i])) {
-                    console.log("coin picked up");
-                    value[i].destroy();
-                    value.splice(i, 1);
-                    continue;
+        for (let i = 0; i < this.coins.length; i++) {
+            this.coins[i].x -= this.speed;
+            // check for collision
+            if (this.coinCollision(this.train, this.coins[i])) {
+                this.fuel += 500;
+                if(this.fuel > this.train.fuelCapacity) {
+                    this.fuel = this.train.fuelCapacity;
                 }
+                this.coins[i].destroy();
+                this.coins.splice(i, 1);
+                continue;
+            }
 
-                if (value[i].x < -2*this.node_interval) {
-                    value[i].destroy();
-                    value.splice(i, 1);
-                }
+            if (this.coins[i].x < -2*this.node_interval) {
+                this.coins[i].destroy();
+                this.coins.splice(i, 1);
             }
         }
     }
@@ -383,7 +407,8 @@ class PlayGame extends Phaser.Scene {
 
     enterStation(station) {
         this.train.atStation = 2;
-        let stationTime = 5000;
+
+        let stationTime = 2000;
         this.train.moving = false;
         this.fuel = this.train.fuelCapacity;
         
