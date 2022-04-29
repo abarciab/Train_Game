@@ -21,6 +21,7 @@ class Train extends Phaser.GameObjects.Sprite {
         this.dx = 0;
         this.dt = 0;
         this.turn_dir = "straight";
+        this.wagon_turn_dir = this.turn_dir;
         this.track_y_interval = 64*6*scene.scaling;
 
         //this.wagons = [scene.add.container(x, y);]
@@ -30,7 +31,6 @@ class Train extends Phaser.GameObjects.Sprite {
         if (this.train_type == "enemy") {
             this.enemy_indicator = scene.add.image(config.width*0.85, y, "enemy train indicator").setScale(scene.scaling*3).setDepth(8).setVisible(false);
             this.flipX = true;
-            this.move_up = true;
         }
 
         this.scaleX = scene.scaling;
@@ -75,10 +75,11 @@ class Train extends Phaser.GameObjects.Sprite {
         // how much the train has moved
         let dy = this.track_y_interval / (turn_timer/(delta/1000));
         if (this.dt < turn_timer) {
-            if (this.turn_dir == "north"){
+            this.wagon_turn_dir = this.turn_dir;
+            if (this.wagon_turn_dir == "north") {
                 this.y -= dy;
             } 
-            else if (this.turn_dir == "south") {
+            else if (this.wagon_turn_dir == "south") {
                 this.y += dy;
             }
         }
@@ -97,28 +98,27 @@ class Train extends Phaser.GameObjects.Sprite {
         if (this.dx >= this.wagon_offset) {
             this.dx = 0;
             for (let i = 0; i < this.wagons.length; i++) {
-                if (!this.wagons[i].turning && this.wagons[i].y != this.turn_dest) {
-                    if (this.turn_dir == "north") {
-                        this.wagons[i].onTrack--;
-                    }
-                    else if (this.turn_dir == "south") {
-                        this.wagons[i].onTrack++;
-                    }
+                if (!this.wagons[i].turning && this.wagons[i].onTrack != this.onTrack) {
+                    this.wagons[i].onTrack = this.onTrack;
                     this.wagons[i].turning = true;
                     this.wagons[i].done_turning = false;
-                    this.wagons[i].turn_dir = this.turn_dir;
+                    this.wagons[i].turn_dir = this.wagon_turn_dir;
                     this.wagons[i].turn_dest = this.turn_dest;
                     break;
                 }
                 else if (this.wagons[i].done_turning) {
+                    console.log("one wagon done turning");
                     this.wagons_turned++;
-                    this.wagons[i].turning = false;
                     this.wagons[i].done_turning = false;
                 }
             }
         }
         if (this.wagons_turned >= this.wagons.length) {
+            console.log("done turning wagons");
+            this.wagons_turned = 0;
             this.turn_wagons = false;
+            this.dx = 0;
+            this.wagon_turn_dir = this.turn_dir;
         }
     }
 }
@@ -152,9 +152,9 @@ class Wagon extends Phaser.GameObjects.Sprite {
             // how much the train has moved
             let dy = this.track_y_interval / (turn_timer/(delta/1000));
             if (this.dt < turn_timer) {
-                if (this.turn_dir == "north"){
+                if (this.turn_dir == "north") {
                     this.y -= dy;
-                } 
+                }
                 else if (this.turn_dir == "south") {
                     this.y += dy;
                 }

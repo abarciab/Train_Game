@@ -43,6 +43,24 @@ class PlayGame extends Phaser.Scene {
         this.coins = [];            // dict of coins
         this.station_spawn_table = [0, 0, 0, 10, 10, 10, 20, 20, 20, 30];
         this.station_spawn_index = 0;
+        this.trainyard_spawn_table = [];
+        this.trainyard_spawn_index = 0;
+        this.upgrades = {
+            "jump": 0,
+            "extra wagon": 0,
+            "protection": 0,
+            "speed boost": 0
+        }
+        for (let i = 0; i < 11; i++) {
+            if (i < 5)
+                this.trainyard_spawn_table.push(0);
+            else if (i < 8)
+                this.trainyard_spawn_table.push(25);
+            else if (i < 10)
+                this.trainyard_spawn_table.push(50);
+            else
+                this.trainyard_spawn_table.push(100);
+        }
         this.gameOver = false;
 
         // initialize tracks and nodes to keys and empty lists
@@ -389,7 +407,8 @@ class PlayGame extends Phaser.Scene {
 
     enterStation(station) {
         this.train.atStation = 2;
-        let stationTime = 5000;
+
+        let stationTime = 2000;
         this.train.moving = false;
         this.fuel = this.train.fuelCapacity;
         

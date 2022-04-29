@@ -218,7 +218,8 @@ function spawnNodes(scene, x, y, station_row, row, can_have_obstacles) {
 }
 
 function spawnEnemyTrain(scene, x, y, row) {
-    if (Math.floor(Math.random()*100)+1 <= 5) {
+    let enemy_spawn_chance = 10;
+    if (Math.floor(Math.random()*100)+1 <= enemy_spawn_chance) {
         //scene.enemy_trains[scene.enemy_trains.length-1].displayOriginX = 0;
         // train.flipX = true;
         let can_spawn = true;
@@ -395,24 +396,41 @@ function checkSameRoute(scene, junction_signs, row) {
     } // end of row for
 }
 
+/*
+    chance to spawn station or trainyard
+*/
 function spawnStation(scene, x, y) {
-    // chance to spawn a station on player's row per spawn
-    let stationCount = Math.ceil(Math.random() * 6); // Possible 1-6 Passengers
-    let passengers = [];
-    for (let j = 0; j < stationCount; j++) {
-        let patienceTime = Math.ceil(Math.random()*240000) + 120000;
-        // console.log(patienceTime);
-        passengers.push(new Passenger(
-            scene, x, y, "passenger 1", 0, scene.train.onTrack, patienceTime, 0
-        ));
+    let isTrainyard = false;
+    if (Math.floor(Math.random()*100)+1 < scene.trainyard_spawn_table[scene.trainyard_spawn_index]) {
+        isTrainyard = true;
+        scene.trainyard_spawn_index = 0;
     }
-    // determine station types
-    let types = ["red square", "blue circle", "green triangle"];
-    let station_types = new Set();
-    let max_num_types = 1;
-    for (let i = 0; i < max_num_types; i++) {
-        let type = Math.floor(Math.random()*3)%3;
-        station_types.add(types[type]);
+    else {
+        scene.trainyard_spawn_index++;
+        // temp make sure trainyard doesnt spawn
+        scene.trainyard_spawn_index = 0;
     }
-    scene.stations.push(new Station(scene, x, y, "station", scene.train.onTrack, station_types, passengers));
+    if (!isTrainyard) {
+        // spawn a station
+        let stationCount = Math.ceil(Math.random() * 6); // Possible 1-6 Passengers
+        let passengers = [];
+        for (let j = 0; j < stationCount; j++) {
+            let patienceTime = Math.ceil(Math.random()*240000) + 120000;
+            passengers.push(new Passenger(
+                scene, x, y, "passenger 1", 0, scene.train.onTrack, patienceTime, 0
+            ));
+        }
+        // determine station types
+        let types = ["red square", "blue circle", "green triangle"];
+        let station_types = new Set();
+        let max_num_types = 1;
+        for (let i = 0; i < max_num_types; i++) {
+            let type = Math.floor(Math.random()*3)%3;
+            station_types.add(types[type]);
+        }
+        scene.stations.push(new Station(scene, x, y, "station", scene.train.onTrack, station_types, passengers));
+    }
+    else {
+        scene.stations.push(new Station(scene, x, y, "station", scene.train.onTrack, new Set("trainyard"), scene.upgrades));
+    }
 }

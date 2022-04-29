@@ -1,6 +1,6 @@
 class Station extends Phaser.GameObjects.Sprite {
     // type: array of all the passenger types that can be dropped off at the station.
-    constructor(scene, x, y, texture, initial_track, type, passengers) {
+    constructor(scene, x, y, texture, initial_track, type, station_contents) {
         super(scene, x, y, texture);
 
         scene.add.existing(this);
@@ -8,7 +8,11 @@ class Station extends Phaser.GameObjects.Sprite {
         this.type = type;
         this.speed = scene.speed;
         this.dir_sign = false;
-        this.passengers = passengers;      // list of passengers at station
+
+        // possible containers
+        this.passengers;
+        this.upgrades;
+
         this.onTrack = initial_track;
         this.moved = false;
         this.visible = false;
@@ -18,11 +22,19 @@ class Station extends Phaser.GameObjects.Sprite {
         this.arriving_status = 0;
         this.stop_dist;
         this.dt = 0;
+        this.sign;
         // this.arriving = 0;
         //this.stopX = this.x + 1300;
         
-        let station_type = Array.from(this.type)[0];    
-        this.sign = scene.add.image(x, y, `${station_type} station sign`).setScale(scene.scaling).setDepth(8);
+        let station_type = Array.from(this.type)[0];   
+        if (station_type != "trainyard") {
+            this.passengers = station_contents;      // list of passengers at station
+            this.sign = scene.add.image(x, y, `${station_type} station sign`).setScale(scene.scaling).setDepth(8);
+        }
+        else {
+            // choose 3 random types from
+        }
+
         this.indicator = scene.add.image(config.width*0.9, y, `${station_type} station indicator`).setScale(scene.scaling*2).setDepth(8).setVisible(false);
 
         this.scaleX = scene.scaling;
