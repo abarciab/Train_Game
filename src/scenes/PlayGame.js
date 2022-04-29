@@ -40,7 +40,7 @@ class PlayGame extends Phaser.Scene {
         this.nodes = {};            // key: track row, value: node objects
         this.stations = [];         // list of stations.
         this.enemy_trains = []      // list of enemy trains
-        this.coins = {};            // dict of coins
+        this.coins = [];            // dict of coins
         this.station_spawn_table = [0, 0, 0, 10, 10, 10, 20, 20, 20, 30];
         this.station_spawn_index = 0;
         this.gameOver = false;
@@ -72,7 +72,7 @@ class PlayGame extends Phaser.Scene {
         this.train.x += this.train.displayWidth;
 
         initSpawn(this);
-        this.train.wagons.push(new Wagon(this, this.train.wagon_point, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
+        this.train.wagons.push(new Wagon(this, this.train.x-this.train.wagon_offset, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
         // if you want to add another wagon
         // this.train.wagons.push(new Wagon(this, this.train.wagons[this.train.wagons.length-1].wagon_point, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
 
@@ -136,6 +136,9 @@ class PlayGame extends Phaser.Scene {
                 if (this.checkObstacleCollision(this.enemy_trains[i], this.nodes[this.enemy_trains[i].onTrack][j])) {
                     console.log("enemy train crashed");
                     this.enemy_trains[i].enemy_indicator.setVisible(false);
+                    this.enemy_trains[i].wagons.forEach(wagon => {
+                        wagon.setVisible(false);
+                    })
                     this.enemy_trains[i].destroy();
                     this.enemy_trains.splice(i, 1);
                     train_destroyed = true;
@@ -173,24 +176,22 @@ class PlayGame extends Phaser.Scene {
     }
 
     updateCoins(delta) {
-        for (const[key, value] of Object.entries(this.coins)) {
-            for (let i = 0; i < value.length; i++) {
-                value[i].x -= this.speed;
-                // check for collision
-                if (this.coinCollision(this.train, value[i])) {
-                    this.fuel += 500;
-                    if(this.fuel > this.train.fuelCapacity) {
-                        this.fuel = this.train.fuelCapacity;
-                    }
-                    value[i].destroy();
-                    value.splice(i, 1);
-                    continue;
+        for (let i = 0; i < this.coins.length; i++) {
+            this.coins[i].x -= this.speed;
+            // check for collision
+            if (this.coinCollision(this.train, this.coins[i])) {
+                this.fuel += 500;
+                if(this.fuel > this.train.fuelCapacity) {
+                    this.fuel = this.train.fuelCapacity;
                 }
+                this.coins[i].destroy();
+                this.coins.splice(i, 1);
+                continue;
+            }
 
-                if (value[i].x < -2*this.node_interval) {
-                    value[i].destroy();
-                    value.splice(i, 1);
-                }
+            if (this.coins[i].x < -2*this.node_interval) {
+                this.coins[i].destroy();
+                this.coins.splice(i, 1);
             }
         }
     }

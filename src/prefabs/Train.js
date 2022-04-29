@@ -13,6 +13,7 @@ class Train extends Phaser.GameObjects.Sprite {
         this.moving = true;                   // tracks if train needs to deplete fuel
         this.junction_wid = (1184-192)*scene.scaling;   // width of a junction to travel x-wards
         this.turning = false;                 // if the train is turning or not
+        this.jumping = false;                 // if the train is jumping or not
         this.turn_wagons = false;             // if the wagons are turning
         this.wagons_turned = 0;               // number of wagons turned
         this.turn_dest = this.y;
@@ -21,7 +22,6 @@ class Train extends Phaser.GameObjects.Sprite {
         this.dt = 0;
         this.turn_dir = "straight";
         this.track_y_interval = 64*6*scene.scaling;
-        this.wagon_point = this.displayWidth * 0.7 * scene.scaling;
 
         //this.wagons = [scene.add.container(x, y);]
         this.wagons = [];
@@ -29,21 +29,31 @@ class Train extends Phaser.GameObjects.Sprite {
         this.enemy_indicator;
         if (this.train_type == "enemy") {
             this.enemy_indicator = scene.add.image(config.width*0.85, y, "enemy train indicator").setScale(scene.scaling*3).setDepth(8).setVisible(false);
+            this.flipX = true;
+            this.move_up = true;
         }
 
         this.scaleX = scene.scaling;
         this.scaleY = scene.scaling;
         this.setDepth(10);
+
+        this.wagon_offset = this.displayWidth * 1.4;
     }
 
     update(timer, delta) {
         if (this.train_type == "enemy" && this.enemy_indicator != undefined) {
             this.x -= this.speed;
+            this.wagons.forEach(wagon => {
+                wagon.x -= this.speed;
+                if (wagon.onTrack != this.onTrack) {
+                    wagon.onTrack = this.onTrack;
+                    wagon.y = this.y;
+                }
+            })
             if (this.x < config.width) {
                 this.enemy_indicator.setVisible(false);
             }
             else if (this.x < config.width*2) {
-                console.log("show indc");
                 this.enemy_indicator.y = this.y;
                 this.enemy_indicator.setVisible(true);
             }
@@ -84,7 +94,7 @@ class Train extends Phaser.GameObjects.Sprite {
     }
     updateWagonTurn(delta) {
         this.dx += this.speed;
-        if (this.dx >= this.wagon_point) {
+        if (this.dx >= this.wagon_offset) {
             this.dx = 0;
             for (let i = 0; i < this.wagons.length; i++) {
                 if (!this.wagons[i].turning && this.wagons[i].y != this.turn_dest) {

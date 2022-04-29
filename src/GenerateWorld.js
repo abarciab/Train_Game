@@ -110,19 +110,6 @@ function checkStationSpawn(scene, station_row, x) {
             station.setVisible(true);
             station.x = x;
             station_row.add(station.onTrack);
-            // move enemy trains off track the station is on
-            scene.enemy_trains.forEach(train => {
-                if (train.x > config.width*1.5 && train.onTrack == station.onTrack) {
-                    if (train.onTrack > 0) {
-                        train.onTrack--;
-                        train.y = scene.nodes[train.onTrack][0].y;
-                    }
-                    else {
-                        train.onTrack++;
-                        train.y = scene.nodes[train.onTrack][0].y;
-                    }
-                }
-            })
         }
     }
 }
@@ -132,17 +119,16 @@ spawn a set of tracks on a row
 */
 function spawnTracks(scene, x, y, row) {
     scene.tracks[row].push(scene.add.image(x, y, "basic_straight_track").setScale(scene.scaling).setDepth(3));
-    // spawnCoinRow(scene, x - (scene.node_interval*(1/6)), y, row, "straight");
     let coin_chance = 10;
     if (Math.floor(Math.random() * 100) + 1 < coin_chance) {
-        spawnCoinRow(scene, x-(scene.node_interval/2), y, row, "straight");
+        spawnCoinRow(scene, x-(scene.node_interval/2), y, "straight");
     }
 }
 
 /*
     spawn a series of coins
 */
-function spawnCoinRow(scene, x, y, row, track_type) {
+function spawnCoinRow(scene, x, y, track_type) {
     let num_coins = 5;
     let x_interval = scene.node_interval / num_coins;
     let y_interval = 0;
@@ -159,7 +145,7 @@ function spawnCoinRow(scene, x, y, row, track_type) {
         y_interval = scene.y_interval / num_coins;
     }
     for (let i = 1; i <= num_coins; i++) {
-        scene.coins[row].push(scene.add.sprite(x+(i*x_interval), y+(i*y_interval), "coin").setScale(scene.scaling).setDepth(5));
+        scene.coins.push(scene.add.sprite(x+(i*x_interval), y+(i*y_interval), "coin").setScale(scene.scaling).setDepth(5));
     }
 }
 
@@ -224,32 +210,32 @@ function spawnNodes(scene, x, y, station_row, row, can_have_obstacles) {
     ));
     let coin_chance = Math.floor(Math.random() * 100) + 1;
     if (coin_chance <= 10 && n_junc) {
-        spawnCoinRow(scene, x+(scene.x_unit*4), y, row, "up")
+        spawnCoinRow(scene, x+(scene.x_unit*4), y, "up")
     }
     if (coin_chance > 5 && coin_chance <= 15 && s_junc) {
-        spawnCoinRow(scene, x+(scene.x_unit*4), y, row, "down")
+        spawnCoinRow(scene, x+(scene.x_unit*4), y, "down")
     }
 }
 
 function spawnEnemyTrain(scene, x, y, row) {
     if (Math.floor(Math.random()*100)+1 <= 5) {
-        scene.enemy_trains.push(new Train(scene, x, y, "basic_locomotive", row, "enemy").setOrigin(0, 0.5));
-        let train = scene.enemy_trains[scene.enemy_trains.length-1]
         //scene.enemy_trains[scene.enemy_trains.length-1].displayOriginX = 0;
-        train.flipX = true;
-        // move enemy trains off track the station is on
+        // train.flipX = true;
+        let can_spawn = true;
         scene.stations.forEach(station => {
-            if (train.onTrack == station.onTrack && station.visible) {
-                if (train.onTrack > 0) {
-                    train.onTrack--;
-                    train.y = scene.nodes[train.onTrack][0].y;
-                }
-                else {
-                    train.onTrack++;
-                    train.y = scene.nodes[train.onTrack][0].y;
-                }
-            }
-        })
+            if (row == station.onTrack && station.visible)
+                can_spawn = false;
+        });
+        if (can_spawn) {
+            scene.enemy_trains.push(new Train(scene, x, y, "enemy_locomotive", row, "enemy").setOrigin(0, 0.5));
+            let train = scene.enemy_trains[scene.enemy_trains.length-1]
+
+            train.wagons.push(new Wagon(scene, train.x+train.wagon_offset*1.05, train.y, 'enemy_cargo_wagon', train.onTrack).setDepth(9));
+            train.wagons[train.wagons.length-1].flipX = true;
+        }
+        else {
+            console.log("share tracks wt station; cant spawn");
+        }
     }
 }
 
