@@ -50,9 +50,10 @@ function LoadUI(scene){
     //passenger patience
     scene.load.image('patience_bar', './assets/UI/passenger patience.png');
 
-    //ggrey backdrop for UI
+    //grey backdrop for UI
     scene.load.image('UI_bar_backgrounds', './assets/UI/bottom bar.png');
     scene.load.image('GO_background', './assets/UI/game over background.png');
+    scene.load.image('wagon_background', './assets/UI/wagon cutout background.png');
 
     //fuel display
     scene.load.image('fuel_meter', './assets/UI/fuel meter.png');
@@ -82,7 +83,7 @@ function StartUI(scene){
     this.front = 60;
     this.iconGap = 80;
     this.iconScale = 0.5;
-    this.bottomBarYpos = game.config.height - 60;
+    this.bottomBarYpos = game.config.height - 30;
 
     //passenger group
     this.numPassengers = 0;
@@ -93,7 +94,8 @@ function StartUI(scene){
 
     //UI background
     this.topBar = scene.add.image(game.config.width/2 + 230, 60, 'UI_bar_backgrounds').setOrigin(0.5).setScale(0.95, 1.4).setDepth(20);
-    this.bottomBar= scene.add.image(game.config.width/2, this.bottomBarYpos, 'UI_bar_backgrounds').setOrigin(0.5).setScale(1.35, 1.5).setDepth(20);
+    //this.bottomBar= scene.add.image(game.config.width/2, this.bottomBarYpos, 'UI_bar_backgrounds').setOrigin(0.5).setScale(1.35, 1.5).setDepth(20);
+    this.bottomBar= scene.add.image(this.front + 190, this.bottomBarYpos, 'wagon_background').setOrigin(0.5).setScale(1.1, 1).setDepth(20);
 
     //fuel display
     this.fuelMeter = scene.add.image(game.config.width - 200, this.bottomBarYpos-10, 'fuel_meter').setOrigin(0.5).setScale(0.55).setDepth(20);
@@ -181,7 +183,6 @@ function displayRating(){
 }
 
 function addPasengerUI(scene, passenger){
-    //console.log("adding passenger with " + passenger.patience + " patience");
 
     this.numPassengers += 1;
     let shape;
@@ -204,7 +205,7 @@ function addPasengerUI(scene, passenger){
     scene.sound.play('board_train', {volume: 0.5});
 }
 
-function RemovePassengerIcons(scene, stationName){
+/*function RemovePassengerIcons(scene, stationName){
 
     for (i = 0; i < this.passengers.countActive(true); i++) {
         let passengerIcon = passengers.getChildren()[i];
@@ -234,6 +235,30 @@ function RemovePassengerIcons(scene, stationName){
         passengerIcon.patienceBar.x = this.front + (scene.UIConfig.iconGap * (i+1));
     }
 
+}*/
+
+function removePassengerIcon(scene, passenger){
+
+    let passengerIcon = passenger.passengerIcon;
+
+    if (passengerIcon.goodReview != false){
+        console.log("good review");
+        scene.sound.play('good_review', {volume: 0.8});
+    } 
+
+    //passengerIcon.passengerObj.disembark(scene);
+    passengerIcon.patienceBar.destroy();
+    this.passengers.remove(passengerIcon, true, true);
+
+    this.numPassengers -= 1;
+
+    for (i = 0; i < this.passengers.countActive(true); i++) {
+        let passengerIcon = passengers.getChildren()[i];
+
+        passengerIcon.x = this.front + (scene.UIConfig.iconGap * (i+1));
+        passengerIcon.patienceBar.x = this.front + (scene.UIConfig.iconGap * (i+1));
+    }
+
 }
 
 class PassengerIcon extends Phaser.GameObjects.Sprite {
@@ -247,7 +272,6 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
         this.patience = passenger.patience;
 
         //change color of patience bar from green to red and make it shrink over time
-        //console.log("adding passengerUI")
         this.green = Phaser.Display.Color.ValueToColor('#03fc13');
         this.red = Phaser.Display.Color.ValueToColor('#fc0303');
         scene.tweens.addCounter({
@@ -270,9 +294,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
             }
         })
 
-        this.ID = Phaser.Math.Between(0, 999);
-
-        this.slot = slot;
+        passenger.passengerIcon = this;
     }
 
     printPassengerIcon(){
