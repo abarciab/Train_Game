@@ -41,6 +41,7 @@ class Menu extends Phaser.Scene {
                     this.load.image(`${sign_shapes[i]} ${sign_dirs[j]}`, `./assets/track signs/${sign_shapes[i]} ${sign_dirs[j]}.png`);
             }
         }
+        this.load.image("trainyard station sign", './assets/stations/red_square.png');
         for (let i = 0; i < sign_shapes.length-1; i++) {
             let sign = sign_shapes[i];
             this.load.image(`${sign} station sign`, `./assets/stations/${sign} station sign.png`);

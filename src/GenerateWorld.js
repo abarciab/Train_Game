@@ -218,10 +218,8 @@ function spawnNodes(scene, x, y, station_row, row, can_have_obstacles) {
 }
 
 function spawnEnemyTrain(scene, x, y, row) {
-    let enemy_spawn_chance = 10;
+    let enemy_spawn_chance = 5;
     if (Math.floor(Math.random()*100)+1 <= enemy_spawn_chance) {
-        //scene.enemy_trains[scene.enemy_trains.length-1].displayOriginX = 0;
-        // train.flipX = true;
         let can_spawn = true;
         scene.stations.forEach(station => {
             if (row == station.onTrack && station.visible)
@@ -283,12 +281,10 @@ function generateStationRoute(scene, junction_signs, row, n_junc, s_junc) {
                     sign_dir = "down";
                     station.onTrack++;
                 }
-                // only make the sign if within the distance for signs to spawn; add station types to the junction sign
+                // only make the sign if within the distance for signs to spawn; add station type to the junction sign
                 if (!(sign_dir in junction_signs))
                     junction_signs[sign_dir] = new Set();
-                Array.from(station.type).forEach(element => {
-                    junction_signs[sign_dir].add(element);
-                });
+                junction_signs[sign_dir].add(station.station_type);
                 station.moved = true; // make it so station can't move multiple times per column
                 // set the station's y to the row it's now on
                 station.y = scene.nodes[station.onTrack][0].y;
@@ -307,9 +303,7 @@ function generateStationRoute(scene, junction_signs, row, n_junc, s_junc) {
             if (sign_dir != undefined) {
                 if (!(sign_dir in junction_signs))
                     junction_signs[sign_dir] = new Set();
-                Array.from(station.type).forEach(element => {
-                    junction_signs[sign_dir].add(element);
-                });
+                junction_signs[sign_dir].add(station.station_type);
             }
         }
     }
@@ -408,7 +402,7 @@ function spawnStation(scene, x, y) {
     else {
         scene.trainyard_spawn_index++;
         // temp make sure trainyard doesnt spawn
-        scene.trainyard_spawn_index = 0;
+        // scene.trainyard_spawn_index = 0;
     }
     if (!isTrainyard) {
         // spawn a station
@@ -420,17 +414,13 @@ function spawnStation(scene, x, y) {
                 scene, x, y, "passenger 1", 0, scene.train.onTrack, patienceTime, 0
             ));
         }
-        // determine station types
-        let types = ["red square", "blue circle", "green triangle"];
-        let station_types = new Set();
-        let max_num_types = 1;
-        for (let i = 0; i < max_num_types; i++) {
-            let type = Math.floor(Math.random()*3)%3;
-            station_types.add(types[type]);
-        }
-        scene.stations.push(new Station(scene, x, y, "station", scene.train.onTrack, station_types, passengers));
+        // determine station type
+        let station_type = scene.station_types[scene.station_type_index];
+        scene.station_type_index = (scene.station_type_index + 1) % 3; 
+        scene.stations.push(new Station(scene, x, y, "station", scene.train.onTrack, station_type, passengers));
     }
     else {
-        scene.stations.push(new Station(scene, x, y, "station", scene.train.onTrack, new Set("trainyard"), scene.upgrades));
+        console.log("spawn trainyard");
+        scene.stations.push(new Station(scene, x, y, "station", scene.train.onTrack, "trainyard", scene.upgrades));
     }
 }
