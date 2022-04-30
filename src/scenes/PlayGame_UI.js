@@ -10,7 +10,7 @@
 this.textConfig = {
     frontFamily: 'Courier',
     fontSize: '28px',
-    color: '#000000',
+    color: '#FFFFFF',
     align: 'center',
 }
 
@@ -70,6 +70,9 @@ function LoadUI(scene){
     //upgrade icons
     scene.load.image('jump_icon', './assets/UI/jump upgrade icon.png');
     scene.load.image('boost_icon', './assets/UI/speed boost upgrade icon.png');
+    scene.load.image('coin_icon', './assets/obstacles/coin pickup.png');
+
+    //coin
     scene.load.image('shield_icon', './assets/UI/protection upgrade icon.png');
 
     //sounds
@@ -93,9 +96,9 @@ function StartUI(scene){
     this.iconGap = 70;
     this.iconScale = 0.5;
     this.bottomBarYpos = game.config.height - 30;
-    this.abilityFront = 90;
+    this.abilityFront = 1000;
     this.abilityGap = 80;
-    this.abilityScale = 0.7;
+    this.abilityScale = 0.6;
 
     //passenger group
     this.numPassengers = 0;
@@ -106,12 +109,16 @@ function StartUI(scene){
 
     //normal UI background
     this.topBar = scene.add.image(game.config.width/2 + 230, 60, 'UI_bar_backgrounds').setOrigin(0.5).setScale(0.95, 1.4).setDepth(20);
+        // coins
+        this.coinIcon = scene.add.image(580, this.topBar.y-6, 'coin_icon').setDepth(22.8).setScale(0.35).setOrigin(0.45);
+        textConfig.align = 'right';
+        this.coinDisplay = scene.add.text(630, this.topBar.y-3, "10", this.textConfig).setOrigin(0.5).setDepth(22.8);
+        textConfig.align = 'center';
+        // abilities
+        this.jumpAbility = scene.add.image(this.abilityFront, this.topBar.y-6, 'jump_icon').setDepth(22.8).setScale(this.abilityScale).setOrigin(0.45);
+        this.boostAbility = scene.add.image(this.abilityFront + this.abilityGap*1, this.topBar.y-6, 'boost_icon').setDepth(22.8).setScale(this.abilityScale).setOrigin(0.45);
+        this.protAbility = scene.add.image(this.abilityFront + this.abilityGap*2, this.topBar.y-6, 'shield_icon').setDepth(22.8).setScale(this.abilityScale).setOrigin(0.45);
     this.locomotive = scene.add.image(250, this.bottomBarYpos, 'locomotive_background').setOrigin(0.5).setScale(1.3, 1).setDepth(20);
-        this.jumpAbility = scene.add.image(this.abilityFront, this.bottomBarYpos-30, 'jump_icon').setDepth(23).setScale(this.abilityScale).setOrigin(0.45);
-        this.boostAbility = scene.add.image(this.abilityFront + this.abilityGap*1, this.bottomBarYpos-30, 'boost_icon').setDepth(23).setScale(this.abilityScale).setOrigin(0.45);
-        this.protAbility = scene.add.image(this.abilityFront + this.abilityGap*2, this.bottomBarYpos-30, 'shield_icon').setDepth(23).setScale(this.abilityScale).setOrigin(0.45);
-        //this.jumpAbility = scene.add.image(80, this.bottomBarYpos-30, 'jump_icon').setDepth(23).setScale(0.8).setOrigin(0.45);
-        //this.jumpAbility = scene.add.image(80, this.bottomBarYpos-30, 'jump_icon').setDepth(23).setScale(0.8).setOrigin(0.45);
     this.wagon1 = scene.add.image(this.front + 250, this.bottomBarYpos, 'wagon_background').setOrigin(0.5).setScale(1.3, 1).setDepth(20);
     this.wagon2 = scene.add.image(this.front + 250 + this.wagon1.displayWidth, this.bottomBarYpos, 'wagon_background').setOrigin(0.5).setScale(1.3, 1).setDepth(20);
 
@@ -129,9 +136,10 @@ function StartUI(scene){
     //distance display
     this.distDisplay = scene.add.text(game.config.width*0.85, this.topBar.y, "Dist: 20,000m", this.textConfig).setOrigin(0.5).setDepth(20);
     this.distDisplay.setColor('#FFFFFF');
+    
     //biome display
-    this.biomeBar = scene.add.image(game.config.width/2 + 60, this.topBar.y, 'biome_bar_fields').setDepth(20);
-    this.biomeBarCursor = scene.add.image(game.config.width/2 + 60, this.topBar.y, 'biome_cursor_fields').setDepth(20);
+    //this.biomeBar = scene.add.image(game.config.width/2 + 60, this.topBar.y, 'biome_bar_fields').setDepth(20);
+    //this.biomeBarCursor = scene.add.image(game.config.width/2 + 60, this.topBar.y, 'biome_cursor_fields').setDepth(20);
 
     //stars
     let starWidth = 80;
@@ -175,11 +183,11 @@ function UpdateUI(scene, delta){
     //update fuel display
     this.fuelNeedle.angle = ( (scene.fuel/scene.train.fuelCapacity) * 180) - 90;
 
-    //update distance display and biome display
+    /*//update distance display and biome display
     biomeBarCursor.x += (delta * scene.speed)/5000;
     if (biomeBarCursor.x > biomeBar.x + biomeBar.displayWidth-40){
         biomeBarCursor.x = game.config.width/2 + 60
-    }
+    }*/
     this.distDisplay.text = "Dist: " + Math.round(scene.dist).toLocaleString(undefined) + "m";
 
     //update star display, if needed
