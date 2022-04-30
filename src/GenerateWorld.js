@@ -232,9 +232,6 @@ function spawnEnemyTrain(scene, x, y, row) {
             train.wagons.push(new Wagon(scene, train.x+train.wagon_offset*1.05, train.y, 'enemy_cargo_wagon', train.onTrack).setDepth(9));
             train.wagons[train.wagons.length-1].flipX = true;
         }
-        else {
-            console.log("share tracks wt station; cant spawn");
-        }
     }
 }
 
@@ -399,7 +396,7 @@ function spawnStation(scene, x, y) {
         isTrainyard = true;
         scene.trainyard_spawn_index = 0;
     }
-    else {
+    else if (scene.trainyard_spawn_index < scene.trainyard_spawn_table.length) {
         scene.trainyard_spawn_index++;
         // temp make sure trainyard doesnt spawn
         // scene.trainyard_spawn_index = 0;
