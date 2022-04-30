@@ -31,7 +31,10 @@ class PlayGame extends Phaser.Scene {
         D_key = this.input.keyboard.addKey('D');
         // key code 37 = left key, 39 = right key
         left_key = this.input.keyboard.addKey(37);
+        up_key = this.input.keyboard.addKey(38);
         right_key = this.input.keyboard.addKey(39);
+        down_key = this.input.keyboard.addKey(40);
+
         space_bar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.base_interval = 64*6;  // base unscaled interval between rows of tracks
         this.num_tracks = 4;        // number of rows of tracks
@@ -162,7 +165,6 @@ class PlayGame extends Phaser.Scene {
             // if they would crash into an obstacle, have them jump ;)
             for (let j = 0; j < this.nodes[this.enemy_trains[i].onTrack].length; j++) {
                 if (this.checkObstacleCollision(this.enemy_trains[i], this.nodes[this.enemy_trains[i].onTrack][j])) {
-                    console.log("enemy train crashed");
                     this.enemy_trains[i].enemy_indicator.setVisible(false);
                     this.enemy_trains[i].wagons.forEach(wagon => {
                         wagon.setVisible(false);
@@ -181,6 +183,7 @@ class PlayGame extends Phaser.Scene {
             if (this.enemy_trains[i].x < -2*this.node_interval) {
                 this.enemy_trains[i].destroy();
                 this.enemy_trains.splice(i, 1);
+                i--;
             }
         }
     }
@@ -211,12 +214,13 @@ class PlayGame extends Phaser.Scene {
                 this.currency += 100;
                 this.coins[i].destroy();
                 this.coins.splice(i, 1);
-                continue;
+                i--;
             }
 
             if (this.coins[i].x < -2*this.node_interval) {
                 this.coins[i].destroy();
                 this.coins.splice(i, 1);
+                i--;
             }
         }
     }
@@ -242,6 +246,7 @@ class PlayGame extends Phaser.Scene {
                 if (this.tracks[i][k].x < -2*this.node_interval) {
                     delete this.tracks[i][k];
                     this.tracks[i].splice(k, 1);
+                    k--
                 }
             }
             // move and update the nodes
@@ -285,12 +290,14 @@ class PlayGame extends Phaser.Scene {
                         // turn north
                         case "north":
                             this.train.onTrack--;
+                            this.turn_speed = this.speed;
                             this.train.turning = true;
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
                             break;
                         // turn south
                         case "south":
                             this.train.onTrack++;
+                            this.turn_speed = this.speed;
                             this.train.turning = true;
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
                             break;
@@ -305,6 +312,7 @@ class PlayGame extends Phaser.Scene {
                     delete this.nodes[i][j];
                     this.nodes[i].splice(j, 1);
                     spawn_tracks=true;
+                    j--;
                 }
             }
         }
@@ -387,12 +395,13 @@ class PlayGame extends Phaser.Scene {
             // when done with station, leave station
             else if (this.stations[i].arrived_status == 4) {
                 let acc_dist = Math.abs((this.stations[i].station_point + this.stations[i].x)-this.train.x);
-                this.train.atStation = 0;
                 this.speed = this.speedLock * (acc_dist / this.stations[i].station_point);
                 if (this.speed < 1) this.speed = 1;
                 if (this.speed >= this.speedLock) {
                     this.stations[i].arrived_status = 5;
                     this.speed = this.speedLock;
+                    console.log("left station");
+                    this.train.atStation = 0;
                 }
             }
 
@@ -413,7 +422,24 @@ class PlayGame extends Phaser.Scene {
         if (right_key.isDown && this.speed < 50) {
             this.speed += 1;
         }
-        
+        if (up_key.isDown && !this.train.turning && this.train.onTrack > 0 && this.train.atStation==0) {
+            console.log("jump up");
+            this.train.turn_dir = "north";
+            this.turn_speed = this.speed;
+            this.train.onTrack--;
+            this.train.turn_dest = this.nodes[this.train.onTrack][0].y;
+            this.train.turning = true;
+            this.train.jumping = true;
+        }
+        if (down_key.isDown && !this.train.turning && this.train.onTrack < this.num_tracks-1 && this.train.atStation==0) {
+            console.log("jump down");
+            this.train.turn_dir = "south";
+            this.turn_speed = this.speed;
+            this.train.onTrack++;
+            this.train.turn_dest = this.nodes[this.train.onTrack][0].y;
+            this.train.turning = true;
+            this.train.jumping = true;
+        }
     }
 
     enterStation(station) {
@@ -422,7 +448,7 @@ class PlayGame extends Phaser.Scene {
         this.train.moving = false;
         this.fuel = this.train.fuelCapacity;
         
-        // RemovePassengerIcons(this, station.station_type);
+        RemovePassengerIcons(this, station.station_type);
 
         this.train.passengers.forEach(passenger => {
             if (station.station_type == passenger.destination) {
@@ -483,12 +509,17 @@ class PlayGame extends Phaser.Scene {
         this.train.atStation = 2;
         this.train.moving = false;
         console.log("enter trainyard");
-        for (let i = 0; i < trainyard.upgrades; i++) {
+        for (let i = 0; i < trainyard.upgrades.length; i++) {
             let upgrade = trainyard.upgrades[i];
             console.log(upgrade, "available at yard");
         }
+        // ui display to have players choose from upgrades
         let leave = this.time.delayedCall(2000, () => {
+            console.log("leaving yard");
             this.train.moving = true;
+            this.upgrades.forEach(upgrade => {
+                upgrade.chosen = false;
+            })
             trainyard.arrived_status = 4;
         });
     }
