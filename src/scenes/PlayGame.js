@@ -544,7 +544,7 @@ class PlayGame extends Phaser.Scene {
         
     }
 
-    enterStation(station) {
+    /*enterStation(station) {
         this.train.atStation = 2;
         let stationTime = 2000;
         this.train.moving = false;
@@ -596,7 +596,6 @@ class PlayGame extends Phaser.Scene {
             their sprites leaving. Alternatively, could
             have immediate train sprite change by
             counting how many passengers got off.
-            */
             let gettingOn = this.time.delayedCall(stationTime/2, () => {
                 // Getting on animations
                 // Same as getting off
@@ -606,7 +605,119 @@ class PlayGame extends Phaser.Scene {
                 // start patience timers
             }, null, this);
         }, null, this);
+    }*/
+    enterStation(station) {
+        this.train.atStation = 2;
+        /*if (((this.train.capacity - stationTime) + station.passengers.length) <= this.train.capacity) {
+            stationTime = (stationTime + station.passengers.length) * 500 + 2000;
+        } else {
+            stationTime = (stationTime + (this.train.capacity - this.train.passengers.length)) * 500 + 2000;
+        }*/
+
+        this.train.moving = false;
+        this.fuel = this.train.fuelCapacity;
+
+
+
+        /* enter station -> delayed call to disembark 1 passenger -> upon completion,
+        do another delayed call if there are more passengers -> once there aren't,
+        delayed call for boarding passengers in the same way -> once there are no more to board,
+        train leaves station */
+        
+        /*while (continueStation) {
+            let getOff = this.time.delayedCall(500, () => {
+                continueStation = passenger.checkStationOff(this, station);
+            });
+        }*/
+
+        /*this.train.passengers.forEach(passenger => {
+            passenger.checkStationOff(this, station);
+        });*/
+        /*continueStation = true;
+
+        while (continueStation) {
+            let getOn = this.time.delayedCall(500, () => {
+                continueStation = passenger.checkStation
+            })
+        }*/
+
+        let lock = true;
+        let stationTime = 0;
+        //let continueStation = true;
+        this.train.passengers.forEach(passenger => {
+            if ((station.station_type == passenger.destination) || !passenger.goodReview) {
+                stationTime++;
+            }
+        });
+        stationTime = 2000 / (stationTime + 1);
+        lock = this.stationRecurOff(station, stationTime, 0);
+        /*while (lock) {
+        }
+        lock = true;
+        lock = this.stationRecurOn(station, stationTime, 0);
+        while (lock) {
+        }
+        this.fuel = this.train.fuelCapacity;
+        this.train.moving = true;
+        station.arrived_status = 4;*/
     }
+
+    stationRecurOff(station, stationTime, position) {
+        for (let i = position; i < this.train.passengers.length; i++) {
+            position = i + 1;
+            if (this.train.passengers[i].destination == station.station_type || !this.train.passengers[i].goodReview) {
+                position = i;
+                break;
+            }
+        }
+        console.log("OFF" + position);
+        if (position > this.train.passengers.length - 1) {
+            if (this.train.passengers.length + station.passengers.length <= this.train.capacity) {
+                stationTime = 2000 / (station.passengers.length + 1);
+            } else {
+                stationTime = 2000 / (this.train.capacity - this.train.passengers.length + 1);
+            }
+            this.stationRecurOn(station, stationTime, 0);
+            return false;
+        }
+
+        let gettingOff = this.time.delayedCall(stationTime, () => {
+            let lock = true;
+            /*if (this.train.passengers[position].destination == station.station_type 
+                || !this.train.passengers[position].goodReview) {
+                    this.train.passengers[position].disembark;
+                }*/
+            this.train.passengers[position].checkStationOff(this, station);
+            lock = this.stationRecurOff(station, stationTime, position);
+            /*} else {
+                lock = this.stationRecurOff(station, stationTime, position);
+            }*/
+            //while (lock) {
+            //}
+            return false;
+        });
+    }
+
+    stationRecurOn(station, stationTime, position) {
+        console.log("ON" + position);
+        if (position > station.passengers.length - 1 || this.train.passengers.length == this.train.capacity) {     
+            this.fuel = this.train.fuelCapacity;
+            this.train.moving = true;
+            station.arrived_status = 4;
+            return false;
+        }
+        let gettingOn = this.time.delayedCall(stationTime, () => {
+            let lock = true;
+            if (station.passengers[position].checkStationOn(this) == true) {
+                this.stationRecurOn(station, stationTime, position + 1);
+                console.log("DONE" + position);
+            }
+            //while (lock) {
+            //}
+            return false;
+        })
+    }
+
 
     enterTrainyard(trainyard) {
         this.train.atStation = 2;
