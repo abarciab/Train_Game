@@ -10,7 +10,9 @@ class Station extends Phaser.GameObjects.Sprite {
         this.dir_sign = false;
 
         // possible containers
+        this.station_capacity = 3;
         this.passengers = [];
+        this.num_upgrades = 4;
         this.upgrades = [];
 
         this.onTrack = initial_track;
@@ -38,8 +40,8 @@ class Station extends Phaser.GameObjects.Sprite {
             this.sign = scene.add.image(x, y, `${this.station_type} station sign`).setScale(scene.scaling).setDepth(8);
         }
         else {
-            // choose 3 random types from upgrades
-            for (let i = 0; i < 3; i++) {
+            // choose num_upgrades random types from upgrades
+            for (let i = 0; i < this.num_upgrades; i++) {
                 let random_index = Math.floor(Math.random() * station_contents.length) % station_contents.length;
                 while (station_contents[random_index].chosen) {
                     random_index = (random_index + 1) % station_contents.length;
@@ -47,6 +49,10 @@ class Station extends Phaser.GameObjects.Sprite {
                 this.upgrades.push(station_contents[random_index]);
                 station_contents[random_index].chosen = true;
             }
+            // set them to false after wards
+            station_contents.forEach(upgrade => {
+                upgrade.chosen = false;
+            });
         }
 
         this.indicator = scene.add.image(config.width*0.9, y, `${this.station_type} station indicator`).setScale(scene.scaling*2).setDepth(8).setVisible(false);
@@ -66,7 +72,11 @@ class Station extends Phaser.GameObjects.Sprite {
             if (this.x < config.width) {
                 this.indicator.setVisible(false);
             }
-            else if (this.x < config.width*2) {
+            else if (this.station_type != "trainyard" && this.x < config.width*2) {
+                this.indicator.y = this.y;
+                this.indicator.setVisible(true);
+            }
+            else if (this.station_type == "trainyard" && this.x < config.width*4) {
                 this.indicator.y = this.y;
                 this.indicator.setVisible(true);
             }

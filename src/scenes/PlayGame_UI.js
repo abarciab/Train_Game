@@ -280,7 +280,7 @@ function hideToolTip(){
 
 function DisplayTrainyardUI(scene, trainyard){
 
-    console.log("displaying trainyardUI");
+    // console.log("displaying trainyardUI");
 
     this.currentStation = trainyard;
     this.shopItems = trainyard.upgrades;

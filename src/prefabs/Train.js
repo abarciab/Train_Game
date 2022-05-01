@@ -34,6 +34,7 @@ class Train extends Phaser.GameObjects.Sprite {
         this.track_y_interval = 64*6*scene.scaling;
         this.wagon_len = 0;
 
+        this.num_wagons = 0;
         this.wagons = [];
         this.train_type = train_type;
         this.enemy_indicator;

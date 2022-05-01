@@ -12,6 +12,7 @@ class PlayGame extends Phaser.Scene {
         this.load.audio('junction_switch', './assets/sound effects/junction switched.mp3');
         this.load.audio('backgroundMusic', './assets/music/main game song.wav');
         this.load.audio('crash_sound', './assets/sound effects/train crash.mp3');
+        this.load.audio('coin_pickup', './assets/sound effects/pickupfuel.wav');
         LoadUI(this);
     }
 
@@ -21,6 +22,7 @@ class PlayGame extends Phaser.Scene {
         this.backgroundMusic = this.sound.add('backgroundMusic', {volume: 0.8, loop: true});
         this.trainSound = this.sound.add('train_on_rails', {volume: .3, loop: true});
         this.crashSound = this.sound.add('crash_sound', {volume: 0.1});
+        this.coinSound = this.sound.add('coin_pickup', {volume: 0.7});
         this.backgroundMusic.play();
         this.trainSound.play();
 
@@ -54,24 +56,25 @@ class PlayGame extends Phaser.Scene {
         this.trainyard_spawn_index = 0;
         this.station_types = ["red square", "blue circle", "green triangle"];
         this.station_type_index = 0;
-        function Upgrade(name, price) {
+        function Upgrade(name, price, max) {
             this.name = name;
             this.price = price;
             this.num_bought = 0;
+            this.max = max;
             this.chosen = false;
         }
         this.upgrades = [
-            new Upgrade("jump", 500),
-            new Upgrade("extra wagon", 1000),
-            new Upgrade("protection", 250),
-            new Upgrade("speed boost", 100)
+            new Upgrade("jump", 100, 5),
+            new Upgrade("extra wagon", 1000, 2),
+            new Upgrade("protection", 250, 3),
+            new Upgrade("speed boost", 500, 3)
         ];
         // upgrades available to the player
         this.player_upgrades = {
-            "jump": 5,
-            "extra wagon": 1,
-            "protection": 3,
-            "speed boost": 5
+            "jump": 1,
+            "extra wagon": 0,
+            "protection": 1,
+            "speed boost": 1
         };
         for (let i = 0; i < 11; i++) {
             if (i < 5)
@@ -92,21 +95,21 @@ class PlayGame extends Phaser.Scene {
             this.coins[i] = [];
         }
 
-        this.margin = config.height/15; // margin; no use right now
+        this.margin = config.height/15;             // margin; no use right now
         this.y_interval = (config.height-(2*this.margin))/(Object.keys(this.tracks).length+1); // interval that rows of tracks should be seperated
         this.scaling = this.y_interval / this.base_interval; // scaling of all objects
-        this.x_unit = 64 * this.scaling; // unit square of measurement
-        this.node_interval = 20 * this.x_unit;  // interval between each node/track placement
-        this.input_interval = this.node_interval; // interval user can input an action before a junction
-        this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
-        this.speed = 10;     // speed of world
+        this.x_unit = 64 * this.scaling;            // unit square of measurement
+        this.node_interval = 20 * this.x_unit;      // interval between each node/track placement
+        this.input_interval = this.node_interval;   // interval user can input an action before a junction
+        this.junction_offset = 2 * this.x_unit;     // offset of junction where train moves
+        this.speed = 10;                // speed of world
 
-        this.dx = 0;        // how much a player has moved
-        this.speedLock = this.speed; // holds speed while speed changes when entering stations
-        this.lock = false; // traces when speed is locked
+        this.dx = 0;                    // how much a player has moved
+        this.speedLock = this.speed;    // holds speed while speed changes when entering stations
+        this.lock = false;              // traces when speed is locked
         this.dist = 0;
-        this.nodes_onscreen = Math.floor(config.width / this.node_interval);   // number of nodes on screen
-        this.num_chunks = this.nodes_onscreen * 10;        // number of chunks that are loaded; 5x screen width
+        this.nodes_onscreen = Math.floor(config.width / this.node_interval);    // number of nodes on screen
+        this.num_chunks = this.nodes_onscreen * 10;     // number of chunks that are loaded; 5x screen width
 
         // spawn the world initially
         this.train = new Train(this, config.width/10, 0, 'basic_locomotive', Math.floor(this.num_tracks/2), "player").setOrigin(1, 0.5);
@@ -246,7 +249,8 @@ class PlayGame extends Phaser.Scene {
             this.coins[i].x -= this.speed;
             // check for collision
             if (this.coinCollision(this.train, this.coins[i])) {
-                this.currency += 100;
+                this.coinSound.play();
+                this.currency += 10;
                 this.coins[i].destroy();
                 this.coins.splice(i, 1);
                 i--;
@@ -290,8 +294,10 @@ class PlayGame extends Phaser.Scene {
                 this.nodes[i][j].update();
                 if (this.checkObstacleCollision(this.train, this.nodes[i][j])) {
                     if (this.player_upgrades["protection"] != 0 || this.train.speed_boost) {
-                        if (!this.train.speed_boost)
+                        if (!this.train.speed_boost) {
                             this.player_upgrades["protection"]--;
+                            console.log("protection used");
+                        }
                         this.nodes[i][j].obstacle.setVisible(false);
                         // play destroy animation
                     }
@@ -519,7 +525,8 @@ class PlayGame extends Phaser.Scene {
                     //console.log("Bad review");
                 } else {
                     if (this.train.health < this.train.healthCapacity) {
-                        this.train.health += 1;
+                        this.train.health += 2;
+                        this.currency += 100;
                     }
                     //console.log("Good review");
                 }
@@ -569,17 +576,13 @@ class PlayGame extends Phaser.Scene {
     enterTrainyard(trainyard) {
         this.train.atStation = 2;
         this.train.moving = false;
-        console.log("enter trainyard");
         if (trainyard.arrived_status = 2) {
             // display the UI. UI will set arrived status to 3 once it is done.
-            //DisplayTrainyardUI(this, trainyard)
+            DisplayTrainyardUI(this, trainyard)
         }
         else {
             console.log("leaving yard");
             this.train.moving = true;
-            this.upgrades.forEach(upgrade => {
-                upgrade.chosen = false;
-            });
             // display the UI
             trainyard.arrived_status = 4;
         }
@@ -601,10 +604,11 @@ class PlayGame extends Phaser.Scene {
                         let recent_wagon = this.train.wagons[this.train.wagons.length-1];
                         this.train.wagons.push(new Wagon(this, recent_wagon.x-recent_wagon.wagon_offset, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
                     }
+                    this.train.capacity += 5;
                 }
                 this.currency -= this.upgrades[i].price;
                 this.upgrades[i].num_bought++;
-                this.upgrades[i].price += 100; // placeholder value
+                // this.upgrades[i].price += 100; // placeholder value
                 break;
             }
         }

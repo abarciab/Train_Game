@@ -188,11 +188,17 @@ function spawnNodes(scene, x, y, station_row, row, can_have_obstacles) {
 
     if (can_have_obstacles) {
         // 10% chance to spawn rock if junction to avoid it
-        let obstacle_chance = Math.floor(Math.random()*100)+1;
-        if (obstacle_chance <= 10 && (n_junc || s_junc)) {
+        let rock_chance = 10;
+        let branch_chance = 20;
+        let obstacle_rng = Math.floor(Math.random()*100)+1;
+        if (scene.dist >= 1000) {
+            rock_chance = 20;
+            branch_chance = 30;
+        }
+        if (obstacle_rng <= rock_chance && (n_junc || s_junc)) {
             obstacle_type = 1;
         } 
-        else if (obstacle_chance <= 30 && (n_junc || s_junc)) {
+        else if (obstacle_rng <= rock_chance+branch_chance && (n_junc || s_junc)) {
             obstacle_type = 2;
         }
     }
@@ -217,8 +223,12 @@ function spawnNodes(scene, x, y, station_row, row, can_have_obstacles) {
     }
 }
 
+// per row check
 function spawnEnemyTrain(scene, x, y, row) {
     let enemy_spawn_chance = 5;
+    if (scene.dist >= 1000) {
+        enemy_spawn_chance = 10;
+    }
     if (Math.floor(Math.random()*100)+1 <= enemy_spawn_chance) {
         let can_spawn = true;
         scene.stations.forEach(station => {
@@ -403,10 +413,10 @@ function spawnStation(scene, x, y) {
     }
     if (!isTrainyard) {
         // spawn a station
-        let stationCount = Math.ceil(Math.random() * 6); // Possible 1-6 Passengers
+        let stationCount = Math.ceil(Math.random() * 4); // Possible 1-4 Passengers
         let passengers = [];
         for (let j = 0; j < stationCount; j++) {
-            let patienceTime = Math.ceil(Math.random()*240000) + 120000;
+            let patienceTime = Math.ceil(Math.random()*30000) + 90000;
             passengers.push(new Passenger(
                 scene, x, y, "passenger 1", 0, scene.train.onTrack, patienceTime, 0
             ));
