@@ -14,7 +14,14 @@ class Train extends Phaser.GameObjects.Sprite {
         this.junction_wid = (1184-192)*scene.scaling;   // width of a junction to travel x-wards
         this.turning = false;                 // if the train is turning or not
         this.jumping = false;                 // if the train is jumping or not
-        this.invincible = false;
+        this.speed_boost = false;
+        this.slow_down = false;
+        this.boost_timer = 0;
+        this.boost_duration = 2;
+        this.wagons_jumping = false;
+
+        this.shield = false;
+
         this.turn_wagons = false;             // if the wagons are turning
         this.wagons_turned = 0;               // number of wagons turned
         this.turn_dest = this.y;
@@ -27,7 +34,6 @@ class Train extends Phaser.GameObjects.Sprite {
         this.track_y_interval = 64*6*scene.scaling;
         this.wagon_len = 0;
 
-        //this.wagons = [scene.add.container(x, y);]
         this.wagons = [];
         this.train_type = train_type;
         this.enemy_indicator;
@@ -64,11 +70,19 @@ class Train extends Phaser.GameObjects.Sprite {
                 this.enemy_indicator.setVisible(true);
             }
         }
+        if (this.speed_boost) {
+            this.boost_timer += delta/1000;
+            if (this.boost_timer >= this.boost_duration) {
+                this.boost_timer = 0;
+                this.slow_down = true;
+            }
+        }
         // if turning, update dy depending on speed
         if (this.turning) {
             this.updateTurn(delta);
         }
         if (this.turn_wagons) {
+            this.wagons_jumping = true;
             this.updateWagonTurn(delta);
         }
     }
@@ -113,7 +127,7 @@ class Train extends Phaser.GameObjects.Sprite {
             for (let i = 0; i < this.wagons.length; i++) {
                 if (!this.wagons[i].turning && this.wagons[i].onTrack != this.onTrack) {
                     this.wagons[i].onTrack = this.onTrack;
-                    if (this.jumping)
+                    if (this.wagons_jumping)
                         this.wagons[i].jumping = true;
                     this.wagons[i].jump_speed = this.jump_speed;
                     this.wagons[i].turning = true;
@@ -130,6 +144,7 @@ class Train extends Phaser.GameObjects.Sprite {
         }
         if (this.wagons_turned >= this.wagons.length) {
             this.wagon_turn_x = this.wagon_offset;
+            this.wagons_jumping = false;
             this.wagons_turned = 0;
             this.turn_wagons = false;
             this.dx = 0;

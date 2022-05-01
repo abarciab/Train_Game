@@ -9,6 +9,6 @@ let config = {
     scene: [Menu, PlayGame]
 }
 
-let W_key, A_key, S_key, D_key, up_key, down_key, left_key, right_key, space_bar;
+let W_key, A_key, S_key, D_key, up_key, down_key, left_key, right_key, space_bar, one_key, two_key;
 
 let game = new Phaser.Game(config);
