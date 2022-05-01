@@ -411,7 +411,7 @@ function displayRating(){
         this.star2.setTexture('star_4/4');
         partialStar = this.star3;
     }
-    if (this.rating >= 8){
+    if (this.rating >= 12){
         this.star3.setTexture('star_4/4');
         partialStar = this.star4;
     }
@@ -549,7 +549,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
                 const colorObj = Phaser.Display.Color.Interpolate.ColorWithColor(this.green, this.red, 100, tween.getValue());
                 this.patienceBar.setTint(Phaser.Display.Color.GetColor(colorObj.r, colorObj.g, colorObj.b));
                 this.patienceBar.setScale(1-tween.getValue()/100, 1);
-                if (tween.getValue() == 100){       
+                if (tween.getValue() == 100){
                     passenger.goodReview = false;
                     this.setAlpha(0.4);
                     scene.cameras.main.shake(50, 0.009);

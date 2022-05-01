@@ -73,7 +73,7 @@ class PlayGame extends Phaser.Scene {
         this.player_upgrades = {
             "jump": 1,
             "extra wagon": 0,
-            "protection": 1,
+            "protection": 0,
             "speed boost": 1
         };
         for (let i = 0; i < 11; i++) {
@@ -325,8 +325,13 @@ class PlayGame extends Phaser.Scene {
                             this.crashSound.play();
                             this.train.health = 0;
                         } else if (this.nodes[i][j].obstacle_type == 2) {
+                            console.log("hit stick");
                             this.crashSound.play();
                             this.train.health -= 4;
+                            this.train.passengers.forEach(element => {
+                                element.patience -= (element.max_patience * 1/4);
+                                if (element.patience < 0) element.patience = 0;
+                            });
                         }
                     }
                 }
@@ -360,12 +365,12 @@ class PlayGame extends Phaser.Scene {
                             this.turn_time = (delta)*(this.train.junction_wid / this.train.speed);
                             this.train.turning = true;
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
-                            let firstNorth = this.time.delayedCall(this.turn_time/4, () => {
-                                this.train.play("turnNorth");
+                            /*let firstNorth = this.time.delayedCall(this.turn_time/4, () => {
+                                //this.train.play("turnNorth");
                                 let secondNorth = this.time.delayedCall(this.turn_time/2, () => {
                                     this.train.play("noTurn");
                                 });
-                            });
+                            });*/
                             break;
                         // turn south
                         case "south":
@@ -373,12 +378,12 @@ class PlayGame extends Phaser.Scene {
                             this.turn_time = (delta)*(this.train.junction_wid / this.train.speed);
                             this.train.turning = true;
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
-                            let firstSouth = this.time.delayedCall(this.turn_time/4, () => {
-                                this.train.play("turnSouth");
+                            /*let firstSouth = this.time.delayedCall(this.turn_time/4, () => {
+                                //this.train.play("turnSouth");
                                 let secondSouth = this.time.delayedCall(this.turn_time/2, () => {
                                     this.train.play("noTurn");
                                 });
-                            });
+                            });*/
                             break;
                         default:
                             console.log("invalid dir");
@@ -638,7 +643,6 @@ class PlayGame extends Phaser.Scene {
                 }
                 this.currency -= this.upgrades[i].price;
                 this.upgrades[i].num_bought++;
-                // this.upgrades[i].price += 100; // placeholder value
                 break;
             }
         }

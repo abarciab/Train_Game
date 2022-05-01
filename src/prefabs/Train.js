@@ -20,8 +20,6 @@ class Train extends Phaser.GameObjects.Sprite {
         this.boost_duration = 2;
         this.wagons_jumping = false;
 
-        this.shield = false;
-
         this.turn_wagons = false;             // if the wagons are turning
         this.wagons_turned = 0;               // number of wagons turned
         this.turn_dest = this.y;
@@ -103,12 +101,17 @@ class Train extends Phaser.GameObjects.Sprite {
             this.wagon_turn_dir = this.turn_dir;
             if (this.wagon_turn_dir == "north") {
                 this.y -= y_per_frame;
+                if (!this.jumping)
+                    this.angle = -10;
             }
             else if (this.wagon_turn_dir == "south") {
                 this.y += y_per_frame;
+                if (!this.jumping)
+                    this.angle = 10;
             }
         }
         else {
+            this.angle = 0;
             this.turning = false;
             this.jumping = false;
             this.dy = 0;
@@ -193,9 +196,13 @@ class Wagon extends Phaser.GameObjects.Sprite {
             this.dy += y_per_frame;
             if (this.dy < this.track_y_interval) {
                 if (this.turn_dir == "north") {
+                    if (!this.jumping)
+                        this.angle = -10;
                     this.y -= y_per_frame;
                 }
                 else if (this.turn_dir == "south") {
+                    if (!this.jumping)
+                        this.angle = 10;
                     this.y += y_per_frame;
                 }
             }
