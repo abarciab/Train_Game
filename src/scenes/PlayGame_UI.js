@@ -182,7 +182,7 @@ function displayRating(){
     }
 }
 
-function addPasengerUI(scene, passenger){
+function addPassengerUI(scene, passenger){
 
     this.numPassengers += 1;
     let shape;
