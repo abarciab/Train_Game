@@ -220,7 +220,7 @@ function StartUI(scene){
     this.star3 = scene.add.image(this.star1.x + starWidth*2, this.topBar.y - 10, 'star_4/4').setScale(0.7);
     this.star4 = scene.add.image(this.star1.x + starWidth*3, this.topBar.y - 10, 'star_4/4').setScale(0.7);
     this.star5 = scene.add.image(this.star1.x + starWidth*4, this.topBar.y - 10, 'star_4/4').setScale(0.7);
-    this.rating  = 20;
+    this.rating = 20;
     displayRating();
 
     //game over UI
@@ -411,7 +411,7 @@ function displayRating(){
         this.star2.setTexture('star_4/4');
         partialStar = this.star3;
     }
-    if (this.rating >= 8){
+    if (this.rating >= 12){
         this.star3.setTexture('star_4/4');
         partialStar = this.star4;
     }
