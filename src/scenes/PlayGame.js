@@ -63,6 +63,7 @@ class PlayGame extends Phaser.Scene {
             new Upgrade("protection", 250),
             new Upgrade("speed boost", 100)
         ];
+        // upgrades available to the player
         this.player_upgrades = {};
         for (let i = 0; i < this.upgrades.length; i++) {
             this.player_upgrades[this.upgrades[i].name] = 0;
@@ -389,12 +390,13 @@ class PlayGame extends Phaser.Scene {
             }
             // once stopped, enter station
             else if (this.stations[i].arriving_status == 2) {
-                if (this.stations[i].station_type != "trainyard")
+                if (this.stations[i].station_type != "trainyard") {
                     this.enterStation(this.stations[i]);
+                    this.stations[i].arriving_status = 3;
+                }
                 else {
                     this.enterTrainyard(this.stations[i]);
                 }
-                this.stations[i].arriving_status = 3;
             }
             // when done with station, leave station
             else if (this.stations[i].arrived_status == 4) {
@@ -429,7 +431,7 @@ class PlayGame extends Phaser.Scene {
         if (up_key.isDown && !this.train.turning && this.train.onTrack > 0 && this.train.atStation==0) {
             console.log("jump up");
             this.train.turn_dir = "north";
-            this.turn_speed = this.speed;
+            //this.train.jump_speed = this.speed;
             this.train.onTrack--;
             this.train.turn_dest = this.nodes[this.train.onTrack][0].y;
             this.train.turning = true;
@@ -438,7 +440,7 @@ class PlayGame extends Phaser.Scene {
         if (down_key.isDown && !this.train.turning && this.train.onTrack < this.num_tracks-1 && this.train.atStation==0) {
             console.log("jump down");
             this.train.turn_dir = "south";
-            this.turn_speed = this.speed;
+            //this.train.jump_speed = this.speed;
             this.train.onTrack++;
             this.train.turn_dest = this.nodes[this.train.onTrack][0].y;
             this.train.turning = true;
@@ -513,19 +515,19 @@ class PlayGame extends Phaser.Scene {
         this.train.atStation = 2;
         this.train.moving = false;
         console.log("enter trainyard");
-        for (let i = 0; i < trainyard.upgrades.length; i++) {
-            let upgrade = trainyard.upgrades[i];
-            console.log(upgrade, "available at yard");
+        if (trainyard.arrived_status = 2) {
+            // display the UI. UI will set arrived status to 4 once it is done.
+            DisplayTrainyardUI(this, trainyard)
         }
-        // ui display to have players choose from upgrades
-        let leave = this.time.delayedCall(2000, () => {
+        else {
             console.log("leaving yard");
             this.train.moving = true;
             this.upgrades.forEach(upgrade => {
                 upgrade.chosen = false;
-            })
+            });
+            // display the UI
             trainyard.arrived_status = 4;
-        });
+        }
     }
 
     buyAbility(ability) {

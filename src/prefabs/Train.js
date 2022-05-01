@@ -19,12 +19,13 @@ class Train extends Phaser.GameObjects.Sprite {
         this.wagons_turned = 0;               // number of wagons turned
         this.turn_dest = this.y;
         this.speed = scene.speed;
-        this.jump_speed = this.speed;
+        this.jump_speed = 20;
         this.dx = 0;
         this.dy = 0;
         this.turn_dir = "straight";
         this.wagon_turn_dir = this.turn_dir;
         this.track_y_interval = 64*6*scene.scaling;
+        this.wagon_len = 0;
 
         //this.wagons = [scene.add.container(x, y);]
         this.wagons = [];
@@ -40,9 +41,12 @@ class Train extends Phaser.GameObjects.Sprite {
         this.setDepth(10);
 
         this.wagon_offset = this.displayWidth * 1.4;
+        this.wagon_turn_x = this.wagon_offset;
     }
 
     update(timer, delta) {
+        if (this.wagons.length && this.wagon_len == 0)
+            this.wagon_len = this.wagons[0].displayWidth;
         if (this.train_type == "enemy" && this.enemy_indicator != undefined) {
             this.x -= this.speed;
             this.wagons.forEach(wagon => {
@@ -98,9 +102,14 @@ class Train extends Phaser.GameObjects.Sprite {
         }
     }
     updateWagonTurn(delta) {
-        this.dx += this.speed;
-        if (this.dx >= this.wagon_offset) {
+        if (!this.jumping)
+            this.dx += this.speed;
+        else {
+            this.dx += this.jump_speed;
+        }
+        if (this.dx >= this.wagon_turn_x) {
             this.dx = 0;
+            this.wagon_turn_x = this.wagon_len;
             for (let i = 0; i < this.wagons.length; i++) {
                 if (!this.wagons[i].turning && this.wagons[i].onTrack != this.onTrack) {
                     this.wagons[i].onTrack = this.onTrack;
@@ -120,6 +129,7 @@ class Train extends Phaser.GameObjects.Sprite {
             }
         }
         if (this.wagons_turned >= this.wagons.length) {
+            this.wagon_turn_x = this.wagon_offset;
             this.wagons_turned = 0;
             this.turn_wagons = false;
             this.dx = 0;
@@ -138,8 +148,7 @@ class Wagon extends Phaser.GameObjects.Sprite {
         this.done_turning = false;
         this.onTrack = track;
         this.speed = scene.speed;
-        this.jump_speed = this.speed;
-        this.wagon_point = (this.x - this.displayWidth*0.5) * scene.scaling;
+        this.jump_speed = 20;
         this.junction_wid = (1184-192)*scene.scaling;
         this.track_y_interval = 64*6*scene.scaling;
         this.upgrades = [];
