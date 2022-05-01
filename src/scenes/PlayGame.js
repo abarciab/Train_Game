@@ -528,16 +528,18 @@ class PlayGame extends Phaser.Scene {
         });
     }
 
-    buyAbility(ability) {
-        if (!ability in player_upgrades) {
+    buyAbility(scene, ability) {
+        if (!ability in scene.player_upgrades) {
             console.log("invalid ability");
             return;
         }
-        player_upgrades[ability]++;
-        for (let i = 0; i < this.upgrades.length; i++) {
-            if (this.upgrades[i].name == ability) {
-                this.upgrades[i].num_bought++;
-                this.upgrades[i].price += 100; // placeholder value
+        scene.player_upgrades[ability]++;
+        for (let i = 0; i < scene.upgrades.length; i++) {
+            if (scene.upgrades[i].name == ability) {
+                scene.currency -= scene.upgrades[i].price;
+                scene.upgrades[i].num_bought++;
+                scene.upgrades[i].price += 100; // placeholder value
+                break;
             }
         }
     }
