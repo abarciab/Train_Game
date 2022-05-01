@@ -13,18 +13,23 @@ class PlayGame extends Phaser.Scene {
         this.load.audio('backgroundMusic', './assets/music/main game song.wav');
         this.load.audio('crash_sound', './assets/sound effects/train crash.mp3');
         this.load.audio('coin_pickup', './assets/sound effects/pickupfuel.wav');
+        this.load.audio('jump', './assets/sound effects/jump.wav');
+        this.load.audio('boost', './assets/sound effects/boost.wav');
+        this.load.audio('hit', './assets/sound effects/hit.wav');
         LoadUI(this);
     }
 
     create() {
-        //sound effects
+        //sound effects: in the future, store inside of a dictionary: key = sound name, value = actual sound
         this.junctionSwitchSfx = this.sound.add('junction_switch', {volume: 0.5, rate: 1.5});
         this.backgroundMusic = this.sound.add('backgroundMusic', {volume: 0.8, loop: true});
         this.trainSound = this.sound.add('train_on_rails', {volume: .3, loop: true});
         this.crashSound = this.sound.add('crash_sound', {volume: 0.1});
         this.coinSound = this.sound.add('coin_pickup', {volume: 0.7});
+        this.jumpSound = this.sound.add('jump');
+        this.boostSound = this.sound.add('boost', {volume: 0.6});
+        this.hitSound = this.sound.add('hit', {volume: 0.3});
         this.backgroundMusic.play();
-        this.trainSound.play();
 
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0);
         W_key = this.input.keyboard.addKey('W');
@@ -197,6 +202,9 @@ class PlayGame extends Phaser.Scene {
             // if they would crash into an obstacle
             for (let j = 0; j < this.nodes[this.enemy_trains[i].onTrack].length; j++) {
                 if (this.checkObstacleCollision(this.enemy_trains[i], this.nodes[this.enemy_trains[i].onTrack][j])) {
+                    console.log("train crashed");
+                    if (this.enemy_trains[i].x < config.width)
+                        this.crashSound.play();
                     this.enemy_trains[i].enemy_indicator.setVisible(false);
                     this.enemy_trains[i].wagons.forEach(wagon => {
                         wagon.setVisible(false);
@@ -222,8 +230,9 @@ class PlayGame extends Phaser.Scene {
                         train_destroyed = true;
                         break;
                     }
-                    else
+                    else {
                         this.train.health = 0;
+                    }
                 }
             }
             if (train_destroyed) continue;
@@ -244,6 +253,12 @@ class PlayGame extends Phaser.Scene {
     }
     
     updateSpeed(delta) {
+        if (this.speed > 0 && !this.trainSound.isPlaying) {
+            this.trainSound.play();
+        }
+        else if (this.speed == 0 && this.trainSound.isPlaying) {
+            this.trainSound.pause();
+        }
         if (this.train.speed_boost && this.train.slow_down) {
             this.speed--;
             if (this.speed <= this.speedLock) {
@@ -312,6 +327,7 @@ class PlayGame extends Phaser.Scene {
                 this.nodes[i][j].update();
                 if (this.checkObstacleCollision(this.train, this.nodes[i][j])) {
                     if (this.player_upgrades["protection"] != 0 || this.train.speed_boost) {
+                        this.hitSound.play();
                         if (!this.train.speed_boost) {
                             this.player_upgrades["protection"]--;
                             console.log("protection used");
@@ -326,7 +342,7 @@ class PlayGame extends Phaser.Scene {
                             this.train.health = 0;
                         } else if (this.nodes[i][j].obstacle_type == 2) {
                             console.log("hit stick");
-                            this.crashSound.play();
+                            this.hitSound.play();
                             this.train.health -= 4;
                             this.train.passengers.forEach(element => {
                                 element.patience -= (element.max_patience * 1/4);
@@ -517,7 +533,7 @@ class PlayGame extends Phaser.Scene {
             return (scene.player_upgrades[ability] && scene.train.atStation==0)
         }
         if (up_key.isDown && can_use_ability(this, "jump") && this.train.onTrack>0 && !this.train.turning) {
-            console.log("jump up");
+            this.jumpSound.play();
             this.player_upgrades["jump"]--;
             this.train.turn_dir = "north";
             this.train.onTrack--;
@@ -526,7 +542,7 @@ class PlayGame extends Phaser.Scene {
             this.train.jumping = true;
         }
         if (down_key.isDown && can_use_ability(this, "jump") && this.train.onTrack<this.num_tracks-1 && !this.train.turning) {
-            console.log("jump down");
+            this.jumpSound.play();
             this.player_upgrades["jump"]--;
             this.train.turn_dir = "south";
             this.train.onTrack++;
@@ -535,7 +551,7 @@ class PlayGame extends Phaser.Scene {
             this.train.jumping = true;
         }
         if (one_key.isDown && can_use_ability(this, "speed boost") && !this.train.speed_boost) {
-            console.log("use speed boost");
+            this.boostSound.play();
             this.speedLock = this.speed;
             this.train.speed_boost = true;
             this.speed += 20;
@@ -608,38 +624,9 @@ class PlayGame extends Phaser.Scene {
     }*/
     enterStation(station) {
         this.train.atStation = 2;
-        /*if (((this.train.capacity - stationTime) + station.passengers.length) <= this.train.capacity) {
-            stationTime = (stationTime + station.passengers.length) * 500 + 2000;
-        } else {
-            stationTime = (stationTime + (this.train.capacity - this.train.passengers.length)) * 500 + 2000;
-        }*/
 
         this.train.moving = false;
         this.fuel = this.train.fuelCapacity;
-
-
-
-        /* enter station -> delayed call to disembark 1 passenger -> upon completion,
-        do another delayed call if there are more passengers -> once there aren't,
-        delayed call for boarding passengers in the same way -> once there are no more to board,
-        train leaves station */
-        
-        /*while (continueStation) {
-            let getOff = this.time.delayedCall(500, () => {
-                continueStation = passenger.checkStationOff(this, station);
-            });
-        }*/
-
-        /*this.train.passengers.forEach(passenger => {
-            passenger.checkStationOff(this, station);
-        });*/
-        /*continueStation = true;
-
-        while (continueStation) {
-            let getOn = this.time.delayedCall(500, () => {
-                continueStation = passenger.checkStation
-            })
-        }*/
 
         let lock = true;
         let stationTime = 0;
@@ -651,15 +638,6 @@ class PlayGame extends Phaser.Scene {
         });
         stationTime = 2000 / (stationTime + 1);
         lock = this.stationRecurOff(station, stationTime, 0);
-        /*while (lock) {
-        }
-        lock = true;
-        lock = this.stationRecurOn(station, stationTime, 0);
-        while (lock) {
-        }
-        this.fuel = this.train.fuelCapacity;
-        this.train.moving = true;
-        station.arrived_status = 4;*/
     }
 
     stationRecurOff(station, stationTime, position) {
@@ -683,17 +661,9 @@ class PlayGame extends Phaser.Scene {
 
         let gettingOff = this.time.delayedCall(stationTime, () => {
             let lock = true;
-            /*if (this.train.passengers[position].destination == station.station_type 
-                || !this.train.passengers[position].goodReview) {
-                    this.train.passengers[position].disembark;
-                }*/
             this.train.passengers[position].checkStationOff(this, station);
             lock = this.stationRecurOff(station, stationTime, position);
-            /*} else {
-                lock = this.stationRecurOff(station, stationTime, position);
-            }*/
-            //while (lock) {
-            //}
+
             return false;
         });
     }
@@ -712,8 +682,7 @@ class PlayGame extends Phaser.Scene {
                 this.stationRecurOn(station, stationTime, position + 1);
                 console.log("DONE" + position);
             }
-            //while (lock) {
-            //}
+
             return false;
         })
     }
