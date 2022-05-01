@@ -12,6 +12,7 @@ class PlayGame extends Phaser.Scene {
         this.load.audio('junction_switch', './assets/sound effects/junction switched.mp3');
         this.load.audio('backgroundMusic', './assets/music/main game song.wav');
         this.load.audio('crash_sound', './assets/sound effects/train crash.mp3');
+        this.load.audio('coin_pickup', './assets/sound effects/pickupfuel.wav');
         LoadUI(this);
     }
 
@@ -21,6 +22,7 @@ class PlayGame extends Phaser.Scene {
         this.backgroundMusic = this.sound.add('backgroundMusic', {volume: 0.8, loop: true});
         this.trainSound = this.sound.add('train_on_rails', {volume: .3, loop: true});
         this.crashSound = this.sound.add('crash_sound', {volume: 0.1});
+        this.coinSound = this.sound.add('coin_pickup', {volume: 0.7});
         this.backgroundMusic.play();
         this.trainSound.play();
 
@@ -31,7 +33,13 @@ class PlayGame extends Phaser.Scene {
         D_key = this.input.keyboard.addKey('D');
         // key code 37 = left key, 39 = right key
         left_key = this.input.keyboard.addKey(37);
+        up_key = this.input.keyboard.addKey(38);
         right_key = this.input.keyboard.addKey(39);
+        down_key = this.input.keyboard.addKey(40);
+
+        one_key = this.input.keyboard.addKey(49);
+        two_key = this.input.keyboard.addKey('2');
+
         space_bar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.base_interval = 64*6;  // base unscaled interval between rows of tracks
         this.num_tracks = 4;        // number of rows of tracks
@@ -41,24 +49,33 @@ class PlayGame extends Phaser.Scene {
         this.stations = [];         // list of stations.
         this.enemy_trains = []      // list of enemy trains
         this.coins = [];            // dict of coins
+        this.currency = 0;
         this.station_spawn_table = [0, 0, 0, 10, 10, 10, 20, 20, 20, 30];
         this.station_spawn_index = 0;
         this.trainyard_spawn_table = [];
         this.trainyard_spawn_index = 0;
         this.station_types = ["red square", "blue circle", "green triangle"];
         this.station_type_index = 0;
-        function Upgrade(name, price) {
+        function Upgrade(name, price, max) {
             this.name = name;
             this.price = price;
             this.num_bought = 0;
+            this.max = max;
             this.chosen = false;
         }
         this.upgrades = [
-            new Upgrade("jump", 500),
-            new Upgrade("extra wagon", 1000),
-            new Upgrade("protection", 250),
-            new Upgrade("speed boost", 100)
+            new Upgrade("jump", 100, 5),
+            new Upgrade("extra wagon", 1000, 2),
+            new Upgrade("protection", 250, 3),
+            new Upgrade("speed boost", 500, 3)
         ];
+        // upgrades available to the player
+        this.player_upgrades = {
+            "jump": 1,
+            "extra wagon": 0,
+            "protection": 1,
+            "speed boost": 1
+        };
         for (let i = 0; i < 11; i++) {
             if (i < 5)
                 this.trainyard_spawn_table.push(0);
@@ -78,31 +95,32 @@ class PlayGame extends Phaser.Scene {
             this.coins[i] = [];
         }
 
-        this.margin = config.height/15; // margin; no use right now
+        this.margin = config.height/15;             // margin; no use right now
         this.y_interval = (config.height-(2*this.margin))/(Object.keys(this.tracks).length+1); // interval that rows of tracks should be seperated
         this.scaling = this.y_interval / this.base_interval; // scaling of all objects
-        this.x_unit = 64 * this.scaling; // unit square of measurement
-        this.node_interval = 20 * this.x_unit;  // interval between each node/track placement
-        this.input_interval = this.node_interval; // interval user can input an action before a junction
-        this.junction_offset = 2 * this.x_unit; // offset of junction where train moves
-        this.speed = 10;     // speed of world
-        this.dx = 0;        // how much a player has moved
-        this.speedLock = this.speed; // holds speed while speed changes when entering stations
-        this.lock = false; // traces when speed is locked
+        this.x_unit = 64 * this.scaling;            // unit square of measurement
+        this.node_interval = 20 * this.x_unit;      // interval between each node/track placement
+        this.input_interval = this.node_interval;   // interval user can input an action before a junction
+        this.junction_offset = 2 * this.x_unit;     // offset of junction where train moves
+        this.speed = 10;                // speed of world
+
+        this.dx = 0;                    // how much a player has moved
+        this.speedLock = this.speed;    // holds speed while speed changes when entering stations
+        this.lock = false;              // traces when speed is locked
         this.dist = 0;
-        this.nodes_onscreen = Math.floor(config.width / this.node_interval);   // number of nodes on screen
-        this.num_chunks = this.nodes_onscreen * 10;        // number of chunks that are loaded; 5x screen width
+        this.nodes_onscreen = Math.floor(config.width / this.node_interval);    // number of nodes on screen
+        this.num_chunks = this.nodes_onscreen * 10;     // number of chunks that are loaded; 5x screen width
 
         // spawn the world initially
         this.train = new Train(this, config.width/10, 0, 'basic_locomotive', Math.floor(this.num_tracks/2), "player").setOrigin(1, 0.5);
         this.train.x += this.train.displayWidth*2;
 
         initSpawn(this);
-        this.train.wagons.push(new Wagon(this, this.train.x-this.train.wagon_offset, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
+        /*this.train.wagons.push(new Wagon(this, this.train.x-this.train.wagon_offset, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
         // if you want to add another wagon
         let recent_wagon = this.train.wagons[this.train.wagons.length-1];
         this.train.wagons.push(new Wagon(this, recent_wagon.x-recent_wagon.wagon_offset, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
-
+        */
         // set fuel
         this.fuel = this.train.fuelCapacity;
         this.currentStation;
@@ -158,10 +176,9 @@ class PlayGame extends Phaser.Scene {
             let train_destroyed = false;
             this.enemy_trains[i].speed = this.speed + 5;
             this.enemy_trains[i].update();
-            // if they would crash into an obstacle, have them jump ;)
+            // if they would crash into an obstacle
             for (let j = 0; j < this.nodes[this.enemy_trains[i].onTrack].length; j++) {
                 if (this.checkObstacleCollision(this.enemy_trains[i], this.nodes[this.enemy_trains[i].onTrack][j])) {
-                    console.log("enemy train crashed");
                     this.enemy_trains[i].enemy_indicator.setVisible(false);
                     this.enemy_trains[i].wagons.forEach(wagon => {
                         wagon.setVisible(false);
@@ -173,13 +190,29 @@ class PlayGame extends Phaser.Scene {
                 }
                 if (this.checkTrainCollision(this.train, this.enemy_trains[i])) {
                     this.crashSound.play();
-                    this.train.health = 0;
+                    if (this.player_upgrades["protection"] != 0 || this.train.speed_boost) {
+                        if (!this.train.speed_boost) {
+                            console.log("protection used");
+                            this.player_upgrades["protection"]--;
+                        }
+                        this.enemy_trains[i].destroy();
+                        this.enemy_trains[i].wagons.forEach(wagon => {
+                            wagon.setVisible(false);
+                        })
+                        this.enemy_trains.splice(i, 1);
+                        i--;
+                        train_destroyed = true;
+                        break;
+                    }
+                    else
+                        this.train.health = 0;
                 }
             }
             if (train_destroyed) continue;
             if (this.enemy_trains[i].x < -2*this.node_interval) {
                 this.enemy_trains[i].destroy();
                 this.enemy_trains.splice(i, 1);
+                i--;
             }
         }
     }
@@ -193,10 +226,19 @@ class PlayGame extends Phaser.Scene {
     }
     
     updateSpeed(delta) {
+        if (this.train.speed_boost && this.train.slow_down) {
+            this.speed--;
+            if (this.speed <= this.speedLock) {
+                this.speed = this.speedLock;
+                this.train.speed_boost = false;
+                this.train.slow_down = false;
+                console.log("speed boost over");
+            }
+        }
         this.dist += (delta/1000) * this.speed;
         this.dx += (delta/1000) * this.speed;
         if (this.dx >= 200 && !this.train.atStation) {
-            this.speed++;
+            this.speed += 2;
             this.dx = 0;
         }
         this.train.speed = this.speed;
@@ -207,18 +249,17 @@ class PlayGame extends Phaser.Scene {
             this.coins[i].x -= this.speed;
             // check for collision
             if (this.coinCollision(this.train, this.coins[i])) {
-                this.fuel += 500;
-                if(this.fuel > this.train.fuelCapacity) {
-                    this.fuel = this.train.fuelCapacity;
-                }
+                this.coinSound.play();
+                this.currency += 10;
                 this.coins[i].destroy();
                 this.coins.splice(i, 1);
-                continue;
+                i--;
             }
 
             if (this.coins[i].x < -2*this.node_interval) {
                 this.coins[i].destroy();
                 this.coins.splice(i, 1);
+                i--;
             }
         }
     }
@@ -244,6 +285,7 @@ class PlayGame extends Phaser.Scene {
                 if (this.tracks[i][k].x < -2*this.node_interval) {
                     delete this.tracks[i][k];
                     this.tracks[i].splice(k, 1);
+                    k--
                 }
             }
             // move and update the nodes
@@ -251,13 +293,23 @@ class PlayGame extends Phaser.Scene {
                 this.nodes[i][j].speed = this.speed;
                 this.nodes[i][j].update();
                 if (this.checkObstacleCollision(this.train, this.nodes[i][j])) {
-                    this.nodes[i][j].obstacleHit = true;
-                    if (this.nodes[i][j].obstacle_type == 1) {
-                        this.crashSound.play();
-                        this.train.health = 0;
-                    } else if (this.nodes[i][j].obstacle_type == 2) {
-                        this.crashSound.play();
-                        this.train.health -= 4;
+                    if (this.player_upgrades["protection"] != 0 || this.train.speed_boost) {
+                        if (!this.train.speed_boost) {
+                            this.player_upgrades["protection"]--;
+                            console.log("protection used");
+                        }
+                        this.nodes[i][j].obstacle.setVisible(false);
+                        // play destroy animation
+                    }
+                    else {
+                        this.nodes[i][j].obstacleHit = true;
+                        if (this.nodes[i][j].obstacle_type == 1) {
+                            this.crashSound.play();
+                            this.train.health = 0;
+                        } else if (this.nodes[i][j].obstacle_type == 2) {
+                            this.crashSound.play();
+                            this.train.health -= 4;
+                        }
                     }
                 }
                 /*if the player is:
@@ -287,12 +339,14 @@ class PlayGame extends Phaser.Scene {
                         // turn north
                         case "north":
                             this.train.onTrack--;
+                            this.turn_speed = this.speed;
                             this.train.turning = true;
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
                             break;
                         // turn south
                         case "south":
                             this.train.onTrack++;
+                            this.turn_speed = this.speed;
                             this.train.turning = true;
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
                             break;
@@ -307,6 +361,7 @@ class PlayGame extends Phaser.Scene {
                     delete this.nodes[i][j];
                     this.nodes[i].splice(j, 1);
                     spawn_tracks=true;
+                    j--;
                 }
             }
         }
@@ -363,6 +418,12 @@ class PlayGame extends Phaser.Scene {
             && this.stations[i].arriving_status == 0) {
                 this.stations[i].arriving_status = 1;
                 this.stations[i].stop_dist = (this.stations[i].x + this.stations[i].station_point) - this.train.x;
+                if (this.train.speed_boost) {
+                    this.speed = this.speedLock;
+                    this.train.speed_boost = false;
+                    this.train.slow_down = false;
+                    this.train.boost_timer = 0;
+                }
                 this.speedLock = this.speed;
                 this.train.atStation = 1;
             }
@@ -379,22 +440,24 @@ class PlayGame extends Phaser.Scene {
             }
             // once stopped, enter station
             else if (this.stations[i].arriving_status == 2) {
-                if (this.stations[i].station_type != "trainyard")
+                if (this.stations[i].station_type != "trainyard") {
                     this.enterStation(this.stations[i]);
+                    this.stations[i].arriving_status = 3;
+                }
                 else {
                     this.enterTrainyard(this.stations[i]);
                 }
-                this.stations[i].arriving_status = 3;
             }
             // when done with station, leave station
             else if (this.stations[i].arrived_status == 4) {
                 let acc_dist = Math.abs((this.stations[i].station_point + this.stations[i].x)-this.train.x);
-                this.train.atStation = 0;
                 this.speed = this.speedLock * (acc_dist / this.stations[i].station_point);
                 if (this.speed < 1) this.speed = 1;
                 if (this.speed >= this.speedLock) {
                     this.stations[i].arrived_status = 5;
                     this.speed = this.speedLock;
+                    console.log("left station");
+                    this.train.atStation = 0;
                 }
             }
 
@@ -415,6 +478,34 @@ class PlayGame extends Phaser.Scene {
         if (right_key.isDown && this.speed < 50) {
             this.speed += 1;
         }
+        let can_use_ability = function(scene, ability) {
+            return (scene.player_upgrades[ability] && scene.train.atStation==0)
+        }
+        if (up_key.isDown && can_use_ability(this, "jump") && this.train.onTrack>0 && !this.train.turning) {
+            console.log("jump up");
+            this.player_upgrades["jump"]--;
+            this.train.turn_dir = "north";
+            this.train.onTrack--;
+            this.train.turn_dest = this.nodes[this.train.onTrack][0].y;
+            this.train.turning = true;
+            this.train.jumping = true;
+        }
+        if (down_key.isDown && can_use_ability(this, "jump") && this.train.onTrack<this.num_tracks-1 && !this.train.turning) {
+            console.log("jump down");
+            this.player_upgrades["jump"]--;
+            this.train.turn_dir = "south";
+            this.train.onTrack++;
+            this.train.turn_dest = this.nodes[this.train.onTrack][0].y;
+            this.train.turning = true;
+            this.train.jumping = true;
+        }
+        if (one_key.isDown && can_use_ability(this, "speed boost") && !this.train.speed_boost) {
+            console.log("use speed boost");
+            this.speedLock = this.speed;
+            this.train.speed_boost = true;
+            this.speed += 20;
+            this.player_upgrades["speed boost"]--;
+        }
         
     }
 
@@ -434,7 +525,8 @@ class PlayGame extends Phaser.Scene {
                     //console.log("Bad review");
                 } else {
                     if (this.train.health < this.train.healthCapacity) {
-                        this.train.health += 1;
+                        this.train.health += 2;
+                        this.currency += 100;
                     }
                     //console.log("Good review");
                 }
@@ -484,14 +576,41 @@ class PlayGame extends Phaser.Scene {
     enterTrainyard(trainyard) {
         this.train.atStation = 2;
         this.train.moving = false;
-        console.log("enter trainyard");
-        for (let i = 0; i < trainyard.upgrades; i++) {
-            let upgrade = trainyard.upgrades[i];
-            console.log(upgrade, "available at yard");
+        if (trainyard.arrived_status = 2) {
+            // display the UI. UI will set arrived status to 3 once it is done.
+            DisplayTrainyardUI(this, trainyard)
         }
-        let leave = this.time.delayedCall(2000, () => {
+        else {
+            console.log("leaving yard");
             this.train.moving = true;
+            // display the UI
             trainyard.arrived_status = 4;
-        });
+        }
+    }
+
+    buyAbility(ability) {
+        if (!ability in this.player_upgrades) {
+            console.log("invalid ability");
+            return;
+        }
+        this.player_upgrades[ability]++;
+        for (let i = 0; i < this.upgrades.length; i++) {
+            if (this.upgrades[i].name == ability) {
+                if (ability == "extra wagon") {
+                    if (!this.train.wagons.length) {
+                        this.train.wagons.push(new Wagon(this, this.train.x-this.train.wagon_offset, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
+                    }
+                    else {
+                        let recent_wagon = this.train.wagons[this.train.wagons.length-1];
+                        this.train.wagons.push(new Wagon(this, recent_wagon.x-recent_wagon.wagon_offset, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
+                    }
+                    this.train.capacity += 5;
+                }
+                this.currency -= this.upgrades[i].price;
+                this.upgrades[i].num_bought++;
+                // this.upgrades[i].price += 100; // placeholder value
+                break;
+            }
+        }
     }
 }

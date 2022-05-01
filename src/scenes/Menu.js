@@ -19,7 +19,7 @@ class Menu extends Phaser.Scene {
         this.load.image('basic_passenger_wagon', './assets/trains/basic passenger wagon.png');
         this.load.image('enemy_cargo_wagon', './assets/trains/enemy cargo wagon.png');
         this.load.image('station', './assets/stations/field top station.png');
-        this.load.image('coin', './assets/obstacles/fuel can.png');
+        this.load.image('coin', './assets/obstacles/coin pickup.png');
         
         this.load.spritesheet('basic_locomotive', './assets/trains/basic locomotive spritesheet.png', {frameWidth: 400, frameHeight: 446, startFrame: 0, endFrame: 2});
         this.load.spritesheet('enemy_locomotive', './assets/trains/enemy locomotive.png', {frameWidth: 400, frameHeight: 446, startFrame: 0, endFrame: 0});
@@ -41,13 +41,13 @@ class Menu extends Phaser.Scene {
                     this.load.image(`${sign_shapes[i]} ${sign_dirs[j]}`, `./assets/track signs/${sign_shapes[i]} ${sign_dirs[j]}.png`);
             }
         }
-        this.load.image("trainyard station sign", './assets/stations/red_square.png');
+        this.load.image("trainyard station indicator", './assets/stations/red_square.png');
         for (let i = 0; i < sign_shapes.length-1; i++) {
             let sign = sign_shapes[i];
             this.load.image(`${sign} station sign`, `./assets/stations/${sign} station sign.png`);
             this.load.image(`${sign} station indicator`, `./assets/stations/${sign} station indicator.png`)
         }
-        this.load.image("enemy train indicator", "./assets/stations/red_square.png");
+        this.load.image("enemy train indicator", "./assets/stations/incoming train indicator.png");
         
         //sounds
         this.load.audio('train_on_rails', './assets/sound effects/train on rails 2.mp3');

@@ -145,7 +145,7 @@ function spawnCoinRow(scene, x, y, track_type) {
         y_interval = scene.y_interval / num_coins;
     }
     for (let i = 1; i <= num_coins; i++) {
-        scene.coins.push(scene.add.sprite(x+(i*x_interval), y+(i*y_interval), "coin").setScale(scene.scaling).setDepth(5));
+        scene.coins.push(scene.add.sprite(x+(i*x_interval), y+(i*y_interval), "coin").setScale(scene.scaling/2).setDepth(5));
     }
 }
 
@@ -188,11 +188,17 @@ function spawnNodes(scene, x, y, station_row, row, can_have_obstacles) {
 
     if (can_have_obstacles) {
         // 10% chance to spawn rock if junction to avoid it
-        let obstacle_chance = Math.floor(Math.random()*100)+1;
-        if (obstacle_chance <= 10 && (n_junc || s_junc)) {
+        let rock_chance = 10;
+        let branch_chance = 20;
+        let obstacle_rng = Math.floor(Math.random()*100)+1;
+        if (scene.dist >= 1000) {
+            rock_chance = 20;
+            branch_chance = 30;
+        }
+        if (obstacle_rng <= rock_chance && (n_junc || s_junc)) {
             obstacle_type = 1;
         } 
-        else if (obstacle_chance <= 30 && (n_junc || s_junc)) {
+        else if (obstacle_rng <= rock_chance+branch_chance && (n_junc || s_junc)) {
             obstacle_type = 2;
         }
     }
@@ -217,8 +223,12 @@ function spawnNodes(scene, x, y, station_row, row, can_have_obstacles) {
     }
 }
 
+// per row check
 function spawnEnemyTrain(scene, x, y, row) {
     let enemy_spawn_chance = 5;
+    if (scene.dist >= 1000) {
+        enemy_spawn_chance = 10;
+    }
     if (Math.floor(Math.random()*100)+1 <= enemy_spawn_chance) {
         let can_spawn = true;
         scene.stations.forEach(station => {
@@ -231,9 +241,6 @@ function spawnEnemyTrain(scene, x, y, row) {
 
             train.wagons.push(new Wagon(scene, train.x+train.wagon_offset*1.05, train.y, 'enemy_cargo_wagon', train.onTrack).setDepth(9));
             train.wagons[train.wagons.length-1].flipX = true;
-        }
-        else {
-            console.log("share tracks wt station; cant spawn");
         }
     }
 }
@@ -399,17 +406,17 @@ function spawnStation(scene, x, y) {
         isTrainyard = true;
         scene.trainyard_spawn_index = 0;
     }
-    else {
+    else if (scene.trainyard_spawn_index < scene.trainyard_spawn_table.length) {
         scene.trainyard_spawn_index++;
         // temp make sure trainyard doesnt spawn
         // scene.trainyard_spawn_index = 0;
     }
     if (!isTrainyard) {
         // spawn a station
-        let stationCount = Math.ceil(Math.random() * 6); // Possible 1-6 Passengers
+        let stationCount = Math.ceil(Math.random() * 4); // Possible 1-4 Passengers
         let passengers = [];
         for (let j = 0; j < stationCount; j++) {
-            let patienceTime = Math.ceil(Math.random()*240000) + 120000;
+            let patienceTime = Math.ceil(Math.random()*30000) + 90000;
             passengers.push(new Passenger(
                 scene, x, y, "passenger 1", 0, scene.train.onTrack, patienceTime, 0
             ));
