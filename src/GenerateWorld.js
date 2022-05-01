@@ -385,7 +385,7 @@ function checkSameRoute(scene, junction_signs, row) {
                             prev_node.signs.push(scene.add.image(prev_node.x, prev_node.y, `track sign ${key1}`).setScale(scene.scaling).setDepth(5));
                             Array.from(value1).forEach(element => {
                                 prev_node.signs.push(scene.add.image(prev_node.x, prev_node.y, `${element} ${key1} sign`).setScale(scene.scaling).setDepth(6));
-                            })
+                            });
                         }
                         break_check = true;
                         if (sign_removed) break;
