@@ -113,6 +113,24 @@ class PlayGame extends Phaser.Scene {
 
         // spawn the world initially
         this.train = new Train(this, config.width/10, 0, 'basic_locomotive', Math.floor(this.num_tracks/2), "player").setOrigin(1, 0.5);
+        this.anims.create({
+            key: 'noTurn',
+            frames: this.anims.generateFrameNumbers('basic_locomotive', { start: 0, end: 0 }),
+            frameRate: 1,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'turnNorth',
+            frames: this.anims.generateFrameNumbers('basic_locomotive', { start: 1, end: 1 }),
+            frameRate: 1,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'turnSouth',
+            frames: this.anims.generateFrameNumbers('basic_locomotive', { start: 2, end: 2 }),
+            frameRate: 1,
+            repeat: -1
+        });
         this.train.x += this.train.displayWidth*2;
 
         initSpawn(this);
@@ -339,16 +357,28 @@ class PlayGame extends Phaser.Scene {
                         // turn north
                         case "north":
                             this.train.onTrack--;
-                            this.turn_speed = this.speed;
+                            this.turn_time = (delta)*(this.train.junction_wid / this.train.speed);
                             this.train.turning = true;
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
+                            let firstNorth = this.time.delayedCall(this.turn_time/4, () => {
+                                this.train.play("turnNorth");
+                                let secondNorth = this.time.delayedCall(this.turn_time/2, () => {
+                                    this.train.play("noTurn");
+                                });
+                            });
                             break;
                         // turn south
                         case "south":
                             this.train.onTrack++;
-                            this.turn_speed = this.speed;
+                            this.turn_time = (delta)*(this.train.junction_wid / this.train.speed);
                             this.train.turning = true;
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
+                            let firstSouth = this.time.delayedCall(this.turn_time/4, () => {
+                                this.train.play("turnSouth");
+                                let secondSouth = this.time.delayedCall(this.turn_time/2, () => {
+                                    this.train.play("noTurn");
+                                });
+                            });
                             break;
                         default:
                             console.log("invalid dir");
