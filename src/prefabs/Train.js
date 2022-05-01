@@ -14,6 +14,7 @@ class Train extends Phaser.GameObjects.Sprite {
         this.junction_wid = (1184-192)*scene.scaling;   // width of a junction to travel x-wards
         this.turning = false;                 // if the train is turning or not
         this.jumping = false;                 // if the train is jumping or not
+        this.invincible = false;
         this.turn_wagons = false;             // if the wagons are turning
         this.wagons_turned = 0;               // number of wagons turned
         this.turn_dest = this.y;

@@ -63,6 +63,10 @@ class PlayGame extends Phaser.Scene {
             new Upgrade("protection", 250),
             new Upgrade("speed boost", 100)
         ];
+        this.player_upgrades = {};
+        for (let i = 0; i < this.upgrades.length; i++) {
+            this.player_upgrades[this.upgrades[i].name] = 0;
+        }
         for (let i = 0; i < 11; i++) {
             if (i < 5)
                 this.trainyard_spawn_table.push(0);
@@ -522,5 +526,19 @@ class PlayGame extends Phaser.Scene {
             })
             trainyard.arrived_status = 4;
         });
+    }
+
+    buyAbility(ability) {
+        if (!ability in player_upgrades) {
+            console.log("invalid ability");
+            return;
+        }
+        player_upgrades[ability]++;
+        for (let i = 0; i < this.upgrades.length; i++) {
+            if (this.upgrades[i].name == ability) {
+                this.upgrades[i].num_bought++;
+                this.upgrades[i].price += 100; // placeholder value
+            }
+        }
     }
 }
