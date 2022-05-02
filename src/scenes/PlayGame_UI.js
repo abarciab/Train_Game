@@ -204,11 +204,6 @@ function StartUI(scene){
             BuyItem(scene, "extra wagon");
         })
     
-
-    //fuel display
-    this.fuelMeter = scene.add.image(game.config.width - 200, this.bottomBarYpos-10, 'fuel_meter').setOrigin(0.5).setScale(0.55).setDepth(20);
-    this.fuelNeedle = scene.add.image(game.config.width - 200, this.bottomBarYpos + 25, 'fuel_needle').setOrigin(0.5).setScale(0.55).setDepth(21);
-    
     //distance display
     this.distDisplay = scene.add.text(game.config.width*0.85, this.topBar.y, "Dist: 20,000m", this.textConfig).setOrigin(0.5).setDepth(20);
     this.distDisplay.setColor('#FFFFFF');
@@ -279,18 +274,30 @@ function hideToolTip(){
     tooltipText.setVisible(false);
 }
 
+function updateAbilities(scene){
+    jumpAbility.setAlpha(0.2);
+    if (scene.player_upgrades["jump"] > 0){
+        jumpAbility.setAlpha(1);
+    }
+    boostAbility.setAlpha(0.2);
+    if (scene.player_upgrades["speed boost"] > 0){
+        boostAbility.setAlpha(1);
+    }
+    protAbility.setAlpha(0.2);
+    if (scene.player_upgrades["protection"] > 0){
+        protAbility.setAlpha(1);
+    }
+}
+
 function DisplayTrainyardUI(scene, trainyard){
 
     if (this.leaveTrainYard){
         CloseTrainyardUI();
         this.leaveTrainYard = false;
-        //console.log("DONE!");
         return "DONE";
     }
     
-    //console.log("displaying trainyardUI");
     this.shopItems = trainyard.upgrades;
-
     this.trainyardMenu.setVisible(true);
 
     this.jumpUpgradeShopIcon.setVisible(true).setAlpha(0.5);
@@ -381,12 +388,22 @@ function CloseTrainyardUI(){
 
 function UpdateUI(scene, delta){
 
+    //avilities
+    updateAbilities(scene);
+
+    if (scene.train.num_wagons == 0){
+        wagon1.setVisible(false);
+        wagon2.setVisible(false);
+    }   
+    if (scene.train.num_wagons > 0){
+        wagon1.setVisible(true);
+    } if (scene.train.num_wagons > 1){
+        wagon2.setVisible(true);
+    }
+
     //instructions
     DisplayNextInstruction(scene);
     this.instructionStage += (delta/1000)/5
-
-    //update fuel display
-    this.fuelNeedle.angle = ( (scene.fuel/scene.train.fuelCapacity) * 180) - 90;
 
     //update coins
     this.coinDisplay.text = scene.currency;
@@ -399,10 +416,6 @@ function UpdateUI(scene, delta){
         this.rating = scene.train.health;
         displayRating();
     }
-}
-
-function updateAbilities(scene){
-
 }
 
 function displayRating(){
