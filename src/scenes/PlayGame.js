@@ -647,8 +647,8 @@ class PlayGame extends Phaser.Scene {
                     else {
                         let recent_wagon = this.train.wagons[this.train.wagons.length-1];
                         this.train.wagons.push(new Wagon(this, recent_wagon.x-recent_wagon.wagon_offset, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
-                        this.train.num_wagons++;
                     }
+                    this.train.num_wagons++;
                     this.train.capacity += 5;
                 }
                 console.log("currency:", this.currency, "- ", this.upgrades[i].price);
