@@ -54,6 +54,7 @@ class Passenger extends Phaser.GameObjects.Sprite {
                 if (scene.train.health < scene.train.healthCapacity) {
                     scene.train.health += 1;
                 }
+                scene.currency += 250;
                 //console.log("Good review");
             }
             scene.train.passengers.splice(scene.train.passengers.indexOf(this), 1);
