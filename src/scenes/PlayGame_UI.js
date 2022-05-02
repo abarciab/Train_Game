@@ -95,7 +95,7 @@ function StartUI(scene){
     };
 
     //variables
-    this.front = 180;
+    this.front = 20;
     this.wagonFront = 490;
     this.iconGap = 80;
     this.iconScale = 0.5;
@@ -241,11 +241,9 @@ function StartUI(scene){
 }
 
 function BuyItem(scene, name){
-
     this.shopItems.forEach(item => {
-        //console.log(item.name);
-        if (item.name == name && scene.currency >= item.price){
-            console.log("BOUGHT 1 " + name + " for " + item.price);
+        if (item.name == name && scene.currency >= item.price && scene.player_upgrades[item.name] < item.max){
+            scene.cameras.main.shake(50, 0.002);
             scene.buyAbility(item.name);
             return;
         }
@@ -380,8 +378,6 @@ function DisplayTrainyardUI(scene, trainyard){
 
 function CloseTrainyardUI(){
 
-    //console.log("closing trainyardUI");
-
     trainyardMenu.setVisible(false);
 
     jumpUpgradeShopIcon.setVisible(false);
@@ -486,11 +482,11 @@ function addPassengerUI(scene, passenger){
     }
 
     this.newPassIcon = new PassengerIcon(scene, this.front + (iconGap*numPassengers), bottomBarYpos-40, shape, passenger, numPassengers).setScale(this.iconScale).setDepth(22.8);
-    if (this.numPassengers > 3){
+    if (this.numPassengers > 5){
         this.newPassIcon.x += this.wagonGap;
         this.newPassIcon.patienceBar.x += this.wagonGap;
     }
-    if (this.numPassengers > 8){
+    if (this.numPassengers > 10){
         this.newPassIcon.x += this.wagonGap;
         this.newPassIcon.patienceBar.x += this.wagonGap;
     }
@@ -529,11 +525,11 @@ function RemovePassengerIcons(scene, stationName){
         passengerIcon.x = this.front + (scene.UIConfig.iconGap * (i+1));
         passengerIcon.patienceBar.x = this.front + (scene.UIConfig.iconGap * (i+1));
 
-        if (i > 3){
+        if (i > 5){
             passengerIcon.x += this.wagonGap;
             passengerIcon.patienceBar.x += this.wagonGap;
         }
-        if (i > 8){
+        if (i > 10){
             passengerIcon.x += this.wagonGap;
             passengerIcon.patienceBar.x += this.wagonGap;        
         }
@@ -588,7 +584,7 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
                 const colorObj = Phaser.Display.Color.Interpolate.ColorWithColor(this.green, this.red, 100, tween.getValue());
                 this.patienceBar.setTint(Phaser.Display.Color.GetColor(colorObj.r, colorObj.g, colorObj.b));
                 this.patienceBar.setScale(1-tween.getValue()/100, 1);
-                if (tween.getValue() == 100){
+                if (tween.getValue() == 100 && passenger.onTrain){
                     passenger.goodReview = false;
                     this.setAlpha(0.4);
                     scene.cameras.main.shake(50, 0.009);
