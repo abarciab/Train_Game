@@ -100,8 +100,8 @@ function StartUI(scene){
     this.iconGap = 80;
     this.iconScale = 0.5;
     this.bottomBarYpos = game.config.height - 30;
-    this.abilityFront = 1000;
-    this.abilityGap = 80;
+    this.abilityFront = 900;
+    this.abilityGap = 190;
     this.abilityScale = 0.6;
     this.wagonGap = 60;
     this.shopItemGap = 90;
@@ -123,8 +123,11 @@ function StartUI(scene){
         textConfig.align = 'center';
         // abilities
         this.jumpAbility = scene.add.image(this.abilityFront, this.topBar.y-6, 'jump_icon').setDepth(22.8).setScale(this.abilityScale).setOrigin(0.45).setAlpha(0.2);
+            this.jumpAbilityText = scene.add.text(this.jumpAbility.x + this.abilityGap/3, this.jumpAbility.y, "1/1", {textConfig}).setDepth(22.8);
         this.boostAbility = scene.add.image(this.abilityFront + this.abilityGap*1, this.topBar.y-6, 'boost_icon').setDepth(22.8).setScale(this.abilityScale).setOrigin(0.45).setAlpha(0.2);
+            this.boostAbilityText = scene.add.text(this.boostAbility.x + this.abilityGap/3, this.boostAbility.y, "1/1", {textConfig}).setDepth(22.8);
         this.protAbility = scene.add.image(this.abilityFront + this.abilityGap*2, this.topBar.y-6, 'shield_icon').setDepth(22.8).setScale(this.abilityScale).setOrigin(0.45).setAlpha(0.2);
+            this.protAbilityText = scene.add.text(this.protAbility.x + this.abilityGap/3, this.protAbility.y, "1/1", {textConfig}).setDepth(22.8);  
     this.locomotive = scene.add.image(250, this.bottomBarYpos, 'locomotive_background').setOrigin(0.5).setScale(1.3, 1).setDepth(20);
     this.wagon1 = scene.add.image(this.wagonFront + 250, this.bottomBarYpos, 'wagon_background').setOrigin(0.5).setScale(1.3, 1).setDepth(20);
     this.wagon2 = scene.add.image(this.wagonFront + 250 + this.wagon1.displayWidth, this.bottomBarYpos, 'wagon_background').setOrigin(0.5).setScale(1.3, 1).setDepth(20);
@@ -287,6 +290,18 @@ function updateAbilities(scene){
     if (scene.player_upgrades["protection"] > 0){
         protAbility.setAlpha(1);
     }
+
+    scene.upgrades.forEach(item => {
+        if (item.name == "jump"){
+            jumpAbilityText.text = scene.player_upgrades["jump"] + "/" + item.max;
+        }
+        if (item.name == "speed boost"){
+            boostAbilityText.text = scene.player_upgrades["speed boost"] + "/" + item.max;
+        }
+        if (item.name == "protection"){
+            protAbilityText.text = scene.player_upgrades["protection"] + "/" + item.max;
+        }
+    })
 }
 
 function DisplayTrainyardUI(scene, trainyard){
