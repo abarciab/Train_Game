@@ -239,6 +239,7 @@ function StartUI(scene){
 
     this.instructionStage = 0;
     scene.UIConfig.iconGap = this.iconGap;
+    this.leaveTrainYard = false;
 }
 
 function BuyItem(scene, name){
@@ -280,12 +281,15 @@ function hideToolTip(){
 
 function DisplayTrainyardUI(scene, trainyard){
 
-    // console.log("displaying trainyardUI");
-
-    this.currentStation = trainyard;
+    if (this.leaveTrainYard){
+        CloseTrainyardUI();
+        this.leaveTrainYard = false;
+        console.log("DONE!");
+        return "DONE";
+    }
+    
+    console.log("displaying trainyardUI");
     this.shopItems = trainyard.upgrades;
-
-
 
     this.trainyardMenu.setVisible(true);
 
@@ -337,8 +341,6 @@ function DisplayTrainyardUI(scene, trainyard){
         }
     })
 
-    
-
     this.exitTrainyardButton.setVisible(true);
 }
 
@@ -362,7 +364,7 @@ function CloseTrainyardUI(){
         wagonBuyButton.setVisible(false);
     exitTrainyardButton.setVisible(false);
 
-    currentStation.arrived_status = 3;
+    this.leaveTrainYard = true;
 }
 
 function UpdateUI(scene, delta){

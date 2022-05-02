@@ -693,7 +693,10 @@ class PlayGame extends Phaser.Scene {
         this.train.moving = false;
         if (trainyard.arrived_status = 2) {
             // display the UI. UI will set arrived status to 3 once it is done.
-            DisplayTrainyardUI(this, trainyard)
+            if (DisplayTrainyardUI(this, trainyard) == "DONE"){
+                console.log("message recieved");
+                trainyard.arrived_status = 3;
+            }
         }
         else {
             console.log("leaving yard");
