@@ -245,10 +245,10 @@ function StartUI(scene){
 function BuyItem(scene, name){
 
     this.shopItems.forEach(item => {
-        console.log(item.name);
+        //console.log(item.name);
         if (item.name == name && scene.currency >= item.price){
             console.log("BOUGHT 1 " + name + " for " + item.price);
-            scene.buyAbility(item);
+            scene.buyAbility(item.name);
             return;
         }
     });
