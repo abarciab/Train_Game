@@ -284,11 +284,11 @@ function DisplayTrainyardUI(scene, trainyard){
     if (this.leaveTrainYard){
         CloseTrainyardUI();
         this.leaveTrainYard = false;
-        console.log("DONE!");
+        //console.log("DONE!");
         return "DONE";
     }
     
-    console.log("displaying trainyardUI");
+    //console.log("displaying trainyardUI");
     this.shopItems = trainyard.upgrades;
 
     this.trainyardMenu.setVisible(true);
@@ -358,7 +358,7 @@ function DisplayTrainyardUI(scene, trainyard){
 
 function CloseTrainyardUI(){
 
-    console.log("closing trainyardUI");
+    //console.log("closing trainyardUI");
 
     trainyardMenu.setVisible(false);
 
@@ -380,9 +380,6 @@ function CloseTrainyardUI(){
 }
 
 function UpdateUI(scene, delta){
-
-    //TEST
-    //DisplayTrainyardUI(scene, scene.upgrades);
 
     //instructions
     DisplayNextInstruction(scene);
