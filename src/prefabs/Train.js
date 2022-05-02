@@ -82,7 +82,6 @@ class Train extends Phaser.GameObjects.Sprite {
             this.updateTurn(delta);
         }
         if (this.turn_wagons) {
-            this.wagons_jumping = true;
             this.updateWagonTurn(delta);
         }
     }
@@ -94,6 +93,7 @@ class Train extends Phaser.GameObjects.Sprite {
         let turn_timer = (delta/1000)*(this.junction_wid / this.speed);
         if (this.jumping) {
             turn_timer = (delta/1000)*(this.junction_wid / this.jump_speed);
+            this.wagons_jumping = true;
         }
         // how much the train will move to accomidate with speed
         let y_per_frame = this.track_y_interval / (turn_timer/(delta/1000));
@@ -132,8 +132,10 @@ class Train extends Phaser.GameObjects.Sprite {
             for (let i = 0; i < this.wagons.length; i++) {
                 if (!this.wagons[i].turning && this.wagons[i].onTrack != this.onTrack) {
                     this.wagons[i].onTrack = this.onTrack;
-                    if (this.wagons_jumping)
+                    if (this.wagons_jumping) {
+                        console.log("wagons jump")
                         this.wagons[i].jumping = true;
+                    }
                     this.wagons[i].jump_speed = this.jump_speed;
                     this.wagons[i].turning = true;
                     this.wagons[i].done_turning = false;
@@ -211,6 +213,7 @@ class Wagon extends Phaser.GameObjects.Sprite {
                 this.done_turning = true;
                 this.turning = false;
                 this.jumping = false;
+                this.angle = 0;
                 this.dy = 0;
                 this.y = this.turn_dest;
                 this.turn_dir = "straight";
