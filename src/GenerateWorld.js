@@ -411,7 +411,11 @@ function spawnStation(scene, x, y) {
     }
     if (!isTrainyard) {
         // spawn a station
-        let stationCount = Math.ceil(Math.random() * 4); // Possible 1-4 Passengers
+        let max_pas = scene.train.capacity;
+        if (scene.train.num_wagons) {
+            max_pas-=2;
+        }
+        let stationCount = Math.ceil(Math.random() * max_pas-1) + 1; // Possible 1-5 Passengers
         let passengers = [];
         for (let j = 0; j < stationCount; j++) {
             let patienceTime = Math.ceil(Math.random()*30000) + 90000;
