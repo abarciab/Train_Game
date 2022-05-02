@@ -408,8 +408,6 @@ function spawnStation(scene, x, y) {
     }
     else if (scene.trainyard_spawn_index < scene.trainyard_spawn_table.length) {
         scene.trainyard_spawn_index++;
-        // temp make sure trainyard doesnt spawn
-        // scene.trainyard_spawn_index = 0;
     }
     if (!isTrainyard) {
         // spawn a station

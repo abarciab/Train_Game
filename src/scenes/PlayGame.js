@@ -83,7 +83,7 @@ class PlayGame extends Phaser.Scene {
         };
         for (let i = 0; i < 11; i++) {
             if (i < 5)
-                this.trainyard_spawn_table.push(100);
+                this.trainyard_spawn_table.push(0);
             else if (i < 8)
                 this.trainyard_spawn_table.push(25);
             else if (i < 10)
@@ -448,11 +448,9 @@ class PlayGame extends Phaser.Scene {
         }
         if (S_key.isDown && "south" in node.junctions && node.turn_dir != "south") {
             this.junctionSwitchSfx.play();
-            //console.log("train wants to go down at next junction");
             node.turn_dir = "south";
         }
         if (D_key.isDown && node.turn_dir != "straight") {
-            //console.log("train wants to go stright at next junction");
             this.junctionSwitchSfx.play();
             node.turn_dir = "straight";
         }
@@ -507,7 +505,6 @@ class PlayGame extends Phaser.Scene {
                 if (this.speed >= this.speedLock) {
                     this.stations[i].arriving_status = 5;
                     this.speed = this.speedLock;
-                    console.log("left station");
                     this.train.atStation = 0;
                 }
             }
@@ -560,68 +557,6 @@ class PlayGame extends Phaser.Scene {
         
     }
 
-    /*enterStation(station) {
-        this.train.atStation = 2;
-        let stationTime = 2000;
-        this.train.moving = false;
-        this.fuel = this.train.fuelCapacity;
-        
-        RemovePassengerIcons(this, station.station_type);
-
-        this.train.passengers.forEach(passenger => {
-            if (station.station_type == passenger.destination) {
-                passenger.onTrain = false;
-                if (passenger.goodReview == false) {
-                    this.train.health -= 2;
-                    //console.log("Bad review");
-                } else {
-                    if (this.train.health < this.train.healthCapacity) {
-                        this.train.health += 2;
-                        this.currency += 100;
-                    }
-                    //console.log("Good review");
-                }
-                this.train.passengers.splice(this.train.passengers.indexOf(passenger), 1);
-                //console.log("Passenger got off train (happy)");
-            } else if (!passenger.goodReview) {
-                passenger.onTrain = false;
-                this.train.health -= 4;
-                //console.log("Terrible review!");
-                this.train.passengers.splice(this.train.passengers.indexOf(passenger), 1);
-                //console.log("Passenger got off train (angry)");
-            }
-        });
-
-        station.passengers.forEach(passenger => {
-            if (this.train.passengers.length < this.train.capacity) {
-                passenger.onTrain = true;
-                passenger.boardTrain(this);
-                this.train.passengers.push(passenger);
-                //console.log("Passenger got on train");
-            }
-            if (this.train.passengers.length == this.train.capacity) {
-                //console.log("Full train!");
-            }
-        });
-
-        let gettingOff = this.time.delayedCall(stationTime/2, () => {
-            // Getting off animations
-            /*
-            Could do this by filling up list of passengers
-            who are getting off, and then showing all
-            their sprites leaving. Alternatively, could
-            have immediate train sprite change by
-            counting how many passengers got off.
-            let gettingOn = this.time.delayedCall(stationTime/2, () => {
-                // Getting on animations
-                // Same as getting off
-                this.fuel = this.train.fuelCapacity;
-                this.train.moving = true;
-                station.arriving_status = 4;
-                // start patience timers
-            }, null, this);
-        }, null, this);
-    }*/
     enterStation(station) {
         this.train.atStation = 2;
 
@@ -648,7 +583,6 @@ class PlayGame extends Phaser.Scene {
                 break;
             }
         }
-        console.log("OFF" + position);
         if (position > this.train.passengers.length - 1) {
             if (this.train.passengers.length + station.passengers.length <= this.train.capacity) {
                 stationTime = 2000 / (station.passengers.length + 1);
@@ -669,7 +603,6 @@ class PlayGame extends Phaser.Scene {
     }
 
     stationRecurOn(station, stationTime, position) {
-        console.log("ON" + position);
         if (position > station.passengers.length - 1 || this.train.passengers.length == this.train.capacity) {     
             this.fuel = this.train.fuelCapacity;
             this.train.moving = true;
@@ -680,7 +613,6 @@ class PlayGame extends Phaser.Scene {
             let lock = true;
             if (station.passengers[position].checkStationOn(this) == true) {
                 this.stationRecurOn(station, stationTime, position + 1);
-                console.log("DONE" + position);
             }
 
             return false;
@@ -691,14 +623,11 @@ class PlayGame extends Phaser.Scene {
     enterTrainyard(trainyard) {
         this.train.atStation = 2;
         this.train.moving = false;
-        console.log(trainyard.arriving_status);
-        if (trainyard.arriving_status == 2) {
-            // display the UI. UI will set arrived status to 3 once it is done.
-            if (DisplayTrainyardUI(this, trainyard) == "DONE"){
-                console.log("message recieved");
-                this.train.moving = true;
-                trainyard.arriving_status = 4;
-            }
+        // display the UI. UI will set arrived status to 3 once it is done.
+        if (DisplayTrainyardUI(this, trainyard) == "DONE"){
+            console.log("message recieved");
+            this.train.moving = true;
+            trainyard.arriving_status = 4;
         }
     }
 
@@ -707,6 +636,7 @@ class PlayGame extends Phaser.Scene {
             console.log("invalid ability");
             return;
         }
+        console.log("buy ability"); 
         this.player_upgrades[ability]++;
         for (let i = 0; i < this.upgrades.length; i++) {
             if (this.upgrades[i].name == ability) {
@@ -720,6 +650,7 @@ class PlayGame extends Phaser.Scene {
                     }
                     this.train.capacity += 5;
                 }
+                console.log("currency:", this.currency, "- ", this.upgrades[i].price);
                 this.currency -= this.upgrades[i].price;
                 this.upgrades[i].num_bought++;
                 break;
