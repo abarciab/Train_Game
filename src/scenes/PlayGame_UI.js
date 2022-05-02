@@ -132,16 +132,16 @@ function StartUI(scene){
     //trainyard UI
     this.trainyardMenu = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5).setVisible(false);
     this.jumpUpgradeShopIcon = scene.add.image(game.config.width/2-this.shopItemGap*2.5, this.shopItemYPos, 'jump_icon').setDepth(23.1).setVisible(false);
-        this.jumpPrice = scene.add.text(game.config.width/2-this.shopItemGap*2.5, this.shopItemYPos+80, '19.99', textConfig).setDepth(23.1).setOrigin(0.5).setVisible(false);
+        this.jumpPrice = scene.add.text(game.config.width/2-this.shopItemGap*2.5, this.shopItemYPos+80, '', textConfig).setDepth(23.1).setOrigin(0.5).setVisible(false);
         this.jumpBuyButton = scene.add.rectangle(game.config.width/2-this.shopItemGap*2.5, this.shopItemYPos+80, 120, 50, 0x010101).setDepth(23).setOrigin(0.5).setVisible(false);
     this.boostUpgradeShopIcon = scene.add.image(game.config.width/2-this.shopItemGap, this.shopItemYPos, 'boost_icon').setDepth(23.1).setVisible(false);
-        this.boostPrice = scene.add.text(game.config.width/2-this.shopItemGap, this.shopItemYPos+80, '19.99', textConfig).setDepth(23.1).setOrigin(0.5).setVisible(false);
+        this.boostPrice = scene.add.text(game.config.width/2-this.shopItemGap, this.shopItemYPos+80, '', textConfig).setDepth(23.1).setOrigin(0.5).setVisible(false);
         this.boostBuyButton = scene.add.rectangle(game.config.width/2-this.shopItemGap, this.shopItemYPos+80, 120, 50, 0x010101).setDepth(23).setOrigin(0.5).setVisible(false);
     this.protUpgradeShopIcon = scene.add.image(game.config.width/2+this.shopItemGap, this.shopItemYPos, 'shield_icon').setDepth(23.1).setVisible(false);
-        this.protPrice = scene.add.text(game.config.width/2+this.shopItemGap, this.shopItemYPos+80, '19.99', textConfig).setDepth(23.1).setOrigin(0.5).setVisible(false);
+        this.protPrice = scene.add.text(game.config.width/2+this.shopItemGap, this.shopItemYPos+80, '', textConfig).setDepth(23.1).setOrigin(0.5).setVisible(false);
         this.protBuyButton = scene.add.rectangle(game.config.width/2+this.shopItemGap, this.shopItemYPos+80, 120, 50, 0x010101).setDepth(23).setOrigin(0.5).setVisible(false);
     this.wagonUpgradeShopIcon = scene.add.image(game.config.width/2+this.shopItemGap*2.5, this.shopItemYPos, 'xtra_wagon').setDepth(23.1).setVisible(false).setTint('909999');
-        this.wagonPrice = scene.add.text(game.config.width/2+this.shopItemGap*2.5, this.shopItemYPos+80, '19.99', textConfig).setDepth(23.1).setOrigin(0.5).setVisible(false);
+        this.wagonPrice = scene.add.text(game.config.width/2+this.shopItemGap*2.5, this.shopItemYPos+80, '', textConfig).setDepth(23.1).setOrigin(0.5).setVisible(false);
         this.wagonBuyButton = scene.add.rectangle(game.config.width/2+this.shopItemGap*2.5, this.shopItemYPos+80, 120, 50, 0x010101).setDepth(23).setOrigin(0.5).setVisible(false);
     this.exitTrainyardButton = scene.add.image(game.config.width/2, game.config.height/2+220, 'GO_background').setDepth(23).setScale(0.7, 0.4).setVisible(false);
     //exit button
@@ -296,6 +296,7 @@ function DisplayTrainyardUI(scene, trainyard){
     this.jumpUpgradeShopIcon.setVisible(true).setAlpha(0.5);
         this.jumpPrice.setVisible(true).setAlpha(0.5).setTint(0xde8983);
         this.jumpBuyButton.setVisible(true).setAlpha(0.5);
+        
 
     this.boostUpgradeShopIcon.setVisible(true).setAlpha(0.5);
         this.boostPrice.setVisible(true).setAlpha(0.5).setTint(0xde8983);
@@ -311,33 +312,44 @@ function DisplayTrainyardUI(scene, trainyard){
 
 
     this.shopItems.forEach(item =>{
-        if (item.name == "jump" && scene.currency >= item.price){
+        if (item.name == "jump"){
             this.jumpPrice.text = item.price;
+        
+            if  (scene.currency >= item.price){
             this.jumpPrice.clearTint();
             this.jumpUpgradeShopIcon.setAlpha(1);
             this.jumpPrice.setAlpha(1);
             this.jumpBuyButton.setAlpha(1);
+            }
         }
-        if (item.name == "speed boost" && scene.currency >= item.price){
+        if (item.name == "speed boost"){
             this.boostPrice.text = item.price;
-            this.boostPrice.clearTint();
-            this.boostUpgradeShopIcon.setAlpha(1);
-            this.boostPrice.setAlpha(1);
-            this.boostBuyButton.setAlpha(1);
+        
+            if (scene.currency >= item.price){
+                this.boostPrice.clearTint();
+                this.boostUpgradeShopIcon.setAlpha(1);
+                this.boostPrice.setAlpha(1);
+                this.boostBuyButton.setAlpha(1);
+            }
         }
-        if (item.name == "extra wagon" && scene.currency >= item.price){
+
+        if (item.name == "extra wagon"){
             this.wagonPrice.text = item.price;
-            this.wagonPrice.clearTint();
-            this.wagonUpgradeShopIcon.setAlpha(1);
-            this.wagonPrice.setAlpha(1);
-            this.wagonBuyButton.setAlpha(1);
+            if (scene.currency >= item.price){
+                this.wagonPrice.clearTint();
+                this.wagonUpgradeShopIcon.setAlpha(1);
+                this.wagonPrice.setAlpha(1);
+                this.wagonBuyButton.setAlpha(1);
+            }
         }
-        if (item.name == "protection" && scene.currency >= item.price){
+        if (item.name == "protection"){
             this.protPrice.text = item.price;
-            this.protPrice.clearTint();
-            this.protUpgradeShopIcon.setAlpha(1);
-            this.protPrice.setAlpha(1);
-            this.protBuyButton.setAlpha(1);
+            if ( scene.currency >= item.price){
+                this.protPrice.clearTint();
+                this.protUpgradeShopIcon.setAlpha(1);
+                this.protPrice.setAlpha(1);
+                this.protBuyButton.setAlpha(1);
+            }
         }
     })
 

@@ -54,7 +54,7 @@ class PlayGame extends Phaser.Scene {
         this.stations = [];         // list of stations.
         this.enemy_trains = []      // list of enemy trains
         this.coins = [];            // dict of coins
-        this.currency = 0;
+        this.currency = 20000;
         this.station_spawn_table = [0, 0, 0, 10, 10, 10, 20, 20, 20, 30];
         this.station_spawn_index = 0;
         this.trainyard_spawn_table = [];
@@ -76,14 +76,14 @@ class PlayGame extends Phaser.Scene {
         ];
         // upgrades available to the player
         this.player_upgrades = {
-            "jump": 1,
+            "jump": 10,
             "extra wagon": 0,
-            "protection": 0,
-            "speed boost": 1
+            "protection": 10,
+            "speed boost": 10
         };
         for (let i = 0; i < 11; i++) {
             if (i < 5)
-                this.trainyard_spawn_table.push(0);
+                this.trainyard_spawn_table.push(100);
             else if (i < 8)
                 this.trainyard_spawn_table.push(25);
             else if (i < 10)
@@ -500,12 +500,12 @@ class PlayGame extends Phaser.Scene {
                 }
             }
             // when done with station, leave station
-            else if (this.stations[i].arrived_status == 4) {
+            else if (this.stations[i].arriving_status == 4) {
                 let acc_dist = Math.abs((this.stations[i].station_point + this.stations[i].x)-this.train.x);
                 this.speed = this.speedLock * (acc_dist / this.stations[i].station_point);
                 if (this.speed < 1) this.speed = 1;
                 if (this.speed >= this.speedLock) {
-                    this.stations[i].arrived_status = 5;
+                    this.stations[i].arriving_status = 5;
                     this.speed = this.speedLock;
                     console.log("left station");
                     this.train.atStation = 0;
@@ -617,7 +617,7 @@ class PlayGame extends Phaser.Scene {
                 // Same as getting off
                 this.fuel = this.train.fuelCapacity;
                 this.train.moving = true;
-                station.arrived_status = 4;
+                station.arriving_status = 4;
                 // start patience timers
             }, null, this);
         }, null, this);
@@ -673,7 +673,7 @@ class PlayGame extends Phaser.Scene {
         if (position > station.passengers.length - 1 || this.train.passengers.length == this.train.capacity) {     
             this.fuel = this.train.fuelCapacity;
             this.train.moving = true;
-            station.arrived_status = 4;
+            station.arriving_status = 4;
             return false;
         }
         let gettingOn = this.time.delayedCall(stationTime, () => {
@@ -691,18 +691,14 @@ class PlayGame extends Phaser.Scene {
     enterTrainyard(trainyard) {
         this.train.atStation = 2;
         this.train.moving = false;
-        if (trainyard.arrived_status = 2) {
+        console.log(trainyard.arriving_status);
+        if (trainyard.arriving_status == 2) {
             // display the UI. UI will set arrived status to 3 once it is done.
             if (DisplayTrainyardUI(this, trainyard) == "DONE"){
                 console.log("message recieved");
-                trainyard.arrived_status = 3;
+                this.train.moving = true;
+                trainyard.arriving_status = 4;
             }
-        }
-        else {
-            console.log("leaving yard");
-            this.train.moving = true;
-            // display the UI
-            trainyard.arrived_status = 4;
         }
     }
 
