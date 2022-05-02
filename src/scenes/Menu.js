@@ -23,6 +23,7 @@ class Menu extends Phaser.Scene {
         
         this.load.spritesheet('basic_locomotive', './assets/trains/basic locomotive spritesheet.png', {frameWidth: 400, frameHeight: 446, startFrame: 0, endFrame: 2});
         this.load.spritesheet('enemy_locomotive', './assets/trains/enemy locomotive.png', {frameWidth: 400, frameHeight: 446, startFrame: 0, endFrame: 0});
+        this.load.spritesheet('enemy train indicator', "./assets/stations/incoming train indicator.png", {frameWidth: 86, frameHeight: 69, strtFrame: 0, endFrame: 1});
         //trees
         this.load.image('field_deadly_obstacle', './assets/obstacles/field deadly obstacle.png');
         this.load.image('field_debris_obstacle', './assets/obstacles/field debris obstacle.png');
@@ -47,13 +48,19 @@ class Menu extends Phaser.Scene {
             this.load.image(`${sign} station sign`, `./assets/stations/${sign} station sign.png`);
             this.load.image(`${sign} station indicator`, `./assets/stations/${sign} station indicator.png`)
         }
-        this.load.image("enemy train indicator", "./assets/stations/incoming train indicator.png");
         
         //sounds
         this.load.audio('train_on_rails', './assets/sound effects/train on rails 2.mp3');
         this.load.audio('menu_music', './assets/music/menu music.mp3');
     }
     create() {
+
+        this.anims.create({
+            key: 'incoming train flash',
+            frames: this.anims.generateFrameNumbers('enemy train indicator', {start: 0, end: 1, first: 0}),
+            frameRate: 3,
+            repeat: -1,
+        });
 
         //spacer vars
         let topGap = 150
