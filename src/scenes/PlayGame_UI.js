@@ -482,8 +482,7 @@ function RemovePassengerIcons(scene, stationName){
             if (passengerIcon.goodReview != false){
                 console.log("good review");
                 scene.sound.play('good_review', {volume: 0.8});
-                scene.currency += 250;
-            } 
+            }
 
             passengerIcon.passengerObj.disembark(scene);
             passengerIcon.patienceBar.destroy();
