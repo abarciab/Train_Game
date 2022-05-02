@@ -62,7 +62,7 @@ class Menu extends Phaser.Scene {
 
         //create button visuals
         this.titleBar = this.add.rectangle(center, topGap, game.config.width*0.3, 120, 0xFFFFFF).setOrigin(0.5);
-        this.TitleText = this.add.text(center, this.titleBar.y, "TRAIN GAME: Unfinished Business", {color: '#000000', fontSize: '22px'}).setOrigin(0.5);
+        this.TitleText = this.add.text(center, this.titleBar.y, "TRAIN GAME: Loco Locomotive", {color: '#000000', fontSize: '22px'}).setOrigin(0.5);
         //
         this.startButton = this.add.rectangle(center, this.titleBar.y + buttonGap*3, game.config.width*0.3, 80, 0xFFFFFF).setOrigin(0.5);
         this.startText = this.add.text(center, this.startButton.y, "START GAME", {color: '#000000'}).setOrigin(0.5);
