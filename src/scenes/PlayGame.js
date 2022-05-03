@@ -54,7 +54,7 @@ class PlayGame extends Phaser.Scene {
         this.stations = [];         // list of stations.
         this.enemy_trains = []      // list of enemy trains
         this.coins = [];            // dict of coins
-        this.currency = 20000;
+        this.currency = 0;
         this.station_spawn_table = [0, 0, 0, 10, 10, 10, 20, 20, 20, 30];
         this.station_spawn_index = 0;
         this.trainyard_spawn_table = [];
@@ -76,10 +76,10 @@ class PlayGame extends Phaser.Scene {
         ];
         // upgrades available to the player
         this.player_upgrades = {
-            "jump": 10,
+            "jump": 0,
             "extra wagon": 0,
-            "protection": 10,
-            "speed boost": 10
+            "protection": 0,
+            "speed boost": 0
         };
         for (let i = 0; i < 11; i++) {
             if (i < 5)

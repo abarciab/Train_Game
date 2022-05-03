@@ -58,18 +58,14 @@ function LoadUI(scene){
     scene.load.image('wagon_background', './assets/UI/wagon cutout background.png');
     scene.load.image('locomotive_background', './assets/UI/locomotive cutout background.png');
 
-    //fuel display
-    scene.load.image('fuel_meter', './assets/UI/fuel meter.png');
-    scene.load.image('fuel_needle', './assets/UI/fuel needle.png');
-   
-    //star
+    //stars
     scene.load.image('star_4/4', './assets/UI/UI star full.png');
     scene.load.image('star_3/4', './assets/UI/UI star three quarter.png');
     scene.load.image('star_2/4', './assets/UI/UI star half.png');
     scene.load.image('star_1/4', './assets/UI/UI star quarter.png');
     scene.load.image('star_0/4', './assets/UI/UI star empty.png');
 
-    //upgrade icons
+    //abilities
     scene.load.image('jump_icon', './assets/UI/jump upgrade icon.png');
     scene.load.image('boost_icon', './assets/UI/speed boost upgrade icon.png');
     scene.load.image('shield_icon', './assets/UI/protection upgrade icon.png');
@@ -78,12 +74,13 @@ function LoadUI(scene){
     //coin
     scene.load.image('coin_icon', './assets/obstacles/coin pickup.png');
 
+    //misc images
+    scene.load.image('volume_icon', './assets/UI/volume.png');
+
     //sounds
     scene.load.audio('bad_review', './assets/sound effects/badreview.wav');
     scene.load.audio('board_train', './assets/sound effects/boardtrain sound.wav');
     scene.load.audio('good_review', './assets/sound effects/disembark sound.wav');
-
-   
 
 }
 
