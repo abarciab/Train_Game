@@ -16,12 +16,13 @@ class Menu extends Phaser.Scene {
         this.load.image('junction_arrows-down', './assets/tracks/junction arrows down.png');
         this.load.image('junction_arrows-up', './assets/tracks/junction arrows up.png');
         this.load.image('junction_arrows-straight', './assets/tracks/junction arrows straight.png');
-        this.load.image('basic_passenger_wagon', './assets/trains/basic passenger wagon.png');
+        
         this.load.image('enemy_cargo_wagon', './assets/trains/enemy cargo wagon.png');
         this.load.image('station', './assets/stations/field top station.png');
         this.load.image('coin', './assets/obstacles/coin pickup.png');
         
-        this.load.spritesheet('basic_locomotive', './assets/trains/basic locomotive spritesheet.png', {frameWidth: 400, frameHeight: 446, startFrame: 0, endFrame: 2});
+        this.load.spritesheet('basic_locomotive', './assets/trains/basic locomotive spritesheet.png', {frameWidth: 400, frameHeight: 446, startFrame: 0, endFrame: 3});
+        this.load.spritesheet('basic_passenger_wagon', './assets/trains/basic wagon spritesheet.png', {frameWidth: 400, frameHeight: 446, startFrame: 0, endFrame: 3});
         this.load.spritesheet('enemy_locomotive', './assets/trains/enemy locomotive.png', {frameWidth: 400, frameHeight: 446, startFrame: 0, endFrame: 0});
         this.load.spritesheet('enemy train indicator', "./assets/stations/incoming train indicator.png", {frameWidth: 86, frameHeight: 69, strtFrame: 0, endFrame: 1});
         //trees
@@ -61,6 +62,18 @@ class Menu extends Phaser.Scene {
             frameRate: 3,
             repeat: -1,
         });
+        this.anims.create({
+            key: 'train move',
+            frames: this.anims.generateFrameNumbers('basic_locomotive', {start: 0, end: 3, first: 0}),
+            frameRate: 5,
+            repeat: -1,
+        });
+        this.anims.create({
+            key: 'wagon move',
+            frames: this.anims.generateFrameNumbers('basic_passenger_wagon', {start: 0, end: 3, first: 0}),
+            frameRate: 5,
+            repeat: -1,
+        });
 
         //spacer vars
         let topGap = 150
@@ -98,7 +111,7 @@ class Menu extends Phaser.Scene {
         //background 
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0).setDepth(-2);
         this.tree1 = this.add.image(200, 600, 'field_deadly_obstacle').setDepth(2);
-        
+
         //tracks behind title
         this.add.image(-30, topGap, 'basic_straight_track').setOrigin(0, 0.5).setDepth(-1);
         this.add.image(game.config.width+30, topGap, 'basic_straight_track').setOrigin(1, 0.5).setDepth(-1);
@@ -114,9 +127,12 @@ class Menu extends Phaser.Scene {
         this.add.image(0, this.startButton.y + buttonGap, 'basic_out-down_track').setOrigin(0, 0.5).setDepth(-1);
         this.add.image(0, topGap, 'basic_out-up_track').setOrigin(0.5, 0.5).setDepth(-1);
         // trains
-        this.locomotiveA = this.add.image(-300, topGap, 'basic_locomotive').setOrigin(0.5).setDepth(1);
-        this.locomotiveB = this.add.image(game.config.width*1.4, this.titleBar.y + buttonGap*3, 'basic_locomotive').setOrigin(.85, 0.5);
-        this.wagonB1 = this.add.image(game.config.width*1.4 + 350, this.titleBar.y + buttonGap*3, 'basic_passenger_wagon').setOrigin(.85, 0.5);
+        this.locomotiveA = this.add.sprite(-300, topGap, 'basic_locomotive').setOrigin(0.5).setDepth(1);
+        this.locomotiveA.anims.play('train move');
+        this.locomotiveB = this.add.sprite(game.config.width*1.4, this.titleBar.y + buttonGap*3, 'basic_locomotive').setOrigin(.85, 0.5);
+        this.locomotiveB.anims.play('train move');
+        this.wagonB1 = this.add.sprite(game.config.width*1.4 + 350, this.titleBar.y + buttonGap*3, 'basic_passenger_wagon').setOrigin(.85, 0.5);
+        this.wagonB1.anims.play('wagon move');
         this.locomotiveB.flipX = true;
         this.wagonB1.flipX = true;
         //this.add.image(-600, this.startButton.y + buttonGap, 'station').setOrigin(0.5).setDepth(-1.5);
