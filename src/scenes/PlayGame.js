@@ -57,7 +57,7 @@ class PlayGame extends Phaser.Scene {
         this.currency = 100000;
         this.station_spawn_table = [0, 0, 0, 10, 10, 10, 20, 20, 20, 30];
         this.station_spawn_index = 0;
-        this.trainyard_spawn_table = [100];
+        this.trainyard_spawn_table = [];
         this.trainyard_spawn_index = 0;
         this.station_types = ["red square", "blue circle", "green triangle"];
         this.station_type_index = 0;

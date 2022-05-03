@@ -14,31 +14,6 @@ this.textConfig = {
     align: 'center',
 }
 
-
-
-
-function DisplayNextInstruction(scene) {
-    let config = {
-        align: 'center',
-        fontSize: '35px',
-        strokeThickness: 1,
-        stroke: '#000000',
-    }
-
-
-    if (this.instructionStage == 0){
-        //instructionStage += 1;
-        this.instructionText = scene.add.text(game.config.width/2, game.config.height/2 - 150, "USE W, S, and D to change junction direction", config)
-        .setDepth(25)
-        .setOrigin(0.5);
-    } 
-    else if (this.instructionStage >= 1 && this.instructionStage < 3){
-        this.instructionStage = 10;
-        this.instructionText.setVisible(false);
-        //DisplayTrainyardUI(scene, scene.upgrades);
-    }
-}
-
 function LoadUI(scene){
     //biome assets
     scene.load.image('biome_bar_fields', './assets/UI/biome bar.png');
@@ -420,10 +395,6 @@ function UpdateUI(scene, delta){
     } if (scene.train.num_wagons > 1){
         wagon2.setVisible(true);
     }
-
-    //instructions
-    DisplayNextInstruction(scene);
-    this.instructionStage += (delta/1000)/5
 
     //update coins
     this.coinDisplay.text = scene.currency;
