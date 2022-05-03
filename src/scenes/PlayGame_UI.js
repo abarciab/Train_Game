@@ -8,7 +8,7 @@
 */
 
 this.textConfig = {
-    frontFamily: 'Courier',
+    frontFamily: 'caviarDream',
     fontSize: '28px',
     color: '#FFFFFF',
     align: 'center',

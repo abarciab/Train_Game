@@ -88,13 +88,13 @@ class Menu extends Phaser.Scene {
 
         //create button visuals
         this.titleBar = this.add.rectangle(center, topGap, game.config.width*0.3, 120, 0xFFFFFF).setOrigin(0.5);
-        this.TitleText = this.add.text(center, this.titleBar.y, "TRAIN GAME: Loco Locomotive", {color: '#000000', fontSize: '22px'}).setOrigin(0.5);
+        this.TitleText = this.add.text(center, this.titleBar.y, "TRAIN GAME: Loco Locomotive", {color: '#000000', fontSize: '22px', fontFamily: 'caviarDream'}).setOrigin(0.5);
         //
         this.startButton = this.add.rectangle(center, this.titleBar.y + buttonGap*3, game.config.width*0.3, 80, 0xFFFFFF).setOrigin(0.5);
-        this.startText = this.add.text(center, this.startButton.y, "START GAME", {color: '#000000'}).setOrigin(0.5);
+        this.startText = this.add.text(center, this.startButton.y, "START GAME", {color: '#000000', fontFamily: 'caviarDream'}).setOrigin(0.5);
         //
         this.optionsButton = this.add.rectangle(center, this.startButton.y + buttonGap, game.config.width*0.3, 80, 0xFFFFFF).setOrigin(0.5).setVisible(false);
-        this.optionsText = this.add.text(center, this.optionsButton.y, "OPTIONS", {color: '#000000'}).setOrigin(0.5).setVisible(false);
+        this.optionsText = this.add.text(center, this.optionsButton.y, "OPTIONS", {color: '#000000', fontFamily: 'caviarDream'}).setOrigin(0.5).setVisible(false);
 
         //add button interactivity
         this.startButton.setInteractive()
@@ -102,7 +102,7 @@ class Menu extends Phaser.Scene {
             .on('pointerout', () => this.startButton.setStrokeStyle(0))
             .on('pointerdown', () => {
                 this.trainSound.stop();
-                this.tutorial = 0;
+                this.tutorial = -1;
                 this.displayNextTutorial();                
             });
 
@@ -163,12 +163,16 @@ class Menu extends Phaser.Scene {
     displayNextTutorial(){
         this.tutorial += 1;
         switch(this.tutorial){
-            case 1:
+            case 0:
                 let tutorialBackground = this.add.image(game.config.width/2, game.config.height/2, 'tutorial_background').setDepth(5).setScale(0.8)
                     .setInteractive()
                     .on('pointerdown', function() {
                         this.scene.displayNextTutorial();
                     });
+                zoomText = this.add.text(game.config.width/2, game.config.height/2, "use cmd/control - to zoom out until the entire screen is visible...", {fontSize: '30px', fontFamily: 'caviarDream'}).setOrigin(0.5).setDepth(5);
+                break;
+            case 1:
+                zoomText.setVisible(false);
                 img1 = this.add.image(game.config.width/2-360, game.config.height/2 , 'tutorial 1').setDepth(5).setScale(0.6);
                 img2 = this.add.image(game.config.width/2+340, game.config.height/2 , 'tutorial 2').setDepth(5).setScale(0.6);
                 break;
@@ -196,6 +200,7 @@ class Menu extends Phaser.Scene {
     }
 }
 
+let zoomText;
 let img1;
 let img2;
 let img3;
