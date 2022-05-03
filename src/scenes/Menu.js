@@ -98,8 +98,7 @@ class Menu extends Phaser.Scene {
         //background 
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0).setDepth(-2);
         this.tree1 = this.add.image(200, 600, 'field_deadly_obstacle').setDepth(2);
-        //this.tree2 = this.add.image(1600, 150, 'field_deadly_obstacle').setDepth(2);
-
+        
         //tracks behind title
         this.add.image(-30, topGap, 'basic_straight_track').setOrigin(0, 0.5).setDepth(-1);
         this.add.image(game.config.width+30, topGap, 'basic_straight_track').setOrigin(1, 0.5).setDepth(-1);

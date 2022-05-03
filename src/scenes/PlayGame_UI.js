@@ -69,18 +69,22 @@ function LoadUI(scene){
     scene.load.image('jump_icon', './assets/UI/jump upgrade icon.png');
     scene.load.image('boost_icon', './assets/UI/speed boost upgrade icon.png');
     scene.load.image('shield_icon', './assets/UI/protection upgrade icon.png');
-    scene.load.image('xtra_wagon', './assets/UI/speed boost upgrade icon.png');
+    scene.load.image('xtra_wagon', './assets/UI/extra wagon upgrade icon.png');
 
     //coin
     scene.load.image('coin_icon', './assets/obstacles/coin pickup.png');
 
     //misc images
-    scene.load.image('volume_icon', './assets/UI/volume.png');
+    scene.load.image('volume_full', './assets/UI/volume full.png');
+    scene.load.image('volume_mid', './assets/UI/volume mid.png');
+    scene.load.image('volume_min', './assets/UI/volume min.png');
+    scene.load.image('buy_button', './assets/UI/shop buy button.png')
 
     //sounds
     scene.load.audio('bad_review', './assets/sound effects/badreview.wav');
     scene.load.audio('board_train', './assets/sound effects/boardtrain sound.wav');
     scene.load.audio('good_review', './assets/sound effects/disembark sound.wav');
+    scene.load.audio('buy_item', './assets/sound effects/shop sfx.mp3');
 
 }
 
@@ -133,21 +137,24 @@ function StartUI(scene){
     this.trainyardMenu = scene.add.image(game.config.width/2, game.config.height/2, 'GO_background').setDepth(23).setScale(1, 1.5).setVisible(false);
     this.jumpUpgradeShopIcon = scene.add.image(game.config.width/2-this.shopItemGap*2.5, this.shopItemYPos, 'jump_icon').setDepth(23.1).setVisible(false);
         this.jumpPrice = scene.add.text(game.config.width/2-this.shopItemGap*2.5, this.shopItemYPos+80, '', textConfig).setDepth(23.1).setOrigin(0.5).setVisible(false);
-        this.jumpBuyButton = scene.add.rectangle(game.config.width/2-this.shopItemGap*2.5, this.shopItemYPos+80, 120, 50, 0x010101).setDepth(23).setOrigin(0.5).setVisible(false);
+        this.jumpBuyButton = scene.add.sprite(game.config.width/2-this.shopItemGap*2.5, this.shopItemYPos+80, 'buy_button').setDepth(23).setOrigin(0.5).setVisible(false);
     this.boostUpgradeShopIcon = scene.add.image(game.config.width/2-this.shopItemGap, this.shopItemYPos, 'boost_icon').setDepth(23.1).setVisible(false);
         this.boostPrice = scene.add.text(game.config.width/2-this.shopItemGap, this.shopItemYPos+80, '', textConfig).setDepth(23.1).setOrigin(0.5).setVisible(false);
-        this.boostBuyButton = scene.add.rectangle(game.config.width/2-this.shopItemGap, this.shopItemYPos+80, 120, 50, 0x010101).setDepth(23).setOrigin(0.5).setVisible(false);
+        this.boostBuyButton = scene.add.image(game.config.width/2-this.shopItemGap, this.shopItemYPos+80,'buy_button').setDepth(23).setOrigin(0.5).setVisible(false);
     this.protUpgradeShopIcon = scene.add.image(game.config.width/2+this.shopItemGap, this.shopItemYPos, 'shield_icon').setDepth(23.1).setVisible(false);
         this.protPrice = scene.add.text(game.config.width/2+this.shopItemGap, this.shopItemYPos+80, '', textConfig).setDepth(23.1).setOrigin(0.5).setVisible(false);
-        this.protBuyButton = scene.add.rectangle(game.config.width/2+this.shopItemGap, this.shopItemYPos+80, 120, 50, 0x010101).setDepth(23).setOrigin(0.5).setVisible(false);
-    this.wagonUpgradeShopIcon = scene.add.image(game.config.width/2+this.shopItemGap*2.5, this.shopItemYPos, 'xtra_wagon').setDepth(23.1).setVisible(false).setTint('909999');
+        this.protBuyButton = scene.add.image(game.config.width/2+this.shopItemGap, this.shopItemYPos+80, 'buy_button').setDepth(23).setOrigin(0.5).setVisible(false);
+    this.wagonUpgradeShopIcon = scene.add.image(game.config.width/2+this.shopItemGap*2.5, this.shopItemYPos, 'xtra_wagon').setDepth(23.1).setVisible(false);
         this.wagonPrice = scene.add.text(game.config.width/2+this.shopItemGap*2.5, this.shopItemYPos+80, '', textConfig).setDepth(23.1).setOrigin(0.5).setVisible(false);
-        this.wagonBuyButton = scene.add.rectangle(game.config.width/2+this.shopItemGap*2.5, this.shopItemYPos+80, 120, 50, 0x010101).setDepth(23).setOrigin(0.5).setVisible(false);
-    this.exitTrainyardButton = scene.add.image(game.config.width/2, game.config.height/2+220, 'GO_background').setDepth(23).setScale(0.7, 0.4).setVisible(false);
+        this.wagonBuyButton = scene.add.image(game.config.width/2+this.shopItemGap*2.5, this.shopItemYPos+80, 'buy_button').setDepth(23).setOrigin(0.5).setVisible(false);
+   
     //exit button
+    this.exitTrainyardButton = scene.add.image(game.config.width/2, game.config.height/2+220, 'GO_background').setDepth(23).setScale(0.7, 0.4).setVisible(false);
+    this.exitTrainyardText = scene.add.text(game.config.width/2, this.exitTrainyardButton.y, "Exit Trainyard", {color: '#FFFFFF', fontSize: '35px'}).setDepth(23).setOrigin(0.5).setVisible(false);
     this.exitTrainyardButton.setInteractive();
     this.exitTrainyardButton.on('pointerdown', function(){
         console.log("CLOSE");
+        scene.cameras.main.shake(50, 0.002);
         CloseTrainyardUI(this);
     })
     //abilityTooltips
@@ -237,10 +244,12 @@ function StartUI(scene){
     this.leaveTrainYard = false;
 }
 
+
 function BuyItem(scene, name){
     this.shopItems.forEach(item => {
         if (item.name == name && scene.currency >= item.price && scene.player_upgrades[item.name] < item.max){
             scene.cameras.main.shake(50, 0.002);
+            scene.sound.play('buy_item', {volume: 0.5});
             scene.buyAbility(item.name);
             return;
         }
@@ -371,6 +380,7 @@ function DisplayTrainyardUI(scene, trainyard){
     })
 
     this.exitTrainyardButton.setVisible(true);
+    this.exitTrainyardText.setVisible(true);
 }
 
 function CloseTrainyardUI(){
@@ -389,7 +399,9 @@ function CloseTrainyardUI(){
     wagonUpgradeShopIcon.setVisible(false);
         wagonPrice.setVisible(false);
         wagonBuyButton.setVisible(false);
+
     exitTrainyardButton.setVisible(false);
+    this.exitTrainyardText.setVisible(false);
 
     this.leaveTrainYard = true;
 }
