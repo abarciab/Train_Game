@@ -43,7 +43,7 @@ class PlayGame extends Phaser.Scene {
         down_key = this.input.keyboard.addKey(40);
 
         one_key = this.input.keyboard.addKey(49);
-        two_key = this.input.keyboard.addKey('2');
+        // two_key = this.input.keyboard.addKey('2');
 
         space_bar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.base_interval = 64*6;  // base unscaled interval between rows of tracks
@@ -54,10 +54,20 @@ class PlayGame extends Phaser.Scene {
         this.stations = [];         // list of stations.
         this.enemy_trains = []      // list of enemy trains
         this.coins = [];            // dict of coins
-        this.currency = 50000;
+        this.currency = 0;
         this.station_spawn_table = [0, 0, 0, 10, 10, 10, 20, 20, 20, 30];
         this.station_spawn_index = 0;
-        this.trainyard_spawn_table = [100];
+        this.trainyard_spawn_table = [];
+        for (let i = 0; i < 11; i++) {
+            if (i < 5)
+                this.trainyard_spawn_table.push(0);
+            else if (i < 8)
+                this.trainyard_spawn_table.push(25);
+            else if (i < 10)
+                this.trainyard_spawn_table.push(50);
+            else
+                this.trainyard_spawn_table.push(100);
+        }
         this.trainyard_spawn_index = 0;
         this.station_types = ["red square", "blue circle", "green triangle"];
         this.station_type_index = 0;
@@ -81,16 +91,7 @@ class PlayGame extends Phaser.Scene {
             "protection": 0,
             "speed boost": 0
         };
-        for (let i = 0; i < 11; i++) {
-            if (i < 5)
-                this.trainyard_spawn_table.push(0);
-            else if (i < 8)
-                this.trainyard_spawn_table.push(25);
-            else if (i < 10)
-                this.trainyard_spawn_table.push(50);
-            else
-                this.trainyard_spawn_table.push(100);
-        }
+
         this.gameOver = false;
 
         // initialize tracks and nodes to keys and empty lists
