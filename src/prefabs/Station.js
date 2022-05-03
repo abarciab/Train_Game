@@ -35,9 +35,9 @@ class Station extends Phaser.GameObjects.Sprite {
         this.sign;
         // this.arriving = 0;
         //this.stopX = this.x + 1300;
+        this.sign = scene.add.image(x, y, `${this.station_type} station sign`).setScale(scene.scaling).setDepth(8);
         if (this.station_type != "trainyard") {
             this.passengers = station_contents;      // list of passengers at station
-            this.sign = scene.add.image(x, y, `${this.station_type} station sign`).setScale(scene.scaling).setDepth(8);
         }
         else {
             // choose num_upgrades random types from upgrades

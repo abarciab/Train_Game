@@ -40,7 +40,7 @@ class Menu extends Phaser.Scene {
         this.load.image('passenger 1', './assets/passengers/basic passenger 1.png');
 
         // signs
-        let sign_shapes = ["blue circle", "green triangle", "red square", "track sign"];
+        let sign_shapes = ["blue circle", "green triangle", "red square", "trainyard", "track sign"];
         let sign_dirs = ["straight", "up", "down"];
         for (let i = 0; i < sign_shapes.length; i++) {
             for (let j = 0; j < sign_dirs.length; j++) {
@@ -50,7 +50,6 @@ class Menu extends Phaser.Scene {
                     this.load.image(`${sign_shapes[i]} ${sign_dirs[j]}`, `./assets/track signs/${sign_shapes[i]} ${sign_dirs[j]}.png`);
             }
         }
-        this.load.image("trainyard station indicator", './assets/stations/red_square.png');
         for (let i = 0; i < sign_shapes.length-1; i++) {
             let sign = sign_shapes[i];
             this.load.image(`${sign} station sign`, `./assets/stations/${sign} station sign.png`);

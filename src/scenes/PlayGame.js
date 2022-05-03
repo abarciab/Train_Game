@@ -256,9 +256,17 @@ class PlayGame extends Phaser.Scene {
     updateSpeed(delta) {
         if (this.speed > 0 && !this.trainSound.isPlaying) {
             this.trainSound.play();
+            this.train.anims.play('train move');
+            this.train.wagons.forEach(wagon => {
+                wagon.anims.play('wagon move');
+            });
         }
         else if (this.speed == 0 && this.trainSound.isPlaying) {
             this.trainSound.pause();
+            this.train.anims.stop();
+            this.train.wagons.forEach(wagon => {
+                wagon.anims.stop();
+            });
         }
         if (this.train.speed_boost && this.train.slow_down) {
             this.speed--;

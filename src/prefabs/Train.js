@@ -184,7 +184,7 @@ class Wagon extends Phaser.GameObjects.Sprite {
         this.scaleY = scene.scaling;
         this.setDepth(10);
 
-        this.wagon_offset = this.displayWidth*0.95;
+        this.wagon_offset = this.displayWidth*0.9;
     }
     update(timer, delta) {
         if (this.turning) {
