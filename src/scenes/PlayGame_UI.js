@@ -45,6 +45,11 @@ function LoadUI(scene){
     scene.load.image('boost_icon', './assets/UI/speed boost upgrade icon.png');
     scene.load.image('shield_icon', './assets/UI/protection upgrade icon.png');
     scene.load.image('xtra_wagon', './assets/UI/extra wagon upgrade icon.png');
+    
+    //key icons
+    scene.load.image('up_key_icon', './assets/UI/up key icon.png');
+    scene.load.image('down_key_icon', './assets/UI/down key icon.png');
+    scene.load.image('boost_key_icon', './assets/UI/one key icon.png');
 
     //coin
     scene.load.image('coin_icon', './assets/obstacles/coin pickup.png');
@@ -100,8 +105,11 @@ function StartUI(scene){
         // abilities
         this.jumpAbility = scene.add.image(this.abilityFront, this.topBar.y-6, 'jump_icon').setDepth(22.8).setScale(this.abilityScale).setOrigin(0.45).setAlpha(0.2);
             this.jumpAbilityText = scene.add.text(this.jumpAbility.x + this.abilityGap/3, this.jumpAbility.y, "1/1", {textConfig}).setDepth(22.8);
+            this.jumpKey1 = scene.add.image(this.jumpAbility.x-30, this.jumpAbility.y-10, 'up_key_icon').setDepth(22.9).setOrigin(0.5).setScale(0.4).setAlpha(0.2);
+            this.jumpKey2 = scene.add.image(this.jumpAbility.x-30, this.jumpAbility.y+10, 'down_key_icon').setDepth(22.9).setOrigin(0.5).setScale(0.4).setAlpha(0.2);
         this.boostAbility = scene.add.image(this.abilityFront + this.abilityGap*1, this.topBar.y-6, 'boost_icon').setDepth(22.8).setScale(this.abilityScale).setOrigin(0.45).setAlpha(0.2);
             this.boostAbilityText = scene.add.text(this.boostAbility.x + this.abilityGap/3, this.boostAbility.y, "1/1", {textConfig}).setDepth(22.8);
+            this.boostKey = scene.add.image(this.boostAbility.x-45, this.boostAbility.y, 'boost_key_icon').setDepth(22.9).setOrigin(0.5).setScale(0.4).setAlpha(0.2);
         this.protAbility = scene.add.image(this.abilityFront + this.abilityGap*2, this.topBar.y-6, 'shield_icon').setDepth(22.8).setScale(this.abilityScale).setOrigin(0.45).setAlpha(0.2);
             this.protAbilityText = scene.add.text(this.protAbility.x + this.abilityGap/3, this.protAbility.y, "1/1", {textConfig}).setDepth(22.8);  
     this.locomotive = scene.add.image(250, this.bottomBarYpos, 'locomotive_background').setOrigin(0.5).setScale(1.3, 1).setDepth(20);
@@ -137,7 +145,7 @@ function StartUI(scene){
         .setVisible(true).setOrigin(1).setVisible(false);
     this.tooltipTitle = scene.add.text(this.tooltipBackground.x-this.tooltipBackground.displayWidth/2, this.tooltipBackground.y-this.tooltipBackground.displayHeight*0.8, "BOOST", textConfig)
         .setOrigin(0.5).setDepth(24.1).setVisible(false);
-    this.tooltipText = scene.add.text(this.tooltipBackground.x-this.tooltipBackground.displayWidth/2, this.tooltipBackground.y-this.tooltipBackground.displayHeight*0.8+this.tooltipTitle.displayHeight*2, "Temporarily speeds\nup your train!", textConfig)
+    this.tooltipText = scene.add.text(this.tooltipBackground.x-this.tooltipBackground.displayWidth/2, this.tooltipBackground.y-this.tooltipBackground.displayHeight*0.8+this.tooltipTitle.displayHeight*2, "", textConfig)
         .setOrigin(0.5).setDepth(24.1).setVisible(false);
     //tooltip functionality
     this.jumpUpgradeShopIcon.setInteractive();
@@ -149,14 +157,14 @@ function StartUI(scene){
         });
     this.boostUpgradeShopIcon.setInteractive();
         this.boostUpgradeShopIcon.on('pointerover', function(){
-            DisplayTooltip(boostUpgradeShopIcon.x, boostUpgradeShopIcon.y, "BOOST", "Temporarily speeds\nup your train!", boostUpgradeShopIcon.alpha);
+            DisplayTooltip(boostUpgradeShopIcon.x, boostUpgradeShopIcon.y, "BOOST", "Temporarily speeds\nup and protects the train", boostUpgradeShopIcon.alpha);
         });
         this.boostUpgradeShopIcon.on('pointerout', function(){
             hideToolTip();
         });
     this.protUpgradeShopIcon.setInteractive();
         this.protUpgradeShopIcon.on('pointerover', function(){
-            DisplayTooltip(protUpgradeShopIcon.x, protUpgradeShopIcon.y, "PROTECTION", "Lets your train hit 1 rock", protUpgradeShopIcon.alpha);
+            DisplayTooltip(protUpgradeShopIcon.x, protUpgradeShopIcon.y, "PROTECTION", "Lets your train survive\none deadly hit", protUpgradeShopIcon.alpha);
         });
         this.protUpgradeShopIcon.on('pointerout', function(){
             hideToolTip();
@@ -258,12 +266,19 @@ function hideToolTip(){
 
 function updateAbilities(scene){
     jumpAbility.setAlpha(0.2);
+    this.jumpKey1.setAlpha(0.2);
+    this.jumpKey2.setAlpha(0.2);
+    this.boostKey.setAlpha(0.2);
+
     if (scene.player_upgrades["jump"] > 0){
         jumpAbility.setAlpha(1);
+        this.jumpKey1.setAlpha(1);
+        this.jumpKey2.setAlpha(1);
     }
     boostAbility.setAlpha(0.2);
     if (scene.player_upgrades["speed boost"] > 0){
         boostAbility.setAlpha(1);
+        boostKey.setAlpha(1);
     }
     protAbility.setAlpha(0.2);
     if (scene.player_upgrades["protection"] > 0){
