@@ -139,7 +139,7 @@ class PlayGame extends Phaser.Scene {
         this.train.x += this.train.displayWidth*2;
 
         initSpawn(this);
-        this.train.wagons.push(new Wagon(this, this.train.x-this.train.wagon_offset, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
+        //this.train.wagons.push(new Wagon(this, this.train.x-this.train.wagon_offset, this.train.y, 'basic_passenger_wagon', this.train.onTrack));
         /*
         // if you want to add another wagon
         let recent_wagon = this.train.wagons[this.train.wagons.length-1];
