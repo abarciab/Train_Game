@@ -22,7 +22,7 @@ class PlayGame extends Phaser.Scene {
     create() {
         //sound effects: in the future, store inside of a dictionary: key = sound name, value = actual sound
         this.junctionSwitchSfx = this.sound.add('junction_switch', {volume: 0.5, rate: 1.5});
-        this.backgroundMusic = this.sound.add('backgroundMusic', {volume: 0.8, loop: true});
+        this.backgroundMusic = this.sound.add('backgroundMusic', {volume: 0.4, loop: true});
         this.trainSound = this.sound.add('train_on_rails', {volume: .3, loop: true});
         this.crashSound = this.sound.add('crash_sound', {volume: 0.1});
         this.coinSound = this.sound.add('coin_pickup', {volume: 0.7});
