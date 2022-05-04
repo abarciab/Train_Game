@@ -54,10 +54,10 @@ class PlayGame extends Phaser.Scene {
         this.stations = [];         // list of stations.
         this.enemy_trains = []      // list of enemy trains
         this.coins = [];            // dict of coins
-        this.currency = 50000;
+        this.currency = 0;
         this.station_spawn_table = [0, 0, 0, 10, 10, 10, 20, 20, 20, 30];
         this.station_spawn_index = 0;
-        this.trainyard_spawn_table = [100];
+        this.trainyard_spawn_table = [];
         this.trainyard_spawn_index = 0;
         this.station_types = ["red square", "blue circle", "green triangle"];
         this.station_type_index = 0;
@@ -69,10 +69,10 @@ class PlayGame extends Phaser.Scene {
             this.chosen = false;
         }
         this.upgrades = [
-            new Upgrade("jump", 100, 5),
-            new Upgrade("extra wagon", 1000, 2),
-            new Upgrade("protection", 250, 3),
-            new Upgrade("speed boost", 500, 3)
+            new Upgrade("jump", 500, 5),
+            new Upgrade("extra wagon", 2500, 2),
+            new Upgrade("protection", 750, 3),
+            new Upgrade("speed boost", 1000, 3)
         ];
         // upgrades available to the player
         this.player_upgrades = {
@@ -499,8 +499,11 @@ class PlayGame extends Phaser.Scene {
             // once stopped, enter station
             else if (this.stations[i].arriving_status == 2) {
                 if (this.stations[i].station_type != "trainyard") {
-                    this.enterStation(this.stations[i]);
-                    this.stations[i].arriving_status = 3;
+                    if (this.enterStation(this.stations[i])) {
+                        this.stations[i].arriving_status = 4;
+                    }
+                    else
+                        this.stations[i].arriving_status = 3;
                 }
                 else {
                     this.enterTrainyard(this.stations[i]);
@@ -508,6 +511,7 @@ class PlayGame extends Phaser.Scene {
             }
             // when done with station, leave station
             else if (this.stations[i].arriving_status == 4) {
+                console.log("leave station");
                 let acc_dist = Math.abs((this.stations[i].station_point + this.stations[i].x)-this.train.x);
                 this.speed = this.speedLock * (acc_dist / this.stations[i].station_point);
                 if (this.speed < 1) this.speed = 1;
@@ -580,8 +584,13 @@ class PlayGame extends Phaser.Scene {
                 stationTime++;
             }
         });
+        if (stationTime == 0 && this.train.passengers.length >= this.train.capacity) {
+            return true;
+        }
         stationTime = 2000 / (stationTime + 1);
         lock = this.stationRecurOff(station, stationTime, 0);
+        station.arriving_status = 4;
+        return false;
     }
 
     stationRecurOff(station, stationTime, position) {
@@ -612,7 +621,8 @@ class PlayGame extends Phaser.Scene {
     }
 
     stationRecurOn(station, stationTime, position) {
-        if (position > station.passengers.length - 1 || this.train.passengers.length == this.train.capacity) {     
+        if (position > station.passengers.length - 1 || this.train.passengers.length >= this.train.capacity) {   
+            console.log(position, this.train.passengers.length, this.train.capacity)  
             this.fuel = this.train.fuelCapacity;
             this.train.moving = true;
             station.arriving_status = 4;
