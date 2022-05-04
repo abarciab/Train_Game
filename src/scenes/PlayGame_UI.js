@@ -135,7 +135,6 @@ function StartUI(scene){
     this.exitTrainyardText = scene.add.text(game.config.width/2, this.exitTrainyardButton.y, "Exit Trainyard", {color: '#FFFFFF', fontSize: '35px'}).setDepth(23).setOrigin(0.5).setVisible(false);
     this.exitTrainyardButton.setInteractive();
     this.exitTrainyardButton.on('pointerdown', function(){
-        console.log("CLOSE");
         scene.cameras.main.shake(50, 0.002);
         CloseTrainyardUI(this);
     })
@@ -327,20 +326,19 @@ function DisplayTrainyardUI(scene, trainyard){
 
 
     this.shopItems.forEach(item =>{
+        let price = item.price + (item.price * item.num_bought);
         if (item.name == "jump"){
-            this.jumpPrice.text = item.price;
-        
-            if  (scene.currency >= item.price){
-            this.jumpPrice.clearTint();
-            this.jumpUpgradeShopIcon.setAlpha(1);
-            this.jumpPrice.setAlpha(1);
-            this.jumpBuyButton.setAlpha(1);
+            this.jumpPrice.text = price;
+            if (scene.currency >= price){
+                this.jumpPrice.clearTint();
+                this.jumpUpgradeShopIcon.setAlpha(1);
+                this.jumpPrice.setAlpha(1);
+                this.jumpBuyButton.setAlpha(1);
             }
         }
         if (item.name == "speed boost"){
-            this.boostPrice.text = item.price;
-        
-            if (scene.currency >= item.price){
+            this.boostPrice.text = price;
+            if (scene.currency >= price){
                 this.boostPrice.clearTint();
                 this.boostUpgradeShopIcon.setAlpha(1);
                 this.boostPrice.setAlpha(1);
@@ -349,8 +347,11 @@ function DisplayTrainyardUI(scene, trainyard){
         }
 
         if (item.name == "extra wagon"){
-            this.wagonPrice.text = item.price;
-            if (scene.currency >= item.price){
+            if (item.num_bought >= item.max)
+                this.wagonPrice.text = "-";
+            else
+                this.wagonPrice.text = price;
+            if (scene.currency >= price){
                 this.wagonPrice.clearTint();
                 this.wagonUpgradeShopIcon.setAlpha(1);
                 this.wagonPrice.setAlpha(1);
@@ -358,8 +359,8 @@ function DisplayTrainyardUI(scene, trainyard){
             }
         }
         if (item.name == "protection"){
-            this.protPrice.text = item.price;
-            if ( scene.currency >= item.price){
+            this.protPrice.text = price;
+            if ( scene.currency >= price){
                 this.protPrice.clearTint();
                 this.protUpgradeShopIcon.setAlpha(1);
                 this.protPrice.setAlpha(1);
@@ -498,7 +499,6 @@ function RemovePassengerIcons(scene, stationName){
         if (passengerIcon.passengerObj.destination == stationName || !passengerIcon.passengerObj.goodReview){
             
             if (passengerIcon.goodReview != false){
-                console.log("good review");
                 scene.sound.play('good_review', {volume: 0.8});
             }
 
@@ -536,7 +536,6 @@ function removePassengerIcon(scene, passenger){
     let passengerIcon = passenger.passengerIcon;
 
     if (passengerIcon.goodReview != false){
-        console.log("good review");
         scene.sound.play('good_review', {volume: 0.8});
     } 
 
@@ -597,7 +596,6 @@ class PassengerIcon extends Phaser.GameObjects.Sprite {
 }
 
 function EndGameUI(scene){
-    //console.log("endGame");
 
     this.darkColorBack.setVisible(true);
     this.gameOverBackground.setVisible(true);
