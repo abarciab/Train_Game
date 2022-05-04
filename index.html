@@ -4,10 +4,20 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preload" as="font" href="./assets/UI/CaviarDreams_Bold.ttf" type="font/ttf" />
     <title>Loco Locomotive</title>
+
+    <style>
+        @font-face {
+        font-family: caviarDream;
+        src: url('./assets/UI/CaviarDreams.ttf');
+        }
+    </style>
+    
 </head>
 <body style="text-align: center">
     <script src="./lib/phaser.js"></script>
+    
     <script src="./src/scenes/PlayGame_UI.js"></script>
     <script src="./src/GenerateWorld.js"></script>
     <script src="./src/prefabs/Passenger.js"></script>

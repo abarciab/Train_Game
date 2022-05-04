@@ -16,19 +16,21 @@ class PlayGame extends Phaser.Scene {
         this.load.audio('jump', './assets/sound effects/jump.wav');
         this.load.audio('boost', './assets/sound effects/boost.wav');
         this.load.audio('hit', './assets/sound effects/hit.wav');
+        this.load.audio('train horn', './assets/sound effects/train_horn.wav');
         LoadUI(this);
     }
 
     create() {
         //sound effects: in the future, store inside of a dictionary: key = sound name, value = actual sound
         this.junctionSwitchSfx = this.sound.add('junction_switch', {volume: 0.5, rate: 1.5});
-        this.backgroundMusic = this.sound.add('backgroundMusic', {volume: 0.8, loop: true});
+        this.backgroundMusic = this.sound.add('backgroundMusic', {volume: 0.4, loop: true});
         this.trainSound = this.sound.add('train_on_rails', {volume: .3, loop: true});
         this.crashSound = this.sound.add('crash_sound', {volume: 0.1});
         this.coinSound = this.sound.add('coin_pickup', {volume: 0.7});
         this.jumpSound = this.sound.add('jump');
         this.boostSound = this.sound.add('boost', {volume: 0.6});
         this.hitSound = this.sound.add('hit', {volume: 0.3});
+        this.hornSound = this.sound.add('train horn', {volume: 0.4});
         this.backgroundMusic.play();
 
         this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'field_background').setOrigin(0, 0);
@@ -79,8 +81,8 @@ class PlayGame extends Phaser.Scene {
             this.chosen = false;
         }
         this.upgrades = [
-            new Upgrade("jump", 100, 5),
-            new Upgrade("extra wagon", 1000, 2),
+            new Upgrade("jump", 200, 5),
+            new Upgrade("extra wagon", 2500, 2),
             new Upgrade("protection", 250, 3),
             new Upgrade("speed boost", 500, 3)
         ];
@@ -174,7 +176,6 @@ class PlayGame extends Phaser.Scene {
             this.speed = 0;
             this.gameOver = true;
             this.backgroundMusic.stop();
-            console.log("YOU DIED");
             EndGameUI(this);
         }
 
@@ -204,7 +205,6 @@ class PlayGame extends Phaser.Scene {
             // if they would crash into an obstacle
             for (let j = 0; j < this.nodes[this.enemy_trains[i].onTrack].length; j++) {
                 if (this.checkObstacleCollision(this.enemy_trains[i], this.nodes[this.enemy_trains[i].onTrack][j])) {
-                    console.log("train crashed");
                     if (this.enemy_trains[i].x < config.width)
                         this.crashSound.play();
                     this.enemy_trains[i].enemy_indicator.setVisible(false);
@@ -220,7 +220,6 @@ class PlayGame extends Phaser.Scene {
                     this.crashSound.play();
                     if (this.player_upgrades["protection"] != 0 || this.train.speed_boost) {
                         if (!this.train.speed_boost) {
-                            console.log("protection used");
                             this.player_upgrades["protection"]--;
                         }
                         this.enemy_trains[i].destroy();
@@ -275,7 +274,6 @@ class PlayGame extends Phaser.Scene {
                 this.speed = this.speedLock;
                 this.train.speed_boost = false;
                 this.train.slow_down = false;
-                console.log("speed boost over");
             }
         }
         this.dist += (delta/1000) * this.speed;
@@ -340,7 +338,6 @@ class PlayGame extends Phaser.Scene {
                         this.hitSound.play();
                         if (!this.train.speed_boost) {
                             this.player_upgrades["protection"]--;
-                            console.log("protection used");
                         }
                         this.nodes[i][j].obstacle.setVisible(false);
                         // play destroy animation
@@ -351,7 +348,6 @@ class PlayGame extends Phaser.Scene {
                             this.crashSound.play();
                             this.train.health = 0;
                         } else if (this.nodes[i][j].obstacle_type == 2) {
-                            console.log("hit stick");
                             this.hitSound.play();
                             this.train.health -= 4;
                             this.train.passengers.forEach(element => {
@@ -404,15 +400,8 @@ class PlayGame extends Phaser.Scene {
                             this.turn_time = (delta)*(this.train.junction_wid / this.train.speed);
                             this.train.turning = true;
                             this.train.turn_dest = this.nodes[this.train.onTrack][j].y;
-                            /*let firstSouth = this.time.delayedCall(this.turn_time/4, () => {
-                                //this.train.play("turnSouth");
-                                let secondSouth = this.time.delayedCall(this.turn_time/2, () => {
-                                    this.train.play("noTurn");
-                                });
-                            });*/
                             break;
                         default:
-                            console.log("invalid dir");
                             break;
                     }
                 }
@@ -500,8 +489,11 @@ class PlayGame extends Phaser.Scene {
             // once stopped, enter station
             else if (this.stations[i].arriving_status == 2) {
                 if (this.stations[i].station_type != "trainyard") {
-                    this.enterStation(this.stations[i]);
-                    this.stations[i].arriving_status = 3;
+                    if (this.enterStation(this.stations[i])) {
+                        this.stations[i].arriving_status = 4;
+                    }
+                    else
+                        this.stations[i].arriving_status = 3;
                 }
                 else {
                     this.enterTrainyard(this.stations[i]);
@@ -511,6 +503,10 @@ class PlayGame extends Phaser.Scene {
             else if (this.stations[i].arriving_status == 4) {
                 let acc_dist = Math.abs((this.stations[i].station_point + this.stations[i].x)-this.train.x);
                 this.speed = this.speedLock * (acc_dist / this.stations[i].station_point);
+                if (!this.stations[i].leaving) {
+                    this.hornSound.play();
+                    this.stations[i].leaving = true;
+                }
                 if (this.speed < 1) this.speed = 1;
                 if (this.speed >= this.speedLock) {
                     this.stations[i].arriving_status = 5;
@@ -529,13 +525,13 @@ class PlayGame extends Phaser.Scene {
     }
 
     updateEvents(delta) {
-        // A and D key exists for debug rn to test with variable speeds
-        if (left_key.isDown && this.speed > 0){
+        // debug keys to test speed
+        /*if (left_key.isDown && this.speed > 0){
             this.speed -= 1;
         }
         if (right_key.isDown && this.speed < 50) {
             this.speed += 1;
-        }
+        }*/
         let can_use_ability = function(scene, ability) {
             return (scene.player_upgrades[ability] && scene.train.atStation==0)
         }
@@ -581,8 +577,13 @@ class PlayGame extends Phaser.Scene {
                 stationTime++;
             }
         });
+        if (stationTime == 0 && this.train.passengers.length >= this.train.capacity) {
+            return true;
+        }
         stationTime = 2000 / (stationTime + 1);
         lock = this.stationRecurOff(station, stationTime, 0);
+        station.arriving_status = 4;
+        return false;
     }
 
     stationRecurOff(station, stationTime, position) {
@@ -613,7 +614,7 @@ class PlayGame extends Phaser.Scene {
     }
 
     stationRecurOn(station, stationTime, position) {
-        if (position > station.passengers.length - 1 || this.train.passengers.length == this.train.capacity) {     
+        if (position > station.passengers.length - 1 || this.train.passengers.length >= this.train.capacity) {   
             this.fuel = this.train.fuelCapacity;
             this.train.moving = true;
             station.arriving_status = 4;
@@ -635,7 +636,6 @@ class PlayGame extends Phaser.Scene {
         this.train.moving = false;
         // display the UI. UI will set arrived status to 3 once it is done.
         if (DisplayTrainyardUI(this, trainyard) == "DONE"){
-            console.log("message recieved");
             this.train.moving = true;
             trainyard.arriving_status = 4;
         }
@@ -643,10 +643,8 @@ class PlayGame extends Phaser.Scene {
 
     buyAbility(ability) {
         if (!ability in this.player_upgrades) {
-            console.log("invalid ability");
             return;
         }
-        console.log("buy ability"); 
         this.player_upgrades[ability]++;
         for (let i = 0; i < this.upgrades.length; i++) {
             if (this.upgrades[i].name == ability) {
@@ -661,8 +659,7 @@ class PlayGame extends Phaser.Scene {
                     this.train.num_wagons++;
                     this.train.capacity += 5;
                 }
-                console.log("currency:", this.currency, "- ", this.upgrades[i].price);
-                this.currency -= this.upgrades[i].price;
+                this.currency -= (this.upgrades[i].price + (this.upgrades[i].num_bought * this.upgrades[i].price));
                 this.upgrades[i].num_bought++;
                 break;
             }

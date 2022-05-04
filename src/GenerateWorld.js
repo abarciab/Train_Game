@@ -429,7 +429,6 @@ function spawnStation(scene, x, y) {
         scene.stations.push(new Station(scene, x, y, "station", scene.train.onTrack, station_type, passengers));
     }
     else {
-        console.log("spawn trainyard");
         scene.stations.push(new Station(scene, x, y, "station", scene.train.onTrack, "trainyard", scene.upgrades));
     }
 }

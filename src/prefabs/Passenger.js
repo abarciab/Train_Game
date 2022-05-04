@@ -16,31 +16,20 @@ class Passenger extends Phaser.GameObjects.Sprite {
         this.scaleY = scene.scaling;
         this.visible = false;
     }
-    /*
-        boardTrain(scene){
-            addPassengerUI(scene, this);
-        }
 
-        disembark(scene){
-            //console.log("I got off the train!");
-        }
-    }*/
     checkStationOn(scene){
         if (scene.train.passengers.length < scene.train.capacity) {
             this.onTrain = true;
             this.boardTrain(scene);
             scene.train.passengers.push(this);
-            //console.log("Passenger got on train");
             return true;
         }
         if (scene.train.passengers.length == scene.train.capacity) {
-            //console.log("Full train!");
             return false;
         }
     }
 
     boardTrain(scene){
-        console.log(this.destination);
         addPassengerUI(scene, this);
     }
 
@@ -49,26 +38,21 @@ class Passenger extends Phaser.GameObjects.Sprite {
             this.onTrain = false;
             if (this.goodReview == false) {
                 scene.train.health -= 2;
-                //console.log("Bad review");
             } else {
                 if (scene.train.health < scene.train.healthCapacity) {
                     scene.train.health += 1;
                 }
                 scene.currency += 250;
-                //console.log("Good review");
             }
             scene.train.passengers.splice(scene.train.passengers.indexOf(this), 1);
             this.disembark(scene);
             return true;
-            //console.log("Passenger got off train (happy)");
         } else if (!this.goodReview) {
             this.onTrain = false;
             scene.train.health -= 4;
-            //console.log("Terrible review!");
             scene.train.passengers.splice(scene.train.passengers.indexOf(this), 1);
             this.disembark(scene);
             return true;
-            //console.log("Passenger got off train (angry)");
         } else {
             return false;
         }
