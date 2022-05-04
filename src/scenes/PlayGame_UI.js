@@ -519,11 +519,11 @@ function RemovePassengerIcons(scene, stationName){
         passengerIcon.x = this.front + (scene.UIConfig.iconGap * (i+1));
         passengerIcon.patienceBar.x = this.front + (scene.UIConfig.iconGap * (i+1));
 
-        if (i > 5){
+        if (i >= 5){
             passengerIcon.x += this.wagonGap;
             passengerIcon.patienceBar.x += this.wagonGap;
         }
-        if (i > 10){
+        if (i >= 10){
             passengerIcon.x += this.wagonGap;
             passengerIcon.patienceBar.x += this.wagonGap;        
         }
