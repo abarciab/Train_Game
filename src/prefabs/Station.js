@@ -21,6 +21,7 @@ class Station extends Phaser.GameObjects.Sprite {
         this.no_junc = true;
         this.spawned = false;
         this.stoppedAt = false;
+        this.leaving = false;
         /*
         arriving status:
             0: not arrived

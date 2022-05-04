@@ -133,7 +133,6 @@ class Train extends Phaser.GameObjects.Sprite {
                 if (!this.wagons[i].turning && this.wagons[i].onTrack != this.onTrack) {
                     this.wagons[i].onTrack = this.onTrack;
                     if (this.wagons_jumping) {
-                        console.log("wagons jump")
                         this.wagons[i].jumping = true;
                     }
                     this.wagons[i].jump_speed = this.jump_speed;
